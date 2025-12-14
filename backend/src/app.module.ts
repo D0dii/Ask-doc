@@ -1,9 +1,16 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { RagModule } from './rag/rag.module';
 
 @Module({
-  imports: [],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true, // Makes ConfigService available globally
+    }),
+    RagModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
