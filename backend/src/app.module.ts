@@ -7,7 +7,7 @@ import { RagModule } from './rag/rag.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true, // Makes ConfigService available globally
+      isGlobal: true,
     }),
     RagModule,
   ],

@@ -10,7 +10,7 @@ import { extractTextFromPdf } from './utils/pdf.util';
 export class RagService implements OnModuleInit {
   private readonly logger = new Logger(RagService.name);
   private qdrant: QdrantClient;
-  private readonly COLLECTION_NAME = 'context_docs';
+  private readonly COLLECTION_NAME = 'ask_doc';
 
   constructor() {
     this.qdrant = new QdrantClient({

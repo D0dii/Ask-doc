@@ -23,14 +23,12 @@ export class RagController {
     if (!file) {
       throw new BadRequestException('File is required');
     }
-
     // 1. Generate a generic File ID (We will use a real DB later)
     const fileId = uuidv4();
 
     // 2. Trigger Ingestion
     // Note: For now, we await it to verify it works.
     // Later, we will remove 'await' for the "Fire and Forget" feature.
-    console.log(file);
     await this.ragService.ingestFile(file.buffer, sessionId, fileId);
 
     return {
