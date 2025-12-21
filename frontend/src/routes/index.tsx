@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
@@ -29,37 +30,30 @@ function App() {
   }, []);
 
   return (
-    <div style={{ padding: "50px", textAlign: "center" }}>
-      <h1>Simple Google Login</h1>
+    <div className="p-12 text-center">
+      <h1 className="text-4xl font-bold mb-6">Simple Google Login</h1>
 
       {!user ? (
         /* --- STATE 1: NOT LOGGED IN --- */
-        <a
-          href="http://localhost:3000/auth/google"
-          style={{
-            padding: "10px 20px",
-            backgroundColor: "#DB4437",
-            color: "white",
-            textDecoration: "none",
-            borderRadius: "5px",
-            fontSize: "18px",
-          }}
-        >
-          Sign in with Google
-        </a>
+        <div>
+          <a
+            href="http://localhost:3000/auth/google"
+            className="inline-block bg-red-600 text-white no-underline rounded-md px-5 py-2 text-lg hover:bg-red-700"
+          >
+            Sign in with Google
+          </a>
+          <Button>Test Button</Button>
+        </div>
       ) : (
         /* --- STATE 2: LOGGED IN (PROFILE) --- */
-        <div
-          style={{ border: "1px solid #ccc", padding: "20px", borderRadius: "10px", display: "inline-block" }}
-        >
-          <img
-            src={user.picture}
-            alt="Profile"
-            style={{ borderRadius: "50%", width: "100px", height: "100px" }}
-          />
-          <h2>Welcome, {user.firstName}!</h2>
-          <p>{user.email}</p>
-          <button onClick={() => setUser(null)} style={{ marginTop: "10px" }}>
+        <div className="border border-gray-300 p-6 rounded-lg inline-block">
+          <img src={user.picture} alt="Profile" className="rounded-full w-24 h-24 mx-auto" />
+          <h2 className="text-xl font-semibold mt-4">Welcome, {user.firstName}!</h2>
+          <p className="text-sm text-gray-600">{user.email}</p>
+          <button
+            onClick={() => setUser(null)}
+            className="mt-4 bg-gray-200 px-3 py-2 rounded hover:bg-gray-300"
+          >
             Logout
           </button>
         </div>
