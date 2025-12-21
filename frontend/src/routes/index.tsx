@@ -1,4 +1,9 @@
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+
+export const Route = createFileRoute("/")({
+  component: App,
+});
 
 function App() {
   const [user, setUser] = useState<any>(null);
@@ -62,5 +67,3 @@ function App() {
     </div>
   );
 }
-
-export default App;
