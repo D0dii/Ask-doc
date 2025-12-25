@@ -5,14 +5,29 @@ import {
   UseInterceptors,
   Body,
   BadRequestException,
+  Get,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { RagService } from './rag.service';
 import { v4 as uuidv4 } from 'uuid';
+import { ApiProperty, ApiResponse } from '@nestjs/swagger';
 
+class FileResponseDto {
+  @ApiProperty()
+  id: string;
+
+  @ApiProperty()
+  name: string;
+}
 @Controller('rag')
 export class RagController {
   constructor(private readonly ragService: RagService) {}
+
+  @Get('files')
+  @ApiResponse({ type: [FileResponseDto] }) // Tell Swagger what this returns
+  getFiles(): FileResponseDto[] {
+    return [{ id: '1', name: 'test' }];
+  }
 
   @Post('ingest')
   @UseInterceptors(FileInterceptor('file'))

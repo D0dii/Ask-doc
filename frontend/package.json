@@ -7,11 +7,13 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "openapi-ts": "openapi-ts"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.4",
     "@tailwindcss/vite": "^4.1.18",
+    "@tanstack/react-query": "^5.90.12",
     "@tanstack/react-router": "^1.141.8",
     "@tanstack/react-router-devtools": "^1.141.8",
     "class-variance-authority": "^0.7.1",
@@ -24,6 +26,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@hey-api/openapi-ts": "^0.89.2",
     "@tanstack/router-plugin": "^1.142.0",
     "@types/node": "^24.10.4",
     "@types/react": "^19.2.5",

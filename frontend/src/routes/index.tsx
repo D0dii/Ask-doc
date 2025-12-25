@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { ragControllerGetFilesOptions } from "@/client/@tanstack/react-query.gen";
+import { useQuery } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/")({
   component: App,
@@ -8,7 +10,10 @@ export const Route = createFileRoute("/")({
 
 function App() {
   const [user, setUser] = useState<any>(null);
-
+  const { data, isLoading, error } = useQuery({
+    ...ragControllerGetFilesOptions(),
+  });
+  console.log(data);
   useEffect(() => {
     // 1. Check if URL has a token (sent by Backend)
     const params = new URLSearchParams(window.location.search);
@@ -58,6 +63,20 @@ function App() {
           </button>
         </div>
       )}
+      <div className="mt-8">
+        {isLoading && <p className="text-sm text-gray-500">Loading files...</p>}
+        {error && <p className="text-sm text-red-500">Failed to load files</p>}
+        {data && Array.isArray(data) && (
+          <div className="mt-4 text-left max-w-xl mx-auto">
+            <h3 className="text-lg font-medium mb-2">Files</h3>
+            <ul className="list-disc list-inside text-sm text-gray-700">
+              {data.map((f: any) => (
+                <li key={f.id ?? f.fileId ?? JSON.stringify(f)}>{f.name ?? f.text ?? JSON.stringify(f)}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
