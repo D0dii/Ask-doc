@@ -8,30 +8,61 @@ export const Route = createFileRoute("/")({
   component: App,
 });
 
+const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
+
+type MeResponse = {
+  id: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  picture?: string;
+  isAdmin: boolean;
+};
+
+async function fetchMe(): Promise<MeResponse | null> {
+  const res = await fetch(`${API_URL}/auth/me`, {
+    credentials: "include",
+  });
+
+  if (res.ok) {
+    return res.json();
+  }
+
+  if (res.status === 401) {
+    const refresh = await fetch(`${API_URL}/auth/refresh`, {
+      method: "POST",
+      credentials: "include",
+    });
+    if (refresh.ok) {
+      const res2 = await fetch(`${API_URL}/auth/me`, {
+        credentials: "include",
+      });
+      const me = await res2.json();
+      console.log(me);
+      return res2.ok ? me : null;
+    }
+  }
+
+  return null;
+}
+
+async function logoutRequest() {
+  await fetch(`${API_URL}/auth/logout`, {
+    method: "POST",
+    credentials: "include",
+  });
+}
+
 function App() {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<MeResponse | null>(null);
   const { data, isLoading, error } = useQuery({
     ...ragControllerGetFilesOptions(),
   });
-  console.log(data);
+
   useEffect(() => {
-    // 1. Check if URL has a token (sent by Backend)
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get("token");
-
-    if (token) {
-      // 2. Simple decode (JSON.parse the middle part of JWT)
-      // In production, use 'jwt-decode' library
-      try {
-        const payload = JSON.parse(atob(token.split(".")[1]));
-        setUser(payload);
-
-        // Optional: Clean URL
-        window.history.replaceState({}, document.title, "/");
-      } catch (e) {
-        console.error("Invalid token");
-      }
-    }
+    fetchMe()
+      .then((u) => setUser(u))
+      .catch((e) => console.error(e));
   }, []);
 
   return (
@@ -42,7 +73,7 @@ function App() {
         /* --- STATE 1: NOT LOGGED IN --- */
         <div>
           <a
-            href="http://localhost:3000/auth/google"
+            href={`${API_URL}/auth/google`}
             className="inline-block bg-red-600 text-white no-underline rounded-md px-5 py-2 text-lg hover:bg-red-700"
           >
             Sign in with Google
@@ -56,7 +87,10 @@ function App() {
           <h2 className="text-xl font-semibold mt-4">Welcome, {user.firstName}!</h2>
           <p className="text-sm text-gray-600">{user.email}</p>
           <button
-            onClick={() => setUser(null)}
+            onClick={async () => {
+              await logoutRequest();
+              setUser(null);
+            }}
             className="mt-4 bg-gray-200 px-3 py-2 rounded hover:bg-gray-300"
           >
             Logout

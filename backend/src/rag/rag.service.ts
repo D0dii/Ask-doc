@@ -1,4 +1,5 @@
 import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { google } from '@ai-sdk/google';
 import { embedMany } from 'ai';
@@ -12,9 +13,12 @@ export class RagService implements OnModuleInit {
   private qdrant: QdrantClient;
   private readonly COLLECTION_NAME = 'ask_doc';
 
-  constructor() {
+  constructor(private configService: ConfigService) {
     this.qdrant = new QdrantClient({
-      url: process.env.QDRANT_URL || 'http://localhost:6333',
+      url: this.configService.get<string>(
+        'QDRANT_URL',
+        'http://localhost:6333',
+      ),
     });
   }
 
