@@ -9,32 +9,19 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AuthGuard } from '@nestjs/passport';
-import type { Request, Response } from 'express';
-import { JwtService } from '@nestjs/jwt';
-import { UsersService } from '../users/users.service';
+import type { Response } from 'express';
 import { AuthService } from './auth.service';
-
-type GoogleUser = {
-  email: string;
-  firstName?: string;
-  lastName?: string;
-  picture?: string;
-  accessToken?: string;
-};
-
-type AuthedRequest = Request & { user?: GoogleUser };
-type CookieBag = {
-  access_token?: string;
-  refresh_token?: string;
-};
-type CookieRequest = Request & { cookies: CookieBag };
+import type {
+  AuthedRequest,
+  CookieRequest,
+  UserRequest,
+} from './types/auth.types';
+import { JwtCookieGuard } from './guards/jwt-cookie.guard';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private configService: ConfigService,
-    private jwtService: JwtService,
-    private usersService: UsersService,
     private authService: AuthService,
   ) {}
 
@@ -68,38 +55,18 @@ export class AuthController {
   }
 
   @Get('me')
-  async me(@Req() req: CookieRequest, @Res() res: Response) {
-    const accessToken = req.cookies?.access_token;
-    console.log(accessToken);
-    if (!accessToken) {
-      return res.status(401).send('Not authenticated');
-    }
+  @UseGuards(JwtCookieGuard)
+  me(@Req() req: UserRequest, @Res() res: Response) {
+    const user = req.user;
 
-    try {
-      const payload = this.jwtService.verify<{
-        sub: string;
-      }>(accessToken, {
-        secret: this.configService.get<string>('JWT_SECRET'),
-      });
-
-      const user = await this.usersService.findOne(payload.sub);
-
-      if (!user) {
-        return res.status(401).send('User not found');
-      }
-
-      return res.send({
-        id: user.id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        picture: user.picture,
-        isAdmin: user.isAdmin,
-      });
-    } catch (err) {
-      console.log(err);
-      return res.status(401).send('Invalid token');
-    }
+    return res.send({
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      picture: user.picture,
+      isAdmin: user.isAdmin,
+    });
   }
 
   @Post('refresh')

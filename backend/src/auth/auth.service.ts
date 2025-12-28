@@ -3,14 +3,7 @@ import { JwtService, type JwtSignOptions } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/user.entity';
-
-type GoogleProfileUser = {
-  email: string;
-  firstName?: string;
-  lastName?: string;
-  picture?: string;
-  accessToken?: string;
-};
+import { GoogleProfileUser } from './types/auth.types';
 
 @Injectable()
 export class AuthService {
