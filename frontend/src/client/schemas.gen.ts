@@ -4,14 +4,313 @@ export const FileResponseDtoSchema = {
     type: 'object',
     properties: {
         id: {
-            type: 'string'
+            type: 'string',
+            description: 'File ID'
         },
         name: {
-            type: 'string'
+            type: 'string',
+            description: 'File name'
+        },
+        originalName: {
+            type: 'string',
+            description: 'Original file name'
+        },
+        mimeType: {
+            type: 'string',
+            description: 'MIME type of the file'
+        },
+        size: {
+            type: 'number',
+            description: 'File size in bytes'
+        },
+        status: {
+            type: 'string',
+            description: 'Processing status',
+            enum: [
+                'pending',
+                'processing',
+                'completed',
+                'failed'
+            ],
+            example: 'pending'
+        },
+        errorMessage: {
+            type: 'string',
+            description: 'Error message if processing failed'
+        },
+        workspaceId: {
+            type: 'string',
+            description: 'Workspace ID this file belongs to'
+        },
+        createdAt: {
+            format: 'date-time',
+            type: 'string',
+            description: 'Created timestamp'
+        },
+        updatedAt: {
+            format: 'date-time',
+            type: 'string',
+            description: 'Updated timestamp'
         }
     },
     required: [
         'id',
+        'name',
+        'originalName',
+        'mimeType',
+        'size',
+        'status',
+        'workspaceId',
+        'createdAt',
+        'updatedAt'
+    ]
+} as const;
+
+export const IngestResponseDtoSchema = {
+    type: 'object',
+    properties: {
+        message: {
+            type: 'string',
+            description: 'Status message'
+        },
+        fileId: {
+            type: 'string',
+            description: 'File ID'
+        },
+        status: {
+            type: 'string',
+            description: 'Current processing status',
+            enum: [
+                'pending',
+                'processing',
+                'completed',
+                'failed'
+            ],
+            example: 'processing'
+        }
+    },
+    required: [
+        'message',
+        'fileId',
+        'status'
+    ]
+} as const;
+
+export const QueryDtoSchema = {
+    type: 'object',
+    properties: {
+        question: {
+            type: 'string',
+            description: 'The question to ask about the documents',
+            example: 'What is the main topic of the document?',
+            minLength: 3,
+            maxLength: 1000
+        }
+    },
+    required: [
+        'question'
+    ]
+} as const;
+
+export const SourceDtoSchema = {
+    type: 'object',
+    properties: {
+        fileId: {
+            type: 'string',
+            description: 'The file ID this chunk belongs to'
+        },
+        text: {
+            type: 'string',
+            description: 'The text content of the chunk'
+        },
+        score: {
+            type: 'number',
+            description: 'Similarity score (0-1)'
+        }
+    },
+    required: [
+        'fileId',
+        'text',
+        'score'
+    ]
+} as const;
+
+export const QueryResponseDtoSchema = {
+    type: 'object',
+    properties: {
+        answer: {
+            type: 'string',
+            description: 'The AI-generated answer'
+        },
+        sources: {
+            description: 'Source documents used to generate the answer',
+            type: 'array',
+            items: {
+                $ref: '#/components/schemas/SourceDto'
+            }
+        }
+    },
+    required: [
+        'answer',
+        'sources'
+    ]
+} as const;
+
+export const CreateWorkspaceDtoSchema = {
+    type: 'object',
+    properties: {
+        name: {
+            type: 'string',
+            description: 'Name of the workspace',
+            example: 'My Project',
+            maxLength: 255
+        },
+        description: {
+            type: 'string',
+            description: 'Optional description of the workspace',
+            example: 'A workspace for my project documents'
+        }
+    },
+    required: [
         'name'
+    ]
+} as const;
+
+export const WorkspaceResponseDtoSchema = {
+    type: 'object',
+    properties: {
+        id: {
+            type: 'string',
+            description: 'Unique identifier of the workspace',
+            example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890'
+        },
+        name: {
+            type: 'string',
+            description: 'Name of the workspace',
+            example: 'My Project'
+        },
+        description: {
+            type: 'object',
+            description: 'Description of the workspace',
+            example: 'A workspace for my project documents',
+            nullable: true
+        },
+        ownerId: {
+            type: 'string',
+            description: 'ID of the workspace owner',
+            example: 'b2c3d4e5-f6a7-8901-bcde-f23456789012'
+        },
+        createdAt: {
+            format: 'date-time',
+            type: 'string',
+            description: 'Creation timestamp',
+            example: '2025-12-29T10:00:00.000Z'
+        },
+        updatedAt: {
+            format: 'date-time',
+            type: 'string',
+            description: 'Last update timestamp',
+            example: '2025-12-29T12:00:00.000Z'
+        }
+    },
+    required: [
+        'id',
+        'name',
+        'description',
+        'ownerId',
+        'createdAt',
+        'updatedAt'
+    ]
+} as const;
+
+export const UpdateWorkspaceDtoSchema = {
+    type: 'object',
+    properties: {
+        name: {
+            type: 'string',
+            description: 'Name of the workspace',
+            example: 'My Updated Project',
+            maxLength: 255
+        },
+        description: {
+            type: 'string',
+            description: 'Optional description of the workspace',
+            example: 'An updated description'
+        }
+    }
+} as const;
+
+export const UserResponseDtoSchema = {
+    type: 'object',
+    properties: {
+        id: {
+            type: 'string',
+            description: 'Unique identifier of the user',
+            example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890'
+        },
+        email: {
+            type: 'string',
+            description: 'Email address of the user',
+            example: 'user@example.com'
+        },
+        firstName: {
+            type: 'object',
+            description: 'First name of the user',
+            example: 'John',
+            nullable: true
+        },
+        lastName: {
+            type: 'object',
+            description: 'Last name of the user',
+            example: 'Doe',
+            nullable: true
+        },
+        picture: {
+            type: 'object',
+            description: 'Profile picture URL',
+            example: 'https://example.com/photo.jpg',
+            nullable: true
+        },
+        isAdmin: {
+            type: 'boolean',
+            description: 'Whether the user has admin privileges',
+            example: false
+        }
+    },
+    required: [
+        'id',
+        'email',
+        'firstName',
+        'lastName',
+        'picture',
+        'isAdmin'
+    ]
+} as const;
+
+export const RefreshResponseDtoSchema = {
+    type: 'object',
+    properties: {
+        ok: {
+            type: 'boolean',
+            description: 'Indicates the refresh was successful',
+            example: true
+        }
+    },
+    required: [
+        'ok'
+    ]
+} as const;
+
+export const LogoutResponseDtoSchema = {
+    type: 'object',
+    properties: {
+        ok: {
+            type: 'boolean',
+            description: 'Indicates the logout was successful',
+            example: true
+        }
+    },
+    required: [
+        'ok'
     ]
 } as const;

@@ -3,8 +3,8 @@
 import { type DefaultError, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { appControllerGetHello, authControllerGoogleAuth, authControllerGoogleAuthRedirect, type Options, ragControllerGetFiles, ragControllerIngest } from '../sdk.gen';
-import type { AppControllerGetHelloData, AuthControllerGoogleAuthData, AuthControllerGoogleAuthRedirectData, RagControllerGetFilesData, RagControllerGetFilesResponse, RagControllerIngestData } from '../types.gen';
+import { appControllerGetHello, authControllerGoogleAuth, authControllerLogout, authControllerMe, authControllerRefresh, type Options, queryControllerQuery, ragControllerDeleteFile, ragControllerGetFile, ragControllerGetFiles, ragControllerIngest, workspacesControllerCreate, workspacesControllerFindAll, workspacesControllerFindOne, workspacesControllerRemove, workspacesControllerUpdate } from '../sdk.gen';
+import type { AppControllerGetHelloData, AuthControllerGoogleAuthData, AuthControllerLogoutData, AuthControllerLogoutResponse, AuthControllerMeData, AuthControllerMeResponse, AuthControllerRefreshData, AuthControllerRefreshResponse, QueryControllerQueryData, QueryControllerQueryResponse, RagControllerDeleteFileData, RagControllerGetFileData, RagControllerGetFileResponse, RagControllerGetFilesData, RagControllerGetFilesResponse, RagControllerIngestData, RagControllerIngestResponse, WorkspacesControllerCreateData, WorkspacesControllerCreateResponse, WorkspacesControllerFindAllData, WorkspacesControllerFindAllResponse, WorkspacesControllerFindOneData, WorkspacesControllerFindOneResponse, WorkspacesControllerRemoveData, WorkspacesControllerUpdateData, WorkspacesControllerUpdateResponse } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
     Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
@@ -56,6 +56,9 @@ export const appControllerGetHelloOptions = (options?: Options<AppControllerGetH
 
 export const ragControllerGetFilesQueryKey = (options?: Options<RagControllerGetFilesData>) => createQueryKey('ragControllerGetFiles', options);
 
+/**
+ * Get all files in a workspace
+ */
 export const ragControllerGetFilesOptions = (options?: Options<RagControllerGetFilesData>) => queryOptions<RagControllerGetFilesResponse, DefaultError, RagControllerGetFilesResponse, ReturnType<typeof ragControllerGetFilesQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
         const { data } = await ragControllerGetFiles({
@@ -69,8 +72,11 @@ export const ragControllerGetFilesOptions = (options?: Options<RagControllerGetF
     queryKey: ragControllerGetFilesQueryKey(options)
 });
 
-export const ragControllerIngestMutation = (options?: Partial<Options<RagControllerIngestData>>): UseMutationOptions<unknown, DefaultError, Options<RagControllerIngestData>> => {
-    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<RagControllerIngestData>> = {
+/**
+ * Upload and ingest a PDF file
+ */
+export const ragControllerIngestMutation = (options?: Partial<Options<RagControllerIngestData>>): UseMutationOptions<RagControllerIngestResponse, DefaultError, Options<RagControllerIngestData>> => {
+    const mutationOptions: UseMutationOptions<RagControllerIngestResponse, DefaultError, Options<RagControllerIngestData>> = {
         mutationFn: async (fnOptions) => {
             const { data } = await ragControllerIngest({
                 ...options,
@@ -83,8 +89,150 @@ export const ragControllerIngestMutation = (options?: Partial<Options<RagControl
     return mutationOptions;
 };
 
+/**
+ * Delete a file
+ */
+export const ragControllerDeleteFileMutation = (options?: Partial<Options<RagControllerDeleteFileData>>): UseMutationOptions<unknown, DefaultError, Options<RagControllerDeleteFileData>> => {
+    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<RagControllerDeleteFileData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await ragControllerDeleteFile({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const ragControllerGetFileQueryKey = (options: Options<RagControllerGetFileData>) => createQueryKey('ragControllerGetFile', options);
+
+/**
+ * Get a specific file by ID
+ */
+export const ragControllerGetFileOptions = (options: Options<RagControllerGetFileData>) => queryOptions<RagControllerGetFileResponse, DefaultError, RagControllerGetFileResponse, ReturnType<typeof ragControllerGetFileQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await ragControllerGetFile({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: ragControllerGetFileQueryKey(options)
+});
+
+/**
+ * Ask a question about the documents in a workspace
+ */
+export const queryControllerQueryMutation = (options?: Partial<Options<QueryControllerQueryData>>): UseMutationOptions<QueryControllerQueryResponse, DefaultError, Options<QueryControllerQueryData>> => {
+    const mutationOptions: UseMutationOptions<QueryControllerQueryResponse, DefaultError, Options<QueryControllerQueryData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await queryControllerQuery({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const workspacesControllerFindAllQueryKey = (options?: Options<WorkspacesControllerFindAllData>) => createQueryKey('workspacesControllerFindAll', options);
+
+/**
+ * Get all workspaces for the current user
+ */
+export const workspacesControllerFindAllOptions = (options?: Options<WorkspacesControllerFindAllData>) => queryOptions<WorkspacesControllerFindAllResponse, DefaultError, WorkspacesControllerFindAllResponse, ReturnType<typeof workspacesControllerFindAllQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await workspacesControllerFindAll({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: workspacesControllerFindAllQueryKey(options)
+});
+
+/**
+ * Create a new workspace
+ */
+export const workspacesControllerCreateMutation = (options?: Partial<Options<WorkspacesControllerCreateData>>): UseMutationOptions<WorkspacesControllerCreateResponse, DefaultError, Options<WorkspacesControllerCreateData>> => {
+    const mutationOptions: UseMutationOptions<WorkspacesControllerCreateResponse, DefaultError, Options<WorkspacesControllerCreateData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await workspacesControllerCreate({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Delete a workspace
+ */
+export const workspacesControllerRemoveMutation = (options?: Partial<Options<WorkspacesControllerRemoveData>>): UseMutationOptions<unknown, DefaultError, Options<WorkspacesControllerRemoveData>> => {
+    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<WorkspacesControllerRemoveData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await workspacesControllerRemove({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const workspacesControllerFindOneQueryKey = (options: Options<WorkspacesControllerFindOneData>) => createQueryKey('workspacesControllerFindOne', options);
+
+/**
+ * Get a specific workspace by ID
+ */
+export const workspacesControllerFindOneOptions = (options: Options<WorkspacesControllerFindOneData>) => queryOptions<WorkspacesControllerFindOneResponse, DefaultError, WorkspacesControllerFindOneResponse, ReturnType<typeof workspacesControllerFindOneQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await workspacesControllerFindOne({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: workspacesControllerFindOneQueryKey(options)
+});
+
+/**
+ * Update a workspace
+ */
+export const workspacesControllerUpdateMutation = (options?: Partial<Options<WorkspacesControllerUpdateData>>): UseMutationOptions<WorkspacesControllerUpdateResponse, DefaultError, Options<WorkspacesControllerUpdateData>> => {
+    const mutationOptions: UseMutationOptions<WorkspacesControllerUpdateResponse, DefaultError, Options<WorkspacesControllerUpdateData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await workspacesControllerUpdate({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
 export const authControllerGoogleAuthQueryKey = (options?: Options<AuthControllerGoogleAuthData>) => createQueryKey('authControllerGoogleAuth', options);
 
+/**
+ * Initiate Google OAuth login
+ */
 export const authControllerGoogleAuthOptions = (options?: Options<AuthControllerGoogleAuthData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof authControllerGoogleAuthQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
         const { data } = await authControllerGoogleAuth({
@@ -98,11 +246,14 @@ export const authControllerGoogleAuthOptions = (options?: Options<AuthController
     queryKey: authControllerGoogleAuthQueryKey(options)
 });
 
-export const authControllerGoogleAuthRedirectQueryKey = (options?: Options<AuthControllerGoogleAuthRedirectData>) => createQueryKey('authControllerGoogleAuthRedirect', options);
+export const authControllerMeQueryKey = (options?: Options<AuthControllerMeData>) => createQueryKey('authControllerMe', options);
 
-export const authControllerGoogleAuthRedirectOptions = (options?: Options<AuthControllerGoogleAuthRedirectData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof authControllerGoogleAuthRedirectQueryKey>>({
+/**
+ * Get current authenticated user
+ */
+export const authControllerMeOptions = (options?: Options<AuthControllerMeData>) => queryOptions<AuthControllerMeResponse, DefaultError, AuthControllerMeResponse, ReturnType<typeof authControllerMeQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await authControllerGoogleAuthRedirect({
+        const { data } = await authControllerMe({
             ...options,
             ...queryKey[0],
             signal,
@@ -110,5 +261,39 @@ export const authControllerGoogleAuthRedirectOptions = (options?: Options<AuthCo
         });
         return data;
     },
-    queryKey: authControllerGoogleAuthRedirectQueryKey(options)
+    queryKey: authControllerMeQueryKey(options)
 });
+
+/**
+ * Refresh access token using refresh token cookie
+ */
+export const authControllerRefreshMutation = (options?: Partial<Options<AuthControllerRefreshData>>): UseMutationOptions<AuthControllerRefreshResponse, DefaultError, Options<AuthControllerRefreshData>> => {
+    const mutationOptions: UseMutationOptions<AuthControllerRefreshResponse, DefaultError, Options<AuthControllerRefreshData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await authControllerRefresh({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Logout and clear auth cookies
+ */
+export const authControllerLogoutMutation = (options?: Partial<Options<AuthControllerLogoutData>>): UseMutationOptions<AuthControllerLogoutResponse, DefaultError, Options<AuthControllerLogoutData>> => {
+    const mutationOptions: UseMutationOptions<AuthControllerLogoutResponse, DefaultError, Options<AuthControllerLogoutData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await authControllerLogout({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};

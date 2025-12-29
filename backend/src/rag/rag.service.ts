@@ -312,7 +312,7 @@ export class RagService implements OnModuleInit {
 
     // D. Generate answer using LLM
     const { text: answer } = await generateText({
-      model: google('gemini-2.0-flash'),
+      model: google('gemini-2.5-flash-lite'),
       system: `You are a helpful assistant that answers questions based on the provided document context. 
 Only answer based on the information in the context. If the context doesn't contain enough information to answer the question, say so.
 Be concise and accurate.`,

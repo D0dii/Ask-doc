@@ -6,6 +6,7 @@ import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { client } from "./client/client.gen";
+import { AuthProvider } from "./contexts/auth-context";
 
 // Create a new router instance
 const router = createRouter({ routeTree });
@@ -21,6 +22,8 @@ const queryClient = new QueryClient();
 client.setConfig({
   // set default base url for requests
   baseUrl: import.meta.env.VITE_backend_url,
+  // include cookies in requests for authentication
+  credentials: "include",
 });
 // Render the app
 const rootElement = document.getElementById("root")!;
@@ -29,7 +32,9 @@ if (!rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
+        <AuthProvider>
+          <RouterProvider router={router} />
+        </AuthProvider>
       </QueryClientProvider>
     </StrictMode>
   );

@@ -5,8 +5,192 @@ export type ClientOptions = {
 };
 
 export type FileResponseDto = {
+    /**
+     * File ID
+     */
     id: string;
+    /**
+     * File name
+     */
     name: string;
+    /**
+     * Original file name
+     */
+    originalName: string;
+    /**
+     * MIME type of the file
+     */
+    mimeType: string;
+    /**
+     * File size in bytes
+     */
+    size: number;
+    /**
+     * Processing status
+     */
+    status: 'pending' | 'processing' | 'completed' | 'failed';
+    /**
+     * Error message if processing failed
+     */
+    errorMessage?: string;
+    /**
+     * Workspace ID this file belongs to
+     */
+    workspaceId: string;
+    /**
+     * Created timestamp
+     */
+    createdAt: string;
+    /**
+     * Updated timestamp
+     */
+    updatedAt: string;
+};
+
+export type IngestResponseDto = {
+    /**
+     * Status message
+     */
+    message: string;
+    /**
+     * File ID
+     */
+    fileId: string;
+    /**
+     * Current processing status
+     */
+    status: 'pending' | 'processing' | 'completed' | 'failed';
+};
+
+export type QueryDto = {
+    /**
+     * The question to ask about the documents
+     */
+    question: string;
+};
+
+export type SourceDto = {
+    /**
+     * The file ID this chunk belongs to
+     */
+    fileId: string;
+    /**
+     * The text content of the chunk
+     */
+    text: string;
+    /**
+     * Similarity score (0-1)
+     */
+    score: number;
+};
+
+export type QueryResponseDto = {
+    /**
+     * The AI-generated answer
+     */
+    answer: string;
+    /**
+     * Source documents used to generate the answer
+     */
+    sources: Array<SourceDto>;
+};
+
+export type CreateWorkspaceDto = {
+    /**
+     * Name of the workspace
+     */
+    name: string;
+    /**
+     * Optional description of the workspace
+     */
+    description?: string;
+};
+
+export type WorkspaceResponseDto = {
+    /**
+     * Unique identifier of the workspace
+     */
+    id: string;
+    /**
+     * Name of the workspace
+     */
+    name: string;
+    /**
+     * Description of the workspace
+     */
+    description: {
+        [key: string]: unknown;
+    } | null;
+    /**
+     * ID of the workspace owner
+     */
+    ownerId: string;
+    /**
+     * Creation timestamp
+     */
+    createdAt: string;
+    /**
+     * Last update timestamp
+     */
+    updatedAt: string;
+};
+
+export type UpdateWorkspaceDto = {
+    /**
+     * Name of the workspace
+     */
+    name?: string;
+    /**
+     * Optional description of the workspace
+     */
+    description?: string;
+};
+
+export type UserResponseDto = {
+    /**
+     * Unique identifier of the user
+     */
+    id: string;
+    /**
+     * Email address of the user
+     */
+    email: string;
+    /**
+     * First name of the user
+     */
+    firstName: {
+        [key: string]: unknown;
+    } | null;
+    /**
+     * Last name of the user
+     */
+    lastName: {
+        [key: string]: unknown;
+    } | null;
+    /**
+     * Profile picture URL
+     */
+    picture: {
+        [key: string]: unknown;
+    } | null;
+    /**
+     * Whether the user has admin privileges
+     */
+    isAdmin: boolean;
+};
+
+export type RefreshResponseDto = {
+    /**
+     * Indicates the refresh was successful
+     */
+    ok: boolean;
+};
+
+export type LogoutResponseDto = {
+    /**
+     * Indicates the logout was successful
+     */
+    ok: boolean;
 };
 
 export type AppControllerGetHelloData = {
@@ -24,25 +208,282 @@ export type RagControllerGetFilesData = {
     body?: never;
     path?: never;
     query?: never;
-    url: '/rag/files';
+    url: '/workspaces/{workspaceId}/files';
+};
+
+export type RagControllerGetFilesErrors = {
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Workspace not found
+     */
+    404: unknown;
 };
 
 export type RagControllerGetFilesResponses = {
-    default: Array<FileResponseDto>;
+    /**
+     * List of files
+     */
+    200: Array<FileResponseDto>;
 };
 
 export type RagControllerGetFilesResponse = RagControllerGetFilesResponses[keyof RagControllerGetFilesResponses];
 
 export type RagControllerIngestData = {
-    body?: never;
+    body: {
+        /**
+         * PDF file to upload
+         */
+        file: Blob | File;
+    };
     path?: never;
     query?: never;
-    url: '/rag/ingest';
+    url: '/workspaces/{workspaceId}/files';
+};
+
+export type RagControllerIngestErrors = {
+    /**
+     * Bad request - file is required or invalid file type
+     */
+    400: unknown;
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Workspace not found
+     */
+    404: unknown;
 };
 
 export type RagControllerIngestResponses = {
-    201: unknown;
+    /**
+     * File upload started
+     */
+    201: IngestResponseDto;
 };
+
+export type RagControllerIngestResponse = RagControllerIngestResponses[keyof RagControllerIngestResponses];
+
+export type RagControllerDeleteFileData = {
+    body?: never;
+    path: {
+        fileId: string;
+    };
+    query?: never;
+    url: '/workspaces/{workspaceId}/files/{fileId}';
+};
+
+export type RagControllerDeleteFileErrors = {
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * File not found
+     */
+    404: unknown;
+};
+
+export type RagControllerDeleteFileResponses = {
+    /**
+     * File deleted successfully
+     */
+    200: unknown;
+};
+
+export type RagControllerGetFileData = {
+    body?: never;
+    path: {
+        fileId: string;
+    };
+    query?: never;
+    url: '/workspaces/{workspaceId}/files/{fileId}';
+};
+
+export type RagControllerGetFileErrors = {
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * File not found
+     */
+    404: unknown;
+};
+
+export type RagControllerGetFileResponses = {
+    /**
+     * File details
+     */
+    200: FileResponseDto;
+};
+
+export type RagControllerGetFileResponse = RagControllerGetFileResponses[keyof RagControllerGetFileResponses];
+
+export type QueryControllerQueryData = {
+    body: QueryDto;
+    path?: never;
+    query?: never;
+    url: '/workspaces/{workspaceId}/query';
+};
+
+export type QueryControllerQueryErrors = {
+    /**
+     * Bad request - no processed documents in workspace
+     */
+    400: unknown;
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Workspace not found
+     */
+    404: unknown;
+};
+
+export type QueryControllerQueryResponses = {
+    /**
+     * AI-generated answer with sources
+     */
+    200: QueryResponseDto;
+};
+
+export type QueryControllerQueryResponse = QueryControllerQueryResponses[keyof QueryControllerQueryResponses];
+
+export type WorkspacesControllerFindAllData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/workspaces';
+};
+
+export type WorkspacesControllerFindAllErrors = {
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+};
+
+export type WorkspacesControllerFindAllResponses = {
+    /**
+     * List of workspaces
+     */
+    200: Array<WorkspaceResponseDto>;
+};
+
+export type WorkspacesControllerFindAllResponse = WorkspacesControllerFindAllResponses[keyof WorkspacesControllerFindAllResponses];
+
+export type WorkspacesControllerCreateData = {
+    body: CreateWorkspaceDto;
+    path?: never;
+    query?: never;
+    url: '/workspaces';
+};
+
+export type WorkspacesControllerCreateErrors = {
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+};
+
+export type WorkspacesControllerCreateResponses = {
+    /**
+     * Workspace created successfully
+     */
+    201: WorkspaceResponseDto;
+};
+
+export type WorkspacesControllerCreateResponse = WorkspacesControllerCreateResponses[keyof WorkspacesControllerCreateResponses];
+
+export type WorkspacesControllerRemoveData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/workspaces/{id}';
+};
+
+export type WorkspacesControllerRemoveErrors = {
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Workspace not found
+     */
+    404: unknown;
+};
+
+export type WorkspacesControllerRemoveResponses = {
+    /**
+     * Workspace deleted successfully
+     */
+    200: unknown;
+};
+
+export type WorkspacesControllerFindOneData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/workspaces/{id}';
+};
+
+export type WorkspacesControllerFindOneErrors = {
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Workspace not found
+     */
+    404: unknown;
+};
+
+export type WorkspacesControllerFindOneResponses = {
+    /**
+     * Workspace details
+     */
+    200: WorkspaceResponseDto;
+};
+
+export type WorkspacesControllerFindOneResponse = WorkspacesControllerFindOneResponses[keyof WorkspacesControllerFindOneResponses];
+
+export type WorkspacesControllerUpdateData = {
+    body: UpdateWorkspaceDto;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/workspaces/{id}';
+};
+
+export type WorkspacesControllerUpdateErrors = {
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Workspace not found
+     */
+    404: unknown;
+};
+
+export type WorkspacesControllerUpdateResponses = {
+    /**
+     * Workspace updated successfully
+     */
+    200: WorkspaceResponseDto;
+};
+
+export type WorkspacesControllerUpdateResponse = WorkspacesControllerUpdateResponses[keyof WorkspacesControllerUpdateResponses];
 
 export type AuthControllerGoogleAuthData = {
     body?: never;
@@ -51,17 +492,64 @@ export type AuthControllerGoogleAuthData = {
     url: '/auth/google';
 };
 
-export type AuthControllerGoogleAuthResponses = {
-    200: unknown;
-};
-
-export type AuthControllerGoogleAuthRedirectData = {
+export type AuthControllerMeData = {
     body?: never;
     path?: never;
     query?: never;
-    url: '/auth/google/callback';
+    url: '/auth/me';
 };
 
-export type AuthControllerGoogleAuthRedirectResponses = {
-    200: unknown;
+export type AuthControllerMeErrors = {
+    /**
+     * Unauthorized
+     */
+    401: unknown;
 };
+
+export type AuthControllerMeResponses = {
+    /**
+     * Current user profile
+     */
+    200: UserResponseDto;
+};
+
+export type AuthControllerMeResponse = AuthControllerMeResponses[keyof AuthControllerMeResponses];
+
+export type AuthControllerRefreshData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/auth/refresh';
+};
+
+export type AuthControllerRefreshErrors = {
+    /**
+     * Invalid or missing refresh token
+     */
+    401: unknown;
+};
+
+export type AuthControllerRefreshResponses = {
+    /**
+     * Tokens refreshed successfully
+     */
+    200: RefreshResponseDto;
+};
+
+export type AuthControllerRefreshResponse = AuthControllerRefreshResponses[keyof AuthControllerRefreshResponses];
+
+export type AuthControllerLogoutData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/auth/logout';
+};
+
+export type AuthControllerLogoutResponses = {
+    /**
+     * Logged out successfully
+     */
+    200: LogoutResponseDto;
+};
+
+export type AuthControllerLogoutResponse = AuthControllerLogoutResponses[keyof AuthControllerLogoutResponses];
