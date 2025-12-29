@@ -3,17 +3,27 @@ import {
   OnModuleInit,
   Logger,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { google } from '@ai-sdk/google';
-import { embedMany } from 'ai';
+import { embedMany, embed, generateText } from 'ai';
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 import { v4 as uuidv4 } from 'uuid';
 import { extractTextFromPdf } from './utils/pdf.util';
 import { File, FileStatus } from './entities/file.entity';
+
+interface QueryResult {
+  answer: string;
+  sources: Array<{
+    fileId: string;
+    text: string;
+    score: number;
+  }>;
+}
 
 @Injectable()
 export class RagService implements OnModuleInit {
@@ -57,7 +67,7 @@ export class RagService implements OnModuleInit {
   }
 
   // 2. The Ingestion Function
-  async ingestFile(fileBuffer: Buffer, sessionId: string, fileId: string) {
+  async ingestFile(fileBuffer: Buffer, workspaceId: string, fileId: string) {
     this.logger.log(`Starting ingestion for file: ${fileId}`);
 
     // A. Parse PDF
@@ -86,7 +96,7 @@ export class RagService implements OnModuleInit {
       payload: {
         text: chunk, // We store the text to retrieve it later
         fileId: fileId, // For Deletion/Filtering
-        sessionId: sessionId, // For User Security
+        workspaceId: workspaceId, // For User Security
       },
     }));
 
@@ -209,5 +219,116 @@ export class RagService implements OnModuleInit {
     // Delete file record from DB
     await this.fileRepository.remove(file);
     this.logger.log(`Deleted file record: ${fileId}`);
+  }
+
+  // Delete all files and vectors for a workspace
+  async deleteAllByWorkspace(workspaceId: string): Promise<void> {
+    // Get all files for this workspace
+    const files = await this.fileRepository.find({ where: { workspaceId } });
+
+    if (files.length === 0) {
+      return;
+    }
+
+    // Delete all vectors from Qdrant for this workspace
+    try {
+      await this.qdrant.delete(this.COLLECTION_NAME, {
+        filter: {
+          must: [
+            {
+              key: 'workspaceId',
+              match: { value: workspaceId },
+            },
+          ],
+        },
+      });
+      this.logger.log(`Deleted all vectors for workspace: ${workspaceId}`);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error(
+        `Error deleting vectors for workspace ${workspaceId}: ${message}`,
+      );
+    }
+
+    // Delete all file records from DB
+    await this.fileRepository.remove(files);
+    this.logger.log(
+      `Deleted ${files.length} file records for workspace: ${workspaceId}`,
+    );
+  }
+
+  // Query documents in a workspace
+  async query(workspaceId: string, question: string): Promise<QueryResult> {
+    this.logger.log(`Query for workspace ${workspaceId}: ${question}`);
+
+    // Check if workspace has any completed files
+    const completedFiles = await this.fileRepository.count({
+      where: { workspaceId, status: FileStatus.COMPLETED },
+    });
+
+    if (completedFiles === 0) {
+      throw new BadRequestException(
+        'No processed documents in this workspace. Please upload and wait for files to be processed.',
+      );
+    }
+
+    // A. Embed the question
+    const { embedding: questionEmbedding } = await embed({
+      model: google.textEmbeddingModel('text-embedding-004'),
+      value: question,
+    });
+
+    // B. Search in Qdrant (filter by workspaceId for security)
+    const searchResult = await this.qdrant.search(this.COLLECTION_NAME, {
+      vector: questionEmbedding,
+      limit: 5, // Top 5 most relevant chunks
+      filter: {
+        must: [
+          {
+            key: 'workspaceId',
+            match: { value: workspaceId },
+          },
+        ],
+      },
+      with_payload: true,
+    });
+
+    if (searchResult.length === 0) {
+      return {
+        answer:
+          'I could not find any relevant information in the documents to answer your question.',
+        sources: [],
+      };
+    }
+
+    // C. Extract context from search results
+    const sources = searchResult.map((result) => ({
+      fileId: result.payload?.fileId as string,
+      text: result.payload?.text as string,
+      score: result.score,
+    }));
+
+    const context = sources.map((s) => s.text).join('\n\n---\n\n');
+
+    // D. Generate answer using LLM
+    const { text: answer } = await generateText({
+      model: google('gemini-2.0-flash'),
+      system: `You are a helpful assistant that answers questions based on the provided document context. 
+Only answer based on the information in the context. If the context doesn't contain enough information to answer the question, say so.
+Be concise and accurate.`,
+      prompt: `Context from documents:
+${context}
+
+Question: ${question}
+
+Answer:`,
+    });
+
+    this.logger.log(`Generated answer for workspace ${workspaceId}`);
+
+    return {
+      answer,
+      sources,
+    };
   }
 }

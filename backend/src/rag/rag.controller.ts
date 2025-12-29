@@ -27,6 +27,8 @@ import type { WorkspaceRequest } from '../auth/types/auth.types';
 import { FileResponseDto, IngestResponseDto } from './dtos';
 import { FileStatus } from './entities/file.entity';
 
+const ALLOWED_MIME_TYPES = ['application/pdf'];
+
 @ApiTags('RAG')
 @ApiCookieAuth()
 @Controller('workspaces/:workspaceId/files')
@@ -69,7 +71,7 @@ export class RagController {
 
   @Post()
   @UseInterceptors(FileInterceptor('file'))
-  @ApiOperation({ summary: 'Upload and ingest a file' })
+  @ApiOperation({ summary: 'Upload and ingest a PDF file' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -89,7 +91,10 @@ export class RagController {
     description: 'File upload started',
     type: IngestResponseDto,
   })
-  @ApiResponse({ status: 400, description: 'Bad request - file is required' })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request - file is required or invalid file type',
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'Workspace not found' })
   async ingest(
@@ -98,6 +103,13 @@ export class RagController {
   ): Promise<IngestResponseDto> {
     if (!file) {
       throw new BadRequestException('File is required');
+    }
+
+    // Validate file type
+    if (!ALLOWED_MIME_TYPES.includes(file.mimetype)) {
+      throw new BadRequestException(
+        `Invalid file type. Only PDF files are allowed. Received: ${file.mimetype}`,
+      );
     }
 
     // Save file to DB and start processing (fire and forget)
