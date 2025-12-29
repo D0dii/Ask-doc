@@ -26,5 +26,6 @@ import { JwtCookieGuard } from './guards/jwt-cookie.guard';
   ],
   controllers: [AuthController],
   providers: [AuthService, GoogleStrategy, JwtCookieGuard],
+  exports: [JwtCookieGuard, JwtModule, UsersModule], // Export guard and its dependencies
 })
 export class AuthModule {}
