@@ -3,53 +3,126 @@ import {
   Post,
   UploadedFile,
   UseInterceptors,
-  Body,
   BadRequestException,
   Get,
+  Param,
+  Delete,
+  UseGuards,
+  Req,
+  NotFoundException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiCookieAuth,
+  ApiConsumes,
+  ApiBody,
+} from '@nestjs/swagger';
 import { RagService } from './rag.service';
-import { v4 as uuidv4 } from 'uuid';
-import { ApiProperty, ApiResponse } from '@nestjs/swagger';
+import { JwtCookieGuard } from '../auth/guards/jwt-cookie.guard';
+import { WorkspaceAccessGuard } from '../workspaces/guards/workspace-access.guard';
+import type { WorkspaceRequest } from '../auth/types/auth.types';
+import { FileResponseDto, IngestResponseDto } from './dtos';
+import { FileStatus } from './entities/file.entity';
 
-class FileResponseDto {
-  @ApiProperty()
-  id: string;
-
-  @ApiProperty()
-  name: string;
-}
-@Controller('rag')
+@ApiTags('RAG')
+@ApiCookieAuth()
+@Controller('workspaces/:workspaceId/files')
+@UseGuards(JwtCookieGuard, WorkspaceAccessGuard)
 export class RagController {
   constructor(private readonly ragService: RagService) {}
 
-  @Get('files')
-  @ApiResponse({ type: [FileResponseDto] }) // Tell Swagger what this returns
-  getFiles(): FileResponseDto[] {
-    return [{ id: '1', name: 'test' }];
+  @Get()
+  @ApiOperation({ summary: 'Get all files in a workspace' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of files',
+    type: [FileResponseDto],
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Workspace not found' })
+  async getFiles(@Req() req: WorkspaceRequest): Promise<FileResponseDto[]> {
+    return this.ragService.getFilesByWorkspace(req.workspace.id);
   }
 
-  @Post('ingest')
+  @Get(':fileId')
+  @ApiOperation({ summary: 'Get a specific file by ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'File details',
+    type: FileResponseDto,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'File not found' })
+  async getFile(
+    @Req() req: WorkspaceRequest,
+    @Param('fileId') fileId: string,
+  ): Promise<FileResponseDto> {
+    const file = await this.ragService.getFileById(fileId, req.workspace.id);
+    if (!file) {
+      throw new NotFoundException('File not found');
+    }
+    return file;
+  }
+
+  @Post()
   @UseInterceptors(FileInterceptor('file'))
+  @ApiOperation({ summary: 'Upload and ingest a file' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+          description: 'PDF file to upload',
+        },
+      },
+      required: ['file'],
+    },
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'File upload started',
+    type: IngestResponseDto,
+  })
+  @ApiResponse({ status: 400, description: 'Bad request - file is required' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Workspace not found' })
   async ingest(
+    @Req() req: WorkspaceRequest,
     @UploadedFile() file: Express.Multer.File,
-    @Body('sessionId') sessionId: string,
-  ) {
+  ): Promise<IngestResponseDto> {
     if (!file) {
       throw new BadRequestException('File is required');
     }
-    // 1. Generate a generic File ID (We will use a real DB later)
-    const fileId = uuidv4();
 
-    // 2. Trigger Ingestion
-    // Note: For now, we await it to verify it works.
-    // Later, we will remove 'await' for the "Fire and Forget" feature.
-    await this.ragService.ingestFile(file.buffer, sessionId, fileId);
+    // Save file to DB and start processing (fire and forget)
+    const savedFile = await this.ragService.createAndProcessFile(
+      file,
+      req.workspace.id,
+    );
 
     return {
-      message: 'Ingestion successful',
-      fileId,
-      chunksProcessed: 'Check server logs',
+      message: 'Processing started',
+      fileId: savedFile.id,
+      status: FileStatus.PROCESSING,
     };
+  }
+
+  @Delete(':fileId')
+  @ApiOperation({ summary: 'Delete a file' })
+  @ApiResponse({ status: 200, description: 'File deleted successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'File not found' })
+  async deleteFile(
+    @Req() req: WorkspaceRequest,
+    @Param('fileId') fileId: string,
+  ): Promise<{ message: string }> {
+    await this.ragService.deleteFile(fileId, req.workspace.id);
+    return { message: 'File deleted successfully' };
   }
 }

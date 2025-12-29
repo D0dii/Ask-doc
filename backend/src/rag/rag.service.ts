@@ -1,11 +1,19 @@
-import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  OnModuleInit,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { google } from '@ai-sdk/google';
 import { embedMany } from 'ai';
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 import { v4 as uuidv4 } from 'uuid';
 import { extractTextFromPdf } from './utils/pdf.util';
+import { File, FileStatus } from './entities/file.entity';
 
 @Injectable()
 export class RagService implements OnModuleInit {
@@ -13,7 +21,11 @@ export class RagService implements OnModuleInit {
   private qdrant: QdrantClient;
   private readonly COLLECTION_NAME = 'ask_doc';
 
-  constructor(private configService: ConfigService) {
+  constructor(
+    private configService: ConfigService,
+    @InjectRepository(File)
+    private fileRepository: Repository<File>,
+  ) {
     this.qdrant = new QdrantClient({
       url: this.configService.get<string>(
         'QDRANT_URL',
@@ -85,5 +97,117 @@ export class RagService implements OnModuleInit {
     });
 
     this.logger.log(`Successfully ingested file ${fileId}`);
+  }
+
+  // Get all files for a workspace (authorization handled by guard)
+  async getFilesByWorkspace(workspaceId: string): Promise<File[]> {
+    return this.fileRepository.find({
+      where: { workspaceId },
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  // Get a specific file (authorization handled by guard)
+  async getFileById(fileId: string, workspaceId: string): Promise<File | null> {
+    return this.fileRepository.findOne({
+      where: { id: fileId, workspaceId },
+    });
+  }
+
+  // Create file record and start async processing (authorization handled by guard)
+  async createAndProcessFile(
+    uploadedFile: Express.Multer.File,
+    workspaceId: string,
+  ): Promise<File> {
+    // Create file record in DB
+    const file = this.fileRepository.create({
+      name: uploadedFile.originalname,
+      originalName: uploadedFile.originalname,
+      mimeType: uploadedFile.mimetype,
+      size: uploadedFile.size,
+      status: FileStatus.PROCESSING,
+      workspaceId,
+    });
+
+    const savedFile = await this.fileRepository.save(file);
+
+    // Fire and forget - start processing without awaiting
+    this.processFileAsync(savedFile.id, uploadedFile.buffer, workspaceId).catch(
+      (error: unknown) => {
+        const message =
+          error instanceof Error ? error.message : 'Unknown error';
+        this.logger.error(`Failed to process file ${savedFile.id}: ${message}`);
+      },
+    );
+
+    return savedFile;
+  }
+
+  // Async file processing
+  private async processFileAsync(
+    fileId: string,
+    fileBuffer: Buffer,
+    workspaceId: string,
+  ): Promise<void> {
+    try {
+      this.logger.log(`Starting async processing for file: ${fileId}`);
+
+      // Run the ingestion
+      await this.ingestFile(fileBuffer, workspaceId, fileId);
+
+      // Update status to completed
+      await this.fileRepository.update(fileId, {
+        status: FileStatus.COMPLETED,
+      });
+
+      this.logger.log(`Completed processing for file: ${fileId}`);
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Unknown error during processing';
+      this.logger.error(`Error processing file ${fileId}: ${message}`);
+
+      // Update status to failed with error message
+      await this.fileRepository.update(fileId, {
+        status: FileStatus.FAILED,
+        errorMessage: message,
+      });
+    }
+  }
+
+  // Delete file and its vectors (authorization handled by guard)
+  async deleteFile(fileId: string, workspaceId: string): Promise<void> {
+    const file = await this.fileRepository.findOne({
+      where: { id: fileId, workspaceId },
+    });
+
+    if (!file) {
+      throw new NotFoundException('File not found');
+    }
+
+    // Delete vectors from Qdrant
+    try {
+      await this.qdrant.delete(this.COLLECTION_NAME, {
+        filter: {
+          must: [
+            {
+              key: 'fileId',
+              match: { value: fileId },
+            },
+          ],
+        },
+      });
+      this.logger.log(`Deleted vectors for file: ${fileId}`);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error(
+        `Error deleting vectors for file ${fileId}: ${message}`,
+      );
+    }
+
+    // Delete file record from DB
+    await this.fileRepository.remove(file);
+    this.logger.log(`Deleted file record: ${fileId}`);
   }
 }
