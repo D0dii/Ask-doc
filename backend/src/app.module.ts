@@ -5,6 +5,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { RagModule } from './rag/rag.module';
 import { AuthModule } from './auth/auth.module';
+import { WorkspacesModule } from './workspaces/workspaces.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { AuthModule } from './auth/auth.module';
     }),
     RagModule,
     AuthModule,
+    WorkspacesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

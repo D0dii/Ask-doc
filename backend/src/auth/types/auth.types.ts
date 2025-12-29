@@ -1,5 +1,5 @@
 import type { Request } from 'express';
-import type { User } from '../../users/user.entity';
+import type { User } from '../../users/entities/user.entity';
 
 export type GoogleProfileUser = {
   email: string;

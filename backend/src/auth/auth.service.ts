@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { JwtService, type JwtSignOptions } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from '../users/users.service';
-import { User } from '../users/user.entity';
+import { User } from '../users/entities/user.entity';
 import { GoogleProfileUser } from './types/auth.types';
 
 @Injectable()

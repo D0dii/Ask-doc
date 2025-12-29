@@ -4,12 +4,17 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
+import { Workspace } from '../../workspaces/entities/workspace.entity';
 
 @Entity()
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @OneToMany(() => Workspace, (workspace) => workspace.owner)
+  workspaces: Workspace[];
 
   @Column({ unique: true })
   email: string;
