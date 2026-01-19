@@ -119,13 +119,18 @@ export class AuthController {
 
   @Post('logout')
   @ApiOperation({ summary: 'Logout and clear auth cookies' })
+  @ApiCookieAuth()
   @ApiResponse({
     status: 200,
     description: 'Logged out successfully',
     type: LogoutResponseDto,
   })
   @HttpCode(200)
-  logout(@Res() res: Response) {
+  @UseGuards(JwtCookieGuard)
+  async logout(@Req() req: UserRequest, @Res() res: Response) {
+    // Invalidate refresh token in database
+    await this.authService.logout(req.user.id);
+
     this.clearAuthCookies(res);
     return res.send({ ok: true });
   }

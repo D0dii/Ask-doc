@@ -1,12 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService, type JwtSignOptions } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/entities/user.entity';
 import { GoogleProfileUser } from './types/auth.types';
+import { hash, compare } from 'bcryptjs';
 
 @Injectable()
 export class AuthService {
+  private readonly BCRYPT_ROUNDS = 10;
+
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
@@ -30,7 +33,7 @@ export class AuthService {
       accessToken: googleUser.accessToken,
     });
 
-    const tokens = this.createTokens(user);
+    const tokens = await this.createTokens(user);
 
     return { ...tokens, user };
   }
@@ -43,31 +46,62 @@ export class AuthService {
       this.configService.get<string>('REFRESH_JWT_SECRET') ||
       this.configService.get<string>('JWT_SECRET');
 
-    const payload = this.jwtService.verify<{
+    let payload: {
       sub: string;
       email?: string;
       isAdmin?: boolean;
       type?: string;
-    }>(refreshToken, {
-      secret: refreshSecret,
-    });
+    };
+
+    try {
+      payload = this.jwtService.verify(refreshToken, {
+        secret: refreshSecret,
+      });
+    } catch {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
 
     if (payload.type !== 'refresh') {
-      throw new Error('Invalid token type');
+      throw new UnauthorizedException('Invalid token type');
     }
 
-    const user = await this.usersService.findOne(payload.sub);
+    // Fetch user with their stored refresh token
+    const user = await this.usersService.findOneWithRefreshToken(payload.sub);
     if (!user) {
-      throw new Error('User not found');
+      throw new UnauthorizedException('User not found');
     }
 
+    // Check if user has a stored refresh token
+    if (!user.refreshToken) {
+      throw new UnauthorizedException(
+        'No refresh token found - please login again',
+      );
+    }
+
+    // Verify the provided refresh token matches the stored hash
+    const isRefreshTokenValid = await compare(refreshToken, user.refreshToken);
+
+    if (!isRefreshTokenValid) {
+      // Token mismatch - possible token theft, invalidate all tokens
+      await this.usersService.updateRefreshToken(user.id, null);
+      throw new UnauthorizedException(
+        'Invalid refresh token - please login again',
+      );
+    }
+
+    // Rotate: Generate new tokens and update stored hash
     return this.createTokens(user);
   }
 
-  private createTokens(user: User): {
+  async logout(userId: string): Promise<void> {
+    // Invalidate refresh token by removing it from database
+    await this.usersService.updateRefreshToken(userId, null);
+  }
+
+  private async createTokens(user: User): Promise<{
     accessToken: string;
     refreshToken: string;
-  } {
+  }> {
     const accessPayload = {
       sub: user.id,
       email: user.email,
@@ -99,6 +133,10 @@ export class AuthService {
           'REFRESH_JWT_EXPIRES_IN',
         ) as JwtSignOptions['expiresIn']) ?? '7d',
     });
+
+    // Hash and store the refresh token in database
+    const hashedRefreshToken = await hash(refreshToken, this.BCRYPT_ROUNDS);
+    await this.usersService.updateRefreshToken(user.id, hashedRefreshToken);
 
     return { accessToken, refreshToken };
   }

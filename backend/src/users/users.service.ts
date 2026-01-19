@@ -37,4 +37,30 @@ export class UsersService {
   async findOne(id: string): Promise<User | null> {
     return this.usersRepository.findOne({ where: { id } });
   }
+
+  async updateRefreshToken(
+    userId: string,
+    refreshToken: string | null,
+  ): Promise<void> {
+    await this.usersRepository.update(userId, {
+      refreshToken: refreshToken as string,
+    });
+  }
+
+  async findOneWithRefreshToken(id: string): Promise<User | null> {
+    return this.usersRepository.findOne({
+      where: { id },
+      select: [
+        'id',
+        'email',
+        'firstName',
+        'lastName',
+        'picture',
+        'isAdmin',
+        'refreshToken',
+        'createdAt',
+        'updatedAt',
+      ],
+    });
+  }
 }

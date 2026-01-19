@@ -28,8 +28,11 @@ export class User {
   @Column({ nullable: true })
   picture: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, select: false })
   accessToken: string;
+
+  @Column({ nullable: true, select: false })
+  refreshToken: string;
 
   @Column({ default: false })
   isAdmin: boolean;
