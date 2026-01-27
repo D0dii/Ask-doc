@@ -14,7 +14,7 @@ const RootLayout = () => {
               AskDoc
             </Link>
             {isAuthenticated && (
-              <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
+              <Link to="/workspaces" className="text-sm text-muted-foreground hover:text-foreground">
                 Workspaces
               </Link>
             )}

@@ -206,7 +206,12 @@ export type AppControllerGetHelloResponses = {
 
 export type RagControllerGetFilesData = {
     body?: never;
-    path?: never;
+    path: {
+        /**
+         * Workspace ID
+         */
+        workspaceId: string;
+    };
     query?: never;
     url: '/workspaces/{workspaceId}/files';
 };
@@ -238,7 +243,12 @@ export type RagControllerIngestData = {
          */
         file: Blob | File;
     };
-    path?: never;
+    path: {
+        /**
+         * Workspace ID
+         */
+        workspaceId: string;
+    };
     query?: never;
     url: '/workspaces/{workspaceId}/files';
 };
@@ -270,7 +280,14 @@ export type RagControllerIngestResponse = RagControllerIngestResponses[keyof Rag
 export type RagControllerDeleteFileData = {
     body?: never;
     path: {
+        /**
+         * File ID
+         */
         fileId: string;
+        /**
+         * Workspace ID
+         */
+        workspaceId: string;
     };
     query?: never;
     url: '/workspaces/{workspaceId}/files/{fileId}';
@@ -297,7 +314,14 @@ export type RagControllerDeleteFileResponses = {
 export type RagControllerGetFileData = {
     body?: never;
     path: {
+        /**
+         * File ID
+         */
         fileId: string;
+        /**
+         * Workspace ID
+         */
+        workspaceId: string;
     };
     query?: never;
     url: '/workspaces/{workspaceId}/files/{fileId}';
@@ -325,7 +349,12 @@ export type RagControllerGetFileResponse = RagControllerGetFileResponses[keyof R
 
 export type QueryControllerQueryData = {
     body: QueryDto;
-    path?: never;
+    path: {
+        /**
+         * Workspace ID
+         */
+        workspaceId: string;
+    };
     query?: never;
     url: '/workspaces/{workspaceId}/query';
 };

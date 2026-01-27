@@ -1,19 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/features/auth/auth-provider";
-import { workspacesControllerFindAllOptions } from "@/client/@tanstack/react-query.gen";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
 function HomePage() {
-  const { user, isLoading, isAuthenticated, login, logout } = useAuth();
-
-  const { data: workspaces, isLoading: workspacesLoading } = useQuery({
-    ...workspacesControllerFindAllOptions(),
-    enabled: isAuthenticated,
-  });
+  const { isLoading, isAuthenticated, login } = useAuth();
 
   if (isLoading) {
     return <p>Loading...</p>;
@@ -32,29 +25,8 @@ function HomePage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <span>{user?.email}</span>
-        <button onClick={logout} className="px-4 py-2 rounded-md border hover:bg-muted">
-          Logout
-        </button>
-      </div>
-
-      <div>
-        <h2 className="text-lg font-semibold mb-2">Workspaces</h2>
-        {workspacesLoading ? (
-          <p>Loading workspaces...</p>
-        ) : workspaces && workspaces.length > 0 ? (
-          <ul className="space-y-2">
-            {workspaces.map((workspace) => (
-              <li key={workspace.id} className="border rounded-md p-2">
-                {workspace.name}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-muted-foreground">No workspaces yet.</p>
-        )}
-      </div>
+      <h1 className="text-2xl font-semibold">Welcome back!</h1>
+      <p className="text-muted-foreground">Select a workspace from the sidebar to get started.</p>
     </div>
   );
 }

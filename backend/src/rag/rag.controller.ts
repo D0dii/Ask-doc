@@ -19,6 +19,7 @@ import {
   ApiCookieAuth,
   ApiConsumes,
   ApiBody,
+  ApiParam,
 } from '@nestjs/swagger';
 import { RagService } from './rag.service';
 import { JwtCookieGuard } from '../auth/guards/jwt-cookie.guard';
@@ -32,6 +33,7 @@ const ALLOWED_MIME_TYPES = ['application/pdf'];
 @ApiTags('RAG')
 @ApiCookieAuth()
 @Controller('workspaces/:workspaceId/files')
+@ApiParam({ name: 'workspaceId', description: 'Workspace ID', type: String })
 @UseGuards(JwtCookieGuard, WorkspaceAccessGuard)
 export class RagController {
   constructor(private readonly ragService: RagService) {}
@@ -51,6 +53,7 @@ export class RagController {
 
   @Get(':fileId')
   @ApiOperation({ summary: 'Get a specific file by ID' })
+  @ApiParam({ name: 'fileId', description: 'File ID', type: String })
   @ApiResponse({
     status: 200,
     description: 'File details',
@@ -127,6 +130,7 @@ export class RagController {
 
   @Delete(':fileId')
   @ApiOperation({ summary: 'Delete a file' })
+  @ApiParam({ name: 'fileId', description: 'File ID', type: String })
   @ApiResponse({ status: 200, description: 'File deleted successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'File not found' })

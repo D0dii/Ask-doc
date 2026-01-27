@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { File } from '../../rag/entities/file.entity';
+import { ChatMessage } from '../../chat/entities/chat-message.entity';
 
 @Entity()
 export class Workspace {
@@ -31,6 +32,9 @@ export class Workspace {
 
   @OneToMany(() => File, (file) => file.workspace)
   files: File[];
+
+  @OneToMany(() => ChatMessage, (message) => message.workspace)
+  chatMessages: ChatMessage[];
 
   @CreateDateColumn()
   createdAt: Date;

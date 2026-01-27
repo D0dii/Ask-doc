@@ -54,12 +54,12 @@ export const appControllerGetHelloOptions = (options?: Options<AppControllerGetH
     queryKey: appControllerGetHelloQueryKey(options)
 });
 
-export const ragControllerGetFilesQueryKey = (options?: Options<RagControllerGetFilesData>) => createQueryKey('ragControllerGetFiles', options);
+export const ragControllerGetFilesQueryKey = (options: Options<RagControllerGetFilesData>) => createQueryKey('ragControllerGetFiles', options);
 
 /**
  * Get all files in a workspace
  */
-export const ragControllerGetFilesOptions = (options?: Options<RagControllerGetFilesData>) => queryOptions<RagControllerGetFilesResponse, DefaultError, RagControllerGetFilesResponse, ReturnType<typeof ragControllerGetFilesQueryKey>>({
+export const ragControllerGetFilesOptions = (options: Options<RagControllerGetFilesData>) => queryOptions<RagControllerGetFilesResponse, DefaultError, RagControllerGetFilesResponse, ReturnType<typeof ragControllerGetFilesQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
         const { data } = await ragControllerGetFiles({
             ...options,

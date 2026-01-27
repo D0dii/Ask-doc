@@ -6,12 +6,14 @@ import { RagService } from './rag.service';
 import { File } from './entities/file.entity';
 import { WorkspacesModule } from '../workspaces/workspaces.module';
 import { AuthModule } from '../auth/auth.module';
+import { ChatModule } from '../chat/chat.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([File]),
     forwardRef(() => WorkspacesModule), // Use forwardRef to handle circular dependency
     AuthModule, // Provides JwtCookieGuard
+    forwardRef(() => ChatModule), // For storing chat messages
   ],
   controllers: [RagController, QueryController],
   providers: [RagService],

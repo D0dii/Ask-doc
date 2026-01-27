@@ -10,6 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { google } from '@ai-sdk/google';
+import { groq } from '@ai-sdk/groq';
 import { embedMany, embed, generateText } from 'ai';
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 import { v4 as uuidv4 } from 'uuid';
@@ -83,16 +84,28 @@ export class RagService implements OnModuleInit {
 
     this.logger.log(`Generated ${chunks.length} chunks from PDF.`);
 
-    // C. Embed using Gemini (Vercel SDK handles batching!)
-    const { embeddings } = await embedMany({
-      model: google.textEmbeddingModel('text-embedding-004'),
-      values: chunks,
-    });
+    // C. Embed using Gemini (batch in groups of 100 - API limit)
+    const BATCH_SIZE = 100;
+    const allEmbeddings: number[][] = [];
+
+    for (let i = 0; i < chunks.length; i += BATCH_SIZE) {
+      const batchChunks = chunks.slice(i, i + BATCH_SIZE);
+      this.logger.log(
+        `Embedding batch ${Math.floor(i / BATCH_SIZE) + 1}/${Math.ceil(chunks.length / BATCH_SIZE)} (${batchChunks.length} chunks)`,
+      );
+
+      const { embeddings } = await embedMany({
+        model: google.embeddingModel('text-embedding-004'),
+        values: batchChunks,
+      });
+
+      allEmbeddings.push(...embeddings);
+    }
 
     // D. Prepare Points for Qdrant
     const points = chunks.map((chunk, index) => ({
       id: uuidv4(), // Qdrant needs UUIDs
-      vector: embeddings[index],
+      vector: allEmbeddings[index],
       payload: {
         text: chunk, // We store the text to retrieve it later
         fileId: fileId, // For Deletion/Filtering
@@ -274,7 +287,7 @@ export class RagService implements OnModuleInit {
 
     // A. Embed the question
     const { embedding: questionEmbedding } = await embed({
-      model: google.textEmbeddingModel('text-embedding-004'),
+      model: google.embeddingModel('text-embedding-004'),
       value: question,
     });
 
@@ -312,7 +325,7 @@ export class RagService implements OnModuleInit {
 
     // D. Generate answer using LLM
     const { text: answer } = await generateText({
-      model: google('gemini-2.5-flash-lite'),
+      model: groq('llama-3.3-70b-versatile'),
       system: `You are a helpful assistant that answers questions based on the provided document context. 
 Only answer based on the information in the context. If the context doesn't contain enough information to answer the question, say so.
 Be concise and accurate.`,

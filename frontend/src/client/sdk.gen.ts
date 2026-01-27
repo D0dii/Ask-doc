@@ -23,7 +23,7 @@ export const appControllerGetHello = <ThrowOnError extends boolean = false>(opti
 /**
  * Get all files in a workspace
  */
-export const ragControllerGetFiles = <ThrowOnError extends boolean = false>(options?: Options<RagControllerGetFilesData, ThrowOnError>) => (options?.client ?? client).get<RagControllerGetFilesResponses, RagControllerGetFilesErrors, ThrowOnError>({
+export const ragControllerGetFiles = <ThrowOnError extends boolean = false>(options: Options<RagControllerGetFilesData, ThrowOnError>) => (options.client ?? client).get<RagControllerGetFilesResponses, RagControllerGetFilesErrors, ThrowOnError>({
     security: [{
             in: 'cookie',
             name: 'access_token',
@@ -193,4 +193,12 @@ export const authControllerRefresh = <ThrowOnError extends boolean = false>(opti
 /**
  * Logout and clear auth cookies
  */
-export const authControllerLogout = <ThrowOnError extends boolean = false>(options?: Options<AuthControllerLogoutData, ThrowOnError>) => (options?.client ?? client).post<AuthControllerLogoutResponses, unknown, ThrowOnError>({ url: '/auth/logout', ...options });
+export const authControllerLogout = <ThrowOnError extends boolean = false>(options?: Options<AuthControllerLogoutData, ThrowOnError>) => (options?.client ?? client).post<AuthControllerLogoutResponses, unknown, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'access_token',
+            type: 'apiKey'
+        }],
+    url: '/auth/logout',
+    ...options
+});

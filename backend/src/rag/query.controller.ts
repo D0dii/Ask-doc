@@ -4,19 +4,25 @@ import {
   ApiOperation,
   ApiResponse,
   ApiCookieAuth,
+  ApiParam,
 } from '@nestjs/swagger';
 import { RagService } from './rag.service';
 import { JwtCookieGuard } from '../auth/guards/jwt-cookie.guard';
 import { WorkspaceAccessGuard } from '../workspaces/guards/workspace-access.guard';
 import type { WorkspaceRequest } from '../auth/types/auth.types';
 import { QueryDto, QueryResponseDto } from './dtos';
+import { ChatService } from '../chat/chat.service';
 
 @ApiTags('RAG')
 @ApiCookieAuth()
 @Controller('workspaces/:workspaceId/query')
+@ApiParam({ name: 'workspaceId', description: 'Workspace ID', type: String })
 @UseGuards(JwtCookieGuard, WorkspaceAccessGuard)
 export class QueryController {
-  constructor(private readonly ragService: RagService) {}
+  constructor(
+    private readonly ragService: RagService,
+    private readonly chatService: ChatService,
+  ) {}
 
   @Post()
   @ApiOperation({
@@ -37,6 +43,17 @@ export class QueryController {
     @Req() req: WorkspaceRequest,
     @Body() body: QueryDto,
   ): Promise<QueryResponseDto> {
-    return this.ragService.query(req.workspace.id, body.question);
+    const result = await this.ragService.query(req.workspace.id, body.question);
+
+    // Store the question and answer in chat history
+    await this.chatService.createMessage({
+      question: body.question,
+      answer: result.answer,
+      sources: result.sources,
+      workspaceId: req.workspace.id,
+      userId: req.user.id,
+    });
+
+    return result;
   }
 }
