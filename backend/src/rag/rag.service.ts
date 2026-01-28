@@ -10,20 +10,16 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { google } from '@ai-sdk/google';
-import { groq } from '@ai-sdk/groq';
-import { embedMany, embed, generateText } from 'ai';
+import { embedMany, embed } from 'ai';
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 import { v4 as uuidv4 } from 'uuid';
 import { extractTextFromPdf } from './utils/pdf.util';
 import { File, FileStatus } from './entities/file.entity';
 
-interface QueryResult {
-  answer: string;
-  sources: Array<{
-    fileId: string;
-    text: string;
-    score: number;
-  }>;
+export interface SearchResult {
+  fileId: string;
+  text: string;
+  score: number;
 }
 
 @Injectable()
@@ -270,9 +266,13 @@ export class RagService implements OnModuleInit {
     );
   }
 
-  // Query documents in a workspace
-  async query(workspaceId: string, question: string): Promise<QueryResult> {
-    this.logger.log(`Query for workspace ${workspaceId}: ${question}`);
+  // Search for relevant document chunks in a workspace (semantic search only)
+  async search(
+    workspaceId: string,
+    question: string,
+    limit = 5,
+  ): Promise<SearchResult[]> {
+    this.logger.log(`Searching workspace ${workspaceId} for: ${question}`);
 
     // Check if workspace has any completed files
     const completedFiles = await this.fileRepository.count({
@@ -285,16 +285,16 @@ export class RagService implements OnModuleInit {
       );
     }
 
-    // A. Embed the question
+    // Embed the question
     const { embedding: questionEmbedding } = await embed({
       model: google.embeddingModel('text-embedding-004'),
       value: question,
     });
 
-    // B. Search in Qdrant (filter by workspaceId for security)
+    // Search in Qdrant (filter by workspaceId for security)
     const searchResult = await this.qdrant.search(this.COLLECTION_NAME, {
       vector: questionEmbedding,
-      limit: 5, // Top 5 most relevant chunks
+      limit,
       filter: {
         must: [
           {
@@ -306,42 +306,17 @@ export class RagService implements OnModuleInit {
       with_payload: true,
     });
 
-    if (searchResult.length === 0) {
-      return {
-        answer:
-          'I could not find any relevant information in the documents to answer your question.',
-        sources: [],
-      };
-    }
-
-    // C. Extract context from search results
-    const sources = searchResult.map((result) => ({
+    // Extract and return search results
+    const results = searchResult.map((result) => ({
       fileId: result.payload?.fileId as string,
       text: result.payload?.text as string,
       score: result.score,
     }));
 
-    const context = sources.map((s) => s.text).join('\n\n---\n\n');
+    this.logger.log(
+      `Found ${results.length} relevant chunks for workspace ${workspaceId}`,
+    );
 
-    // D. Generate answer using LLM
-    const { text: answer } = await generateText({
-      model: groq('llama-3.3-70b-versatile'),
-      system: `You are a helpful assistant that answers questions based on the provided document context. 
-Only answer based on the information in the context. If the context doesn't contain enough information to answer the question, say so.
-Be concise and accurate.`,
-      prompt: `Context from documents:
-${context}
-
-Question: ${question}
-
-Answer:`,
-    });
-
-    this.logger.log(`Generated answer for workspace ${workspaceId}`);
-
-    return {
-      answer,
-      sources,
-    };
+    return results;
   }
 }

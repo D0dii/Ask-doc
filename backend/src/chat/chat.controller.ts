@@ -1,7 +1,9 @@
 import {
   Controller,
   Get,
+  Post,
   Delete,
+  Body,
   Param,
   Query,
   UseGuards,
@@ -21,7 +23,12 @@ import { ChatService } from './chat.service';
 import { JwtCookieGuard } from '../auth/guards/jwt-cookie.guard';
 import { WorkspaceAccessGuard } from '../workspaces/guards/workspace-access.guard';
 import type { WorkspaceRequest } from '../auth/types/auth.types';
-import { ChatMessageResponseDto, ChatHistoryResponseDto } from './dtos';
+import {
+  ChatMessageResponseDto,
+  ChatHistoryResponseDto,
+  QueryDto,
+  QueryResponseDto,
+} from './dtos';
 
 @ApiTags('Chat')
 @ApiCookieAuth()
@@ -30,6 +37,28 @@ import { ChatMessageResponseDto, ChatHistoryResponseDto } from './dtos';
 @UseGuards(JwtCookieGuard, WorkspaceAccessGuard)
 export class ChatController {
   constructor(private readonly chatService: ChatService) {}
+
+  @Post('query')
+  @ApiOperation({
+    summary: 'Ask a question about the documents in a workspace',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'AI-generated answer with sources',
+    type: QueryResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request - no processed documents in workspace',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Workspace not found' })
+  async query(
+    @Req() req: WorkspaceRequest,
+    @Body() body: QueryDto,
+  ): Promise<QueryResponseDto> {
+    return this.chatService.query(req.workspace.id, req.user.id, body.question);
+  }
 
   @Get()
   @ApiOperation({ summary: 'Get chat history for a workspace' })

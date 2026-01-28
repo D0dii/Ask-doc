@@ -96,66 +96,6 @@ export const IngestResponseDtoSchema = {
     ]
 } as const;
 
-export const QueryDtoSchema = {
-    type: 'object',
-    properties: {
-        question: {
-            type: 'string',
-            description: 'The question to ask about the documents',
-            example: 'What is the main topic of the document?',
-            minLength: 3,
-            maxLength: 1000
-        }
-    },
-    required: [
-        'question'
-    ]
-} as const;
-
-export const SourceDtoSchema = {
-    type: 'object',
-    properties: {
-        fileId: {
-            type: 'string',
-            description: 'The file ID this chunk belongs to'
-        },
-        text: {
-            type: 'string',
-            description: 'The text content of the chunk'
-        },
-        score: {
-            type: 'number',
-            description: 'Similarity score (0-1)'
-        }
-    },
-    required: [
-        'fileId',
-        'text',
-        'score'
-    ]
-} as const;
-
-export const QueryResponseDtoSchema = {
-    type: 'object',
-    properties: {
-        answer: {
-            type: 'string',
-            description: 'The AI-generated answer'
-        },
-        sources: {
-            description: 'Source documents used to generate the answer',
-            type: 'array',
-            items: {
-                $ref: '#/components/schemas/SourceDto'
-            }
-        }
-    },
-    required: [
-        'answer',
-        'sources'
-    ]
-} as const;
-
 export const CreateWorkspaceDtoSchema = {
     type: 'object',
     properties: {
@@ -312,5 +252,157 @@ export const LogoutResponseDtoSchema = {
     },
     required: [
         'ok'
+    ]
+} as const;
+
+export const QueryDtoSchema = {
+    type: 'object',
+    properties: {
+        question: {
+            type: 'string',
+            description: 'The question to ask about the documents',
+            example: 'What is the main topic of the document?',
+            minLength: 3,
+            maxLength: 1000
+        }
+    },
+    required: [
+        'question'
+    ]
+} as const;
+
+export const SourceDtoSchema = {
+    type: 'object',
+    properties: {
+        fileId: {
+            type: 'string',
+            description: 'The file ID this chunk belongs to'
+        },
+        text: {
+            type: 'string',
+            description: 'The text content of the chunk'
+        },
+        score: {
+            type: 'number',
+            description: 'Similarity score (0-1)'
+        }
+    },
+    required: [
+        'fileId',
+        'text',
+        'score'
+    ]
+} as const;
+
+export const QueryResponseDtoSchema = {
+    type: 'object',
+    properties: {
+        answer: {
+            type: 'string',
+            description: 'The AI-generated answer'
+        },
+        sources: {
+            description: 'Source documents used to generate the answer',
+            type: 'array',
+            items: {
+                $ref: '#/components/schemas/SourceDto'
+            }
+        }
+    },
+    required: [
+        'answer',
+        'sources'
+    ]
+} as const;
+
+export const ChatMessageSourceDtoSchema = {
+    type: 'object',
+    properties: {
+        fileId: {
+            type: 'string',
+            description: 'The file ID this source belongs to'
+        },
+        text: {
+            type: 'string',
+            description: 'The text content of the source'
+        },
+        score: {
+            type: 'number',
+            description: 'Similarity score (0-1)'
+        }
+    },
+    required: [
+        'fileId',
+        'text',
+        'score'
+    ]
+} as const;
+
+export const ChatMessageResponseDtoSchema = {
+    type: 'object',
+    properties: {
+        id: {
+            type: 'string',
+            description: 'Unique identifier of the chat message'
+        },
+        question: {
+            type: 'string',
+            description: 'The question asked by the user'
+        },
+        answer: {
+            type: 'string',
+            description: 'The AI-generated answer'
+        },
+        sources: {
+            description: 'Source documents used to generate the answer',
+            nullable: true,
+            type: 'array',
+            items: {
+                $ref: '#/components/schemas/ChatMessageSourceDto'
+            }
+        },
+        workspaceId: {
+            type: 'string',
+            description: 'ID of the workspace this message belongs to'
+        },
+        userId: {
+            type: 'string',
+            description: 'ID of the user who asked the question'
+        },
+        createdAt: {
+            format: 'date-time',
+            type: 'string',
+            description: 'When the message was created'
+        }
+    },
+    required: [
+        'id',
+        'question',
+        'answer',
+        'sources',
+        'workspaceId',
+        'userId',
+        'createdAt'
+    ]
+} as const;
+
+export const ChatHistoryResponseDtoSchema = {
+    type: 'object',
+    properties: {
+        messages: {
+            description: 'List of chat messages',
+            type: 'array',
+            items: {
+                $ref: '#/components/schemas/ChatMessageResponseDto'
+            }
+        },
+        total: {
+            type: 'number',
+            description: 'Total number of messages'
+        }
+    },
+    required: [
+        'messages',
+        'total'
     ]
 } as const;

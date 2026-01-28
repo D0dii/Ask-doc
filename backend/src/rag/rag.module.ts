@@ -1,22 +1,19 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RagController } from './rag.controller';
-import { QueryController } from './query.controller';
 import { RagService } from './rag.service';
 import { File } from './entities/file.entity';
 import { WorkspacesModule } from '../workspaces/workspaces.module';
 import { AuthModule } from '../auth/auth.module';
-import { ChatModule } from '../chat/chat.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([File]),
     forwardRef(() => WorkspacesModule), // Use forwardRef to handle circular dependency
     AuthModule, // Provides JwtCookieGuard
-    forwardRef(() => ChatModule), // For storing chat messages
   ],
-  controllers: [RagController, QueryController],
+  controllers: [RagController],
   providers: [RagService],
-  exports: [RagService], // Export for WorkspacesService to use
+  exports: [RagService], // Export for ChatService and WorkspacesService to use
 })
 export class RagModule {}

@@ -62,39 +62,6 @@ export type IngestResponseDto = {
     status: 'pending' | 'processing' | 'completed' | 'failed';
 };
 
-export type QueryDto = {
-    /**
-     * The question to ask about the documents
-     */
-    question: string;
-};
-
-export type SourceDto = {
-    /**
-     * The file ID this chunk belongs to
-     */
-    fileId: string;
-    /**
-     * The text content of the chunk
-     */
-    text: string;
-    /**
-     * Similarity score (0-1)
-     */
-    score: number;
-};
-
-export type QueryResponseDto = {
-    /**
-     * The AI-generated answer
-     */
-    answer: string;
-    /**
-     * Source documents used to generate the answer
-     */
-    sources: Array<SourceDto>;
-};
-
 export type CreateWorkspaceDto = {
     /**
      * Name of the workspace
@@ -191,6 +158,96 @@ export type LogoutResponseDto = {
      * Indicates the logout was successful
      */
     ok: boolean;
+};
+
+export type QueryDto = {
+    /**
+     * The question to ask about the documents
+     */
+    question: string;
+};
+
+export type SourceDto = {
+    /**
+     * The file ID this chunk belongs to
+     */
+    fileId: string;
+    /**
+     * The text content of the chunk
+     */
+    text: string;
+    /**
+     * Similarity score (0-1)
+     */
+    score: number;
+};
+
+export type QueryResponseDto = {
+    /**
+     * The AI-generated answer
+     */
+    answer: string;
+    /**
+     * Source documents used to generate the answer
+     */
+    sources: Array<SourceDto>;
+};
+
+export type ChatMessageSourceDto = {
+    /**
+     * The file ID this source belongs to
+     */
+    fileId: string;
+    /**
+     * The text content of the source
+     */
+    text: string;
+    /**
+     * Similarity score (0-1)
+     */
+    score: number;
+};
+
+export type ChatMessageResponseDto = {
+    /**
+     * Unique identifier of the chat message
+     */
+    id: string;
+    /**
+     * The question asked by the user
+     */
+    question: string;
+    /**
+     * The AI-generated answer
+     */
+    answer: string;
+    /**
+     * Source documents used to generate the answer
+     */
+    sources: Array<ChatMessageSourceDto> | null;
+    /**
+     * ID of the workspace this message belongs to
+     */
+    workspaceId: string;
+    /**
+     * ID of the user who asked the question
+     */
+    userId: string;
+    /**
+     * When the message was created
+     */
+    createdAt: string;
+};
+
+export type ChatHistoryResponseDto = {
+    /**
+     * List of chat messages
+     */
+    messages: Array<ChatMessageResponseDto>;
+    /**
+     * Total number of messages
+     */
+    total: number;
 };
 
 export type AppControllerGetHelloData = {
@@ -346,42 +403,6 @@ export type RagControllerGetFileResponses = {
 };
 
 export type RagControllerGetFileResponse = RagControllerGetFileResponses[keyof RagControllerGetFileResponses];
-
-export type QueryControllerQueryData = {
-    body: QueryDto;
-    path: {
-        /**
-         * Workspace ID
-         */
-        workspaceId: string;
-    };
-    query?: never;
-    url: '/workspaces/{workspaceId}/query';
-};
-
-export type QueryControllerQueryErrors = {
-    /**
-     * Bad request - no processed documents in workspace
-     */
-    400: unknown;
-    /**
-     * Unauthorized
-     */
-    401: unknown;
-    /**
-     * Workspace not found
-     */
-    404: unknown;
-};
-
-export type QueryControllerQueryResponses = {
-    /**
-     * AI-generated answer with sources
-     */
-    200: QueryResponseDto;
-};
-
-export type QueryControllerQueryResponse = QueryControllerQueryResponses[keyof QueryControllerQueryResponses];
 
 export type WorkspacesControllerFindAllData = {
     body?: never;
@@ -582,3 +603,176 @@ export type AuthControllerLogoutResponses = {
 };
 
 export type AuthControllerLogoutResponse = AuthControllerLogoutResponses[keyof AuthControllerLogoutResponses];
+
+export type ChatControllerQueryData = {
+    body: QueryDto;
+    path: {
+        /**
+         * Workspace ID
+         */
+        workspaceId: string;
+    };
+    query?: never;
+    url: '/workspaces/{workspaceId}/chat/query';
+};
+
+export type ChatControllerQueryErrors = {
+    /**
+     * Bad request - no processed documents in workspace
+     */
+    400: unknown;
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Workspace not found
+     */
+    404: unknown;
+};
+
+export type ChatControllerQueryResponses = {
+    /**
+     * AI-generated answer with sources
+     */
+    200: QueryResponseDto;
+};
+
+export type ChatControllerQueryResponse = ChatControllerQueryResponses[keyof ChatControllerQueryResponses];
+
+export type ChatControllerClearHistoryData = {
+    body?: never;
+    path: {
+        /**
+         * Workspace ID
+         */
+        workspaceId: string;
+    };
+    query?: never;
+    url: '/workspaces/{workspaceId}/chat';
+};
+
+export type ChatControllerClearHistoryErrors = {
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+};
+
+export type ChatControllerClearHistoryResponses = {
+    /**
+     * Chat history cleared successfully
+     */
+    200: unknown;
+};
+
+export type ChatControllerGetChatHistoryData = {
+    body?: never;
+    path: {
+        /**
+         * Workspace ID
+         */
+        workspaceId: string;
+    };
+    query?: {
+        /**
+         * Number of messages to return (default: 50)
+         */
+        limit?: number;
+        /**
+         * Number of messages to skip (default: 0)
+         */
+        offset?: number;
+    };
+    url: '/workspaces/{workspaceId}/chat';
+};
+
+export type ChatControllerGetChatHistoryErrors = {
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Workspace not found
+     */
+    404: unknown;
+};
+
+export type ChatControllerGetChatHistoryResponses = {
+    /**
+     * Chat history retrieved successfully
+     */
+    200: ChatHistoryResponseDto;
+};
+
+export type ChatControllerGetChatHistoryResponse = ChatControllerGetChatHistoryResponses[keyof ChatControllerGetChatHistoryResponses];
+
+export type ChatControllerDeleteMessageData = {
+    body?: never;
+    path: {
+        /**
+         * Message ID
+         */
+        messageId: string;
+        /**
+         * Workspace ID
+         */
+        workspaceId: string;
+    };
+    query?: never;
+    url: '/workspaces/{workspaceId}/chat/{messageId}';
+};
+
+export type ChatControllerDeleteMessageErrors = {
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Message not found
+     */
+    404: unknown;
+};
+
+export type ChatControllerDeleteMessageResponses = {
+    /**
+     * Message deleted successfully
+     */
+    200: unknown;
+};
+
+export type ChatControllerGetMessageData = {
+    body?: never;
+    path: {
+        /**
+         * Message ID
+         */
+        messageId: string;
+        /**
+         * Workspace ID
+         */
+        workspaceId: string;
+    };
+    query?: never;
+    url: '/workspaces/{workspaceId}/chat/{messageId}';
+};
+
+export type ChatControllerGetMessageErrors = {
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Message not found
+     */
+    404: unknown;
+};
+
+export type ChatControllerGetMessageResponses = {
+    /**
+     * Chat message retrieved successfully
+     */
+    200: ChatMessageResponseDto;
+};
+
+export type ChatControllerGetMessageResponse = ChatControllerGetMessageResponses[keyof ChatControllerGetMessageResponses];
