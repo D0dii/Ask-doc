@@ -6,6 +6,17 @@ import { generateText } from 'ai';
 import { ChatMessage } from './entities/chat-message.entity';
 import { ChatConversation } from './entities/chat-conversation.entity';
 import { RagService, SearchResult } from '../rag/rag.service';
+import { LLM_MODELS, CHAT_CONFIG } from '../shared/constants';
+import {
+  QUESTION_REWRITER_SYSTEM_PROMPT,
+  QUESTION_REWRITER_PROMPT_TEMPLATE,
+  ANSWER_GENERATOR_SYSTEM_PROMPT,
+  ANSWER_GENERATOR_PROMPT_TEMPLATE,
+  TITLE_GENERATOR_SYSTEM_PROMPT,
+  TITLE_GENERATOR_PROMPT_TEMPLATE,
+  formatConversationHistory,
+  formatSourcesContext,
+} from './constants';
 
 export interface QueryResult {
   answer: string;
@@ -22,7 +33,6 @@ interface ConversationMessage {
 @Injectable()
 export class ChatService {
   private readonly logger = new Logger(ChatService.name);
-  private readonly MAX_CONTEXT_MESSAGES = 6; // Last 3 Q&A pairs
 
   constructor(
     @InjectRepository(ChatMessage)
@@ -217,7 +227,7 @@ export class ChatService {
     const recentMessages = await this.chatMessageRepository.find({
       where: { conversationId },
       order: { createdAt: 'DESC' },
-      take: this.MAX_CONTEXT_MESSAGES / 2, // Get last N Q&A pairs
+      take: CHAT_CONFIG.MAX_CONTEXT_MESSAGES / 2, // Get last N Q&A pairs
     });
 
     // Convert to conversation format (oldest first)
@@ -240,28 +250,13 @@ export class ChatService {
     }
 
     // Use LLM to rewrite the question
-    const historyText = conversationHistory
-      .map(
-        (msg) =>
-          `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}`,
-      )
-      .join('\n');
+    const historyText = formatConversationHistory(conversationHistory);
 
     try {
       const { text } = await generateText({
-        model: groq('llama-3.3-70b-versatile'),
-        system: `You are a question rewriter. Given a conversation history and a follow-up question, rewrite the question to be standalone and self-contained.
-
-Rules:
-- If the question is already standalone, return it unchanged
-- Keep the rewritten question concise
-- Only output the rewritten question, nothing else`,
-        prompt: `Conversation history:
-${historyText}
-
-Follow-up question: ${question}
-
-Rewritten standalone question:`,
+        model: groq(LLM_MODELS.GROQ.DEFAULT),
+        system: QUESTION_REWRITER_SYSTEM_PROMPT,
+        prompt: QUESTION_REWRITER_PROMPT_TEMPLATE(historyText, question),
       });
 
       return text.trim() || question;
@@ -276,32 +271,22 @@ Rewritten standalone question:`,
     sources: SearchResult[],
     conversationHistory: ConversationMessage[],
   ): Promise<string> {
-    const context = sources.map((s) => s.text).join('\n\n---\n\n');
+    const context = formatSourcesContext(sources);
 
     // Build conversation context string
-    let conversationContext = '';
-    if (conversationHistory.length > 0) {
-      conversationContext = `
-Previous conversation:
-${conversationHistory.map((msg) => `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}`).join('\n')}
-
----
-
-`;
-    }
+    const conversationContext =
+      conversationHistory.length > 0
+        ? formatConversationHistory(conversationHistory)
+        : undefined;
 
     const { text } = await generateText({
-      model: groq('llama-3.3-70b-versatile'),
-      system: `You are a helpful assistant that answers questions based on the provided document context.
-Only answer based on the information in the context. If the context doesn't contain enough information to answer the question, say so.
-Be concise and accurate.
-If there's previous conversation history, use it to understand follow-up questions and maintain consistency in your answers.`,
-      prompt: `${conversationContext}Context from documents:
-${context}
-
-Current question: ${question}
-
-Answer:`,
+      model: groq(LLM_MODELS.GROQ.DEFAULT),
+      system: ANSWER_GENERATOR_SYSTEM_PROMPT,
+      prompt: ANSWER_GENERATOR_PROMPT_TEMPLATE({
+        conversationHistory: conversationContext,
+        context,
+        question,
+      }),
     });
 
     return text;
@@ -313,13 +298,14 @@ Answer:`,
   ): Promise<string> {
     try {
       const { text } = await generateText({
-        model: groq('llama-3.3-70b-versatile'),
-        system:
-          'Generate a short, concise title (max 50 characters) for this conversation based on the question and answer. Only output the title, nothing else.',
-        prompt: `Question: ${question}\nAnswer: ${answer}\n\nTitle:`,
+        model: groq(LLM_MODELS.GROQ.DEFAULT),
+        system: TITLE_GENERATOR_SYSTEM_PROMPT,
+        prompt: TITLE_GENERATOR_PROMPT_TEMPLATE(question, answer),
       });
 
-      return text.trim().slice(0, 50) || 'New conversation';
+      return (
+        text.trim().slice(0, CHAT_CONFIG.MAX_TITLE_LENGTH) || 'New conversation'
+      );
     } catch {
       return 'New conversation';
     }

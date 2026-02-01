@@ -15,6 +15,7 @@ import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 import { v4 as uuidv4 } from 'uuid';
 import { extractTextFromPdf } from './utils/pdf.util';
 import { File, FileStatus } from './entities/file.entity';
+import { EMBEDDING_MODELS, RAG_CONFIG } from '../shared/constants';
 
 export interface SearchResult {
   fileId: string;
@@ -26,7 +27,6 @@ export interface SearchResult {
 export class RagService implements OnModuleInit {
   private readonly logger = new Logger(RagService.name);
   private qdrant: QdrantClient;
-  private readonly COLLECTION_NAME = 'ask_doc';
 
   constructor(
     private configService: ConfigService,
@@ -46,15 +46,17 @@ export class RagService implements OnModuleInit {
     try {
       const result = await this.qdrant.getCollections();
       const exists = result.collections.some(
-        (c) => c.name === this.COLLECTION_NAME,
+        (c) => c.name === RAG_CONFIG.COLLECTION_NAME,
       );
 
       if (!exists) {
-        this.logger.log(`Creating Qdrant collection: ${this.COLLECTION_NAME}`);
-        await this.qdrant.createCollection(this.COLLECTION_NAME, {
+        this.logger.log(
+          `Creating Qdrant collection: ${RAG_CONFIG.COLLECTION_NAME}`,
+        );
+        await this.qdrant.createCollection(RAG_CONFIG.COLLECTION_NAME, {
           vectors: {
-            size: 768, // Gemini text-embedding-004 size
-            distance: 'Cosine',
+            size: EMBEDDING_MODELS.OLLAMA.DIMENSIONS,
+            distance: RAG_CONFIG.DISTANCE_METRIC,
           },
         });
       }
@@ -72,26 +74,25 @@ export class RagService implements OnModuleInit {
 
     // B. Split Text (Chunks)
     const splitter = new RecursiveCharacterTextSplitter({
-      chunkSize: 1000,
-      chunkOverlap: 200, // Important for context continuity
+      chunkSize: RAG_CONFIG.CHUNK_SIZE,
+      chunkOverlap: RAG_CONFIG.CHUNK_OVERLAP,
     });
     const docOutput = await splitter.createDocuments([text]);
     const chunks = docOutput.map((doc) => doc.pageContent);
 
     this.logger.log(`Generated ${chunks.length} chunks from PDF.`);
 
-    // C. Embed using Gemini (batch in groups of 100 - API limit)
-    const BATCH_SIZE = 100;
+    // C. Embed using Ollama (batch in groups)
     const allEmbeddings: number[][] = [];
 
-    for (let i = 0; i < chunks.length; i += BATCH_SIZE) {
-      const batchChunks = chunks.slice(i, i + BATCH_SIZE);
+    for (let i = 0; i < chunks.length; i += RAG_CONFIG.EMBEDDING_BATCH_SIZE) {
+      const batchChunks = chunks.slice(i, i + RAG_CONFIG.EMBEDDING_BATCH_SIZE);
       this.logger.log(
-        `Embedding batch ${Math.floor(i / BATCH_SIZE) + 1}/${Math.ceil(chunks.length / BATCH_SIZE)} (${batchChunks.length} chunks)`,
+        `Embedding batch ${Math.floor(i / RAG_CONFIG.EMBEDDING_BATCH_SIZE) + 1}/${Math.ceil(chunks.length / RAG_CONFIG.EMBEDDING_BATCH_SIZE)} (${batchChunks.length} chunks)`,
       );
 
       const { embeddings } = await embedMany({
-        model: ollama.embedding('nomic-embed-text-v2-moe'),
+        model: ollama.embedding(EMBEDDING_MODELS.OLLAMA.DEFAULT),
         values: batchChunks,
       });
 
@@ -110,7 +111,7 @@ export class RagService implements OnModuleInit {
     }));
 
     // E. Save to Database
-    await this.qdrant.upsert(this.COLLECTION_NAME, {
+    await this.qdrant.upsert(RAG_CONFIG.COLLECTION_NAME, {
       wait: true,
       points: points,
     });
@@ -207,7 +208,7 @@ export class RagService implements OnModuleInit {
 
     // Delete vectors from Qdrant
     try {
-      await this.qdrant.delete(this.COLLECTION_NAME, {
+      await this.qdrant.delete(RAG_CONFIG.COLLECTION_NAME, {
         filter: {
           must: [
             {
@@ -241,7 +242,7 @@ export class RagService implements OnModuleInit {
 
     // Delete all vectors from Qdrant for this workspace
     try {
-      await this.qdrant.delete(this.COLLECTION_NAME, {
+      await this.qdrant.delete(RAG_CONFIG.COLLECTION_NAME, {
         filter: {
           must: [
             {
@@ -270,7 +271,7 @@ export class RagService implements OnModuleInit {
   async search(
     workspaceId: string,
     question: string,
-    limit = 5,
+    limit = RAG_CONFIG.DEFAULT_SEARCH_LIMIT,
   ): Promise<SearchResult[]> {
     this.logger.log(`Searching workspace ${workspaceId} for: ${question}`);
 
@@ -287,12 +288,12 @@ export class RagService implements OnModuleInit {
 
     // Embed the question
     const { embedding: questionEmbedding } = await embed({
-      model: ollama.embedding('nomic-embed-text-v2-moe'),
+      model: ollama.embedding(EMBEDDING_MODELS.OLLAMA.DEFAULT),
       value: question,
     });
 
     // Search in Qdrant (filter by workspaceId for security)
-    const searchResult = await this.qdrant.search(this.COLLECTION_NAME, {
+    const searchResult = await this.qdrant.search(RAG_CONFIG.COLLECTION_NAME, {
       vector: questionEmbedding,
       limit,
       filter: {
