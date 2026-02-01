@@ -9,7 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { QdrantClient } from '@qdrant/js-client-rest';
-import { google } from '@ai-sdk/google';
+import { ollama } from 'ai-sdk-ollama';
 import { embedMany, embed } from 'ai';
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 import { v4 as uuidv4 } from 'uuid';
@@ -91,7 +91,7 @@ export class RagService implements OnModuleInit {
       );
 
       const { embeddings } = await embedMany({
-        model: google.embeddingModel('text-embedding-004'),
+        model: ollama.embedding('nomic-embed-text-v2-moe'),
         values: batchChunks,
       });
 
@@ -287,7 +287,7 @@ export class RagService implements OnModuleInit {
 
     // Embed the question
     const { embedding: questionEmbedding } = await embed({
-      model: google.embeddingModel('text-embedding-004'),
+      model: ollama.embedding('nomic-embed-text-v2-moe'),
       value: question,
     });
 

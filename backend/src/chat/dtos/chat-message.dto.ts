@@ -28,8 +28,10 @@ export class ChatMessageResponseDto {
   })
   sources: ChatMessageSourceDto[] | null;
 
-  @ApiProperty({ description: 'ID of the workspace this message belongs to' })
-  workspaceId: string;
+  @ApiProperty({
+    description: 'ID of the conversation this message belongs to',
+  })
+  conversationId: string;
 
   @ApiProperty({ description: 'ID of the user who asked the question' })
   userId: string;

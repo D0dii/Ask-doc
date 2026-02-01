@@ -255,7 +255,7 @@ export const LogoutResponseDtoSchema = {
     ]
 } as const;
 
-export const QueryDtoSchema = {
+export const QueryInConversationDtoSchema = {
     type: 'object',
     properties: {
         question: {
@@ -264,6 +264,11 @@ export const QueryDtoSchema = {
             example: 'What is the main topic of the document?',
             minLength: 3,
             maxLength: 1000
+        },
+        conversationId: {
+            type: 'string',
+            description: 'ID of an existing conversation to continue. If not provided, a new conversation will be created.',
+            example: '123e4567-e89b-12d3-a456-426614174000'
         }
     },
     required: [
@@ -271,30 +276,7 @@ export const QueryDtoSchema = {
     ]
 } as const;
 
-export const SourceDtoSchema = {
-    type: 'object',
-    properties: {
-        fileId: {
-            type: 'string',
-            description: 'The file ID this chunk belongs to'
-        },
-        text: {
-            type: 'string',
-            description: 'The text content of the chunk'
-        },
-        score: {
-            type: 'number',
-            description: 'Similarity score (0-1)'
-        }
-    },
-    required: [
-        'fileId',
-        'text',
-        'score'
-    ]
-} as const;
-
-export const QueryResponseDtoSchema = {
+export const QueryInConversationResponseDtoSchema = {
     type: 'object',
     properties: {
         answer: {
@@ -302,16 +284,116 @@ export const QueryResponseDtoSchema = {
             description: 'The AI-generated answer'
         },
         sources: {
-            description: 'Source documents used to generate the answer',
             type: 'array',
+            description: 'Source documents used to generate the answer',
             items: {
-                $ref: '#/components/schemas/SourceDto'
+                type: 'object',
+                properties: {
+                    fileId: {
+                        type: 'string'
+                    },
+                    text: {
+                        type: 'string'
+                    },
+                    score: {
+                        type: 'number'
+                    }
+                }
             }
+        },
+        conversationId: {
+            type: 'string',
+            description: 'The conversation ID (new or existing)'
+        },
+        messageId: {
+            type: 'string',
+            description: 'The message ID of this Q&A'
         }
     },
     required: [
         'answer',
-        'sources'
+        'sources',
+        'conversationId',
+        'messageId'
+    ]
+} as const;
+
+export const CreateConversationDtoSchema = {
+    type: 'object',
+    properties: {
+        title: {
+            type: 'string',
+            description: 'Optional title for the conversation',
+            example: 'Questions about REST API',
+            maxLength: 200
+        }
+    }
+} as const;
+
+export const ConversationResponseDtoSchema = {
+    type: 'object',
+    properties: {
+        id: {
+            type: 'string',
+            description: 'Unique identifier of the conversation'
+        },
+        title: {
+            type: 'object',
+            description: 'Title of the conversation',
+            nullable: true
+        },
+        workspaceId: {
+            type: 'string',
+            description: 'ID of the workspace this conversation belongs to'
+        },
+        userId: {
+            type: 'string',
+            description: 'ID of the user who created the conversation'
+        },
+        messageCount: {
+            type: 'number',
+            description: 'Number of messages in the conversation'
+        },
+        createdAt: {
+            format: 'date-time',
+            type: 'string',
+            description: 'When the conversation was created'
+        },
+        updatedAt: {
+            format: 'date-time',
+            type: 'string',
+            description: 'When the conversation was last updated'
+        }
+    },
+    required: [
+        'id',
+        'title',
+        'workspaceId',
+        'userId',
+        'messageCount',
+        'createdAt',
+        'updatedAt'
+    ]
+} as const;
+
+export const ConversationListResponseDtoSchema = {
+    type: 'object',
+    properties: {
+        conversations: {
+            description: 'List of conversations',
+            type: 'array',
+            items: {
+                $ref: '#/components/schemas/ConversationResponseDto'
+            }
+        },
+        total: {
+            type: 'number',
+            description: 'Total number of conversations'
+        }
+    },
+    required: [
+        'conversations',
+        'total'
     ]
 } as const;
 
@@ -361,9 +443,9 @@ export const ChatMessageResponseDtoSchema = {
                 $ref: '#/components/schemas/ChatMessageSourceDto'
             }
         },
-        workspaceId: {
+        conversationId: {
             type: 'string',
-            description: 'ID of the workspace this message belongs to'
+            description: 'ID of the conversation this message belongs to'
         },
         userId: {
             type: 'string',
@@ -380,29 +462,78 @@ export const ChatMessageResponseDtoSchema = {
         'question',
         'answer',
         'sources',
-        'workspaceId',
+        'conversationId',
         'userId',
         'createdAt'
     ]
 } as const;
 
-export const ChatHistoryResponseDtoSchema = {
+export const ConversationWithMessagesDtoSchema = {
     type: 'object',
     properties: {
+        id: {
+            type: 'string',
+            description: 'Unique identifier of the conversation'
+        },
+        title: {
+            type: 'object',
+            description: 'Title of the conversation',
+            nullable: true
+        },
+        workspaceId: {
+            type: 'string',
+            description: 'ID of the workspace this conversation belongs to'
+        },
+        userId: {
+            type: 'string',
+            description: 'ID of the user who created the conversation'
+        },
+        messageCount: {
+            type: 'number',
+            description: 'Number of messages in the conversation'
+        },
+        createdAt: {
+            format: 'date-time',
+            type: 'string',
+            description: 'When the conversation was created'
+        },
+        updatedAt: {
+            format: 'date-time',
+            type: 'string',
+            description: 'When the conversation was last updated'
+        },
         messages: {
-            description: 'List of chat messages',
+            description: 'Messages in the conversation',
             type: 'array',
             items: {
                 $ref: '#/components/schemas/ChatMessageResponseDto'
             }
-        },
-        total: {
-            type: 'number',
-            description: 'Total number of messages'
         }
     },
     required: [
-        'messages',
-        'total'
+        'id',
+        'title',
+        'workspaceId',
+        'userId',
+        'messageCount',
+        'createdAt',
+        'updatedAt',
+        'messages'
+    ]
+} as const;
+
+export const UpdateConversationDtoSchema = {
+    type: 'object',
+    properties: {
+        title: {
+            type: 'string',
+            description: 'New title for the conversation',
+            example: 'REST API Architecture Discussion',
+            minLength: 1,
+            maxLength: 200
+        }
+    },
+    required: [
+        'title'
     ]
 } as const;

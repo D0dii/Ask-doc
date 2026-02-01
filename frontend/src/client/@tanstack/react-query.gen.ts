@@ -3,8 +3,8 @@
 import { type DefaultError, type InfiniteData, infiniteQueryOptions, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { appControllerGetHello, authControllerGoogleAuth, authControllerLogout, authControllerMe, authControllerRefresh, chatControllerClearHistory, chatControllerDeleteMessage, chatControllerGetChatHistory, chatControllerGetMessage, chatControllerQuery, type Options, ragControllerDeleteFile, ragControllerGetFile, ragControllerGetFiles, ragControllerIngest, workspacesControllerCreate, workspacesControllerFindAll, workspacesControllerFindOne, workspacesControllerRemove, workspacesControllerUpdate } from '../sdk.gen';
-import type { AppControllerGetHelloData, AuthControllerGoogleAuthData, AuthControllerLogoutData, AuthControllerLogoutResponse, AuthControllerMeData, AuthControllerMeResponse, AuthControllerRefreshData, AuthControllerRefreshResponse, ChatControllerClearHistoryData, ChatControllerDeleteMessageData, ChatControllerGetChatHistoryData, ChatControllerGetChatHistoryResponse, ChatControllerGetMessageData, ChatControllerGetMessageResponse, ChatControllerQueryData, ChatControllerQueryResponse, RagControllerDeleteFileData, RagControllerGetFileData, RagControllerGetFileResponse, RagControllerGetFilesData, RagControllerGetFilesResponse, RagControllerIngestData, RagControllerIngestResponse, WorkspacesControllerCreateData, WorkspacesControllerCreateResponse, WorkspacesControllerFindAllData, WorkspacesControllerFindAllResponse, WorkspacesControllerFindOneData, WorkspacesControllerFindOneResponse, WorkspacesControllerRemoveData, WorkspacesControllerUpdateData, WorkspacesControllerUpdateResponse } from '../types.gen';
+import { authControllerGoogleAuth, authControllerLogout, authControllerMe, authControllerRefresh, chatControllerClearConversations, chatControllerCreateConversation, chatControllerDeleteConversation, chatControllerDeleteMessage, chatControllerGetConversation, chatControllerGetConversations, chatControllerGetMessages, chatControllerQuery, chatControllerUpdateConversation, type Options, ragControllerDeleteFile, ragControllerGetFile, ragControllerGetFiles, ragControllerIngest, workspacesControllerCreate, workspacesControllerFindAll, workspacesControllerFindOne, workspacesControllerRemove, workspacesControllerUpdate } from '../sdk.gen';
+import type { AuthControllerGoogleAuthData, AuthControllerLogoutData, AuthControllerLogoutResponse, AuthControllerMeData, AuthControllerMeResponse, AuthControllerRefreshData, AuthControllerRefreshResponse, ChatControllerClearConversationsData, ChatControllerCreateConversationData, ChatControllerCreateConversationResponse, ChatControllerDeleteConversationData, ChatControllerDeleteMessageData, ChatControllerGetConversationData, ChatControllerGetConversationResponse, ChatControllerGetConversationsData, ChatControllerGetConversationsResponse, ChatControllerGetMessagesData, ChatControllerGetMessagesResponse, ChatControllerQueryData, ChatControllerQueryResponse, ChatControllerUpdateConversationData, ChatControllerUpdateConversationResponse, RagControllerDeleteFileData, RagControllerGetFileData, RagControllerGetFileResponse, RagControllerGetFilesData, RagControllerGetFilesResponse, RagControllerIngestData, RagControllerIngestResponse, WorkspacesControllerCreateData, WorkspacesControllerCreateResponse, WorkspacesControllerFindAllData, WorkspacesControllerFindAllResponse, WorkspacesControllerFindOneData, WorkspacesControllerFindOneResponse, WorkspacesControllerRemoveData, WorkspacesControllerUpdateData, WorkspacesControllerUpdateResponse } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
     Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
@@ -38,21 +38,6 @@ const createQueryKey = <TOptions extends Options>(id: string, options?: TOptions
     }
     return [params];
 };
-
-export const appControllerGetHelloQueryKey = (options?: Options<AppControllerGetHelloData>) => createQueryKey('appControllerGetHello', options);
-
-export const appControllerGetHelloOptions = (options?: Options<AppControllerGetHelloData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof appControllerGetHelloQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await appControllerGetHello({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: appControllerGetHelloQueryKey(options)
-});
 
 export const ragControllerGetFilesQueryKey = (options: Options<RagControllerGetFilesData>) => createQueryKey('ragControllerGetFiles', options);
 
@@ -283,6 +268,8 @@ export const authControllerLogoutMutation = (options?: Partial<Options<AuthContr
 
 /**
  * Ask a question about the documents in a workspace
+ *
+ * Asks a question and optionally continues an existing conversation. If conversationId is provided, the question will be added to that conversation with context awareness. If not, a new conversation will be created.
  */
 export const chatControllerQueryMutation = (options?: Partial<Options<ChatControllerQueryData>>): UseMutationOptions<ChatControllerQueryResponse, DefaultError, Options<ChatControllerQueryData>> => {
     const mutationOptions: UseMutationOptions<ChatControllerQueryResponse, DefaultError, Options<ChatControllerQueryData>> = {
@@ -299,12 +286,12 @@ export const chatControllerQueryMutation = (options?: Partial<Options<ChatContro
 };
 
 /**
- * Clear all chat history for a workspace
+ * Clear all conversations for a workspace
  */
-export const chatControllerClearHistoryMutation = (options?: Partial<Options<ChatControllerClearHistoryData>>): UseMutationOptions<unknown, DefaultError, Options<ChatControllerClearHistoryData>> => {
-    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<ChatControllerClearHistoryData>> = {
+export const chatControllerClearConversationsMutation = (options?: Partial<Options<ChatControllerClearConversationsData>>): UseMutationOptions<unknown, DefaultError, Options<ChatControllerClearConversationsData>> => {
+    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<ChatControllerClearConversationsData>> = {
         mutationFn: async (fnOptions) => {
-            const { data } = await chatControllerClearHistory({
+            const { data } = await chatControllerClearConversations({
                 ...options,
                 ...fnOptions,
                 throwOnError: true
@@ -315,14 +302,14 @@ export const chatControllerClearHistoryMutation = (options?: Partial<Options<Cha
     return mutationOptions;
 };
 
-export const chatControllerGetChatHistoryQueryKey = (options: Options<ChatControllerGetChatHistoryData>) => createQueryKey('chatControllerGetChatHistory', options);
+export const chatControllerGetConversationsQueryKey = (options: Options<ChatControllerGetConversationsData>) => createQueryKey('chatControllerGetConversations', options);
 
 /**
- * Get chat history for a workspace
+ * Get all conversations for a workspace
  */
-export const chatControllerGetChatHistoryOptions = (options: Options<ChatControllerGetChatHistoryData>) => queryOptions<ChatControllerGetChatHistoryResponse, DefaultError, ChatControllerGetChatHistoryResponse, ReturnType<typeof chatControllerGetChatHistoryQueryKey>>({
+export const chatControllerGetConversationsOptions = (options: Options<ChatControllerGetConversationsData>) => queryOptions<ChatControllerGetConversationsResponse, DefaultError, ChatControllerGetConversationsResponse, ReturnType<typeof chatControllerGetConversationsQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await chatControllerGetChatHistory({
+        const { data } = await chatControllerGetConversations({
             ...options,
             ...queryKey[0],
             signal,
@@ -330,7 +317,7 @@ export const chatControllerGetChatHistoryOptions = (options: Options<ChatControl
         });
         return data;
     },
-    queryKey: chatControllerGetChatHistoryQueryKey(options)
+    queryKey: chatControllerGetConversationsQueryKey(options)
 });
 
 const createInfiniteParams = <K extends Pick<QueryKey<Options>[0], 'body' | 'headers' | 'path' | 'query'>>(queryKey: QueryKey<Options>, page: K) => {
@@ -362,23 +349,23 @@ const createInfiniteParams = <K extends Pick<QueryKey<Options>[0], 'body' | 'hea
     return params as unknown as typeof page;
 };
 
-export const chatControllerGetChatHistoryInfiniteQueryKey = (options: Options<ChatControllerGetChatHistoryData>): QueryKey<Options<ChatControllerGetChatHistoryData>> => createQueryKey('chatControllerGetChatHistory', options, true);
+export const chatControllerGetConversationsInfiniteQueryKey = (options: Options<ChatControllerGetConversationsData>): QueryKey<Options<ChatControllerGetConversationsData>> => createQueryKey('chatControllerGetConversations', options, true);
 
 /**
- * Get chat history for a workspace
+ * Get all conversations for a workspace
  */
-export const chatControllerGetChatHistoryInfiniteOptions = (options: Options<ChatControllerGetChatHistoryData>) => infiniteQueryOptions<ChatControllerGetChatHistoryResponse, DefaultError, InfiniteData<ChatControllerGetChatHistoryResponse>, QueryKey<Options<ChatControllerGetChatHistoryData>>, number | Pick<QueryKey<Options<ChatControllerGetChatHistoryData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
+export const chatControllerGetConversationsInfiniteOptions = (options: Options<ChatControllerGetConversationsData>) => infiniteQueryOptions<ChatControllerGetConversationsResponse, DefaultError, InfiniteData<ChatControllerGetConversationsResponse>, QueryKey<Options<ChatControllerGetConversationsData>>, number | Pick<QueryKey<Options<ChatControllerGetConversationsData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
 // @ts-ignore
 {
     queryFn: async ({ pageParam, queryKey, signal }) => {
         // @ts-ignore
-        const page: Pick<QueryKey<Options<ChatControllerGetChatHistoryData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
+        const page: Pick<QueryKey<Options<ChatControllerGetConversationsData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
             query: {
                 offset: pageParam
             }
         };
         const params = createInfiniteParams(queryKey, page);
-        const { data } = await chatControllerGetChatHistory({
+        const { data } = await chatControllerGetConversations({
             ...options,
             ...params,
             signal,
@@ -386,11 +373,98 @@ export const chatControllerGetChatHistoryInfiniteOptions = (options: Options<Cha
         });
         return data;
     },
-    queryKey: chatControllerGetChatHistoryInfiniteQueryKey(options)
+    queryKey: chatControllerGetConversationsInfiniteQueryKey(options)
 });
 
 /**
- * Delete a specific chat message
+ * Create a new conversation
+ */
+export const chatControllerCreateConversationMutation = (options?: Partial<Options<ChatControllerCreateConversationData>>): UseMutationOptions<ChatControllerCreateConversationResponse, DefaultError, Options<ChatControllerCreateConversationData>> => {
+    const mutationOptions: UseMutationOptions<ChatControllerCreateConversationResponse, DefaultError, Options<ChatControllerCreateConversationData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await chatControllerCreateConversation({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Delete a conversation and all its messages
+ */
+export const chatControllerDeleteConversationMutation = (options?: Partial<Options<ChatControllerDeleteConversationData>>): UseMutationOptions<unknown, DefaultError, Options<ChatControllerDeleteConversationData>> => {
+    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<ChatControllerDeleteConversationData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await chatControllerDeleteConversation({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const chatControllerGetConversationQueryKey = (options: Options<ChatControllerGetConversationData>) => createQueryKey('chatControllerGetConversation', options);
+
+/**
+ * Get a specific conversation with its messages
+ */
+export const chatControllerGetConversationOptions = (options: Options<ChatControllerGetConversationData>) => queryOptions<ChatControllerGetConversationResponse, DefaultError, ChatControllerGetConversationResponse, ReturnType<typeof chatControllerGetConversationQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await chatControllerGetConversation({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: chatControllerGetConversationQueryKey(options)
+});
+
+/**
+ * Update a conversation title
+ */
+export const chatControllerUpdateConversationMutation = (options?: Partial<Options<ChatControllerUpdateConversationData>>): UseMutationOptions<ChatControllerUpdateConversationResponse, DefaultError, Options<ChatControllerUpdateConversationData>> => {
+    const mutationOptions: UseMutationOptions<ChatControllerUpdateConversationResponse, DefaultError, Options<ChatControllerUpdateConversationData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await chatControllerUpdateConversation({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const chatControllerGetMessagesQueryKey = (options: Options<ChatControllerGetMessagesData>) => createQueryKey('chatControllerGetMessages', options);
+
+/**
+ * Get all messages in a conversation
+ */
+export const chatControllerGetMessagesOptions = (options: Options<ChatControllerGetMessagesData>) => queryOptions<ChatControllerGetMessagesResponse, DefaultError, ChatControllerGetMessagesResponse, ReturnType<typeof chatControllerGetMessagesQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await chatControllerGetMessages({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: chatControllerGetMessagesQueryKey(options)
+});
+
+/**
+ * Delete a specific message from a conversation
  */
 export const chatControllerDeleteMessageMutation = (options?: Partial<Options<ChatControllerDeleteMessageData>>): UseMutationOptions<unknown, DefaultError, Options<ChatControllerDeleteMessageData>> => {
     const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<ChatControllerDeleteMessageData>> = {
@@ -405,21 +479,3 @@ export const chatControllerDeleteMessageMutation = (options?: Partial<Options<Ch
     };
     return mutationOptions;
 };
-
-export const chatControllerGetMessageQueryKey = (options: Options<ChatControllerGetMessageData>) => createQueryKey('chatControllerGetMessage', options);
-
-/**
- * Get a specific chat message
- */
-export const chatControllerGetMessageOptions = (options: Options<ChatControllerGetMessageData>) => queryOptions<ChatControllerGetMessageResponse, DefaultError, ChatControllerGetMessageResponse, ReturnType<typeof chatControllerGetMessageQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await chatControllerGetMessage({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: chatControllerGetMessageQueryKey(options)
-});

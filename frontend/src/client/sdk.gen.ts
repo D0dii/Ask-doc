@@ -2,7 +2,7 @@
 
 import { type Client, formDataBodySerializer, type Options as Options2, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { AppControllerGetHelloData, AppControllerGetHelloResponses, AuthControllerGoogleAuthData, AuthControllerLogoutData, AuthControllerLogoutResponses, AuthControllerMeData, AuthControllerMeErrors, AuthControllerMeResponses, AuthControllerRefreshData, AuthControllerRefreshErrors, AuthControllerRefreshResponses, ChatControllerClearHistoryData, ChatControllerClearHistoryErrors, ChatControllerClearHistoryResponses, ChatControllerDeleteMessageData, ChatControllerDeleteMessageErrors, ChatControllerDeleteMessageResponses, ChatControllerGetChatHistoryData, ChatControllerGetChatHistoryErrors, ChatControllerGetChatHistoryResponses, ChatControllerGetMessageData, ChatControllerGetMessageErrors, ChatControllerGetMessageResponses, ChatControllerQueryData, ChatControllerQueryErrors, ChatControllerQueryResponses, RagControllerDeleteFileData, RagControllerDeleteFileErrors, RagControllerDeleteFileResponses, RagControllerGetFileData, RagControllerGetFileErrors, RagControllerGetFileResponses, RagControllerGetFilesData, RagControllerGetFilesErrors, RagControllerGetFilesResponses, RagControllerIngestData, RagControllerIngestErrors, RagControllerIngestResponses, WorkspacesControllerCreateData, WorkspacesControllerCreateErrors, WorkspacesControllerCreateResponses, WorkspacesControllerFindAllData, WorkspacesControllerFindAllErrors, WorkspacesControllerFindAllResponses, WorkspacesControllerFindOneData, WorkspacesControllerFindOneErrors, WorkspacesControllerFindOneResponses, WorkspacesControllerRemoveData, WorkspacesControllerRemoveErrors, WorkspacesControllerRemoveResponses, WorkspacesControllerUpdateData, WorkspacesControllerUpdateErrors, WorkspacesControllerUpdateResponses } from './types.gen';
+import type { AuthControllerGoogleAuthData, AuthControllerLogoutData, AuthControllerLogoutResponses, AuthControllerMeData, AuthControllerMeErrors, AuthControllerMeResponses, AuthControllerRefreshData, AuthControllerRefreshErrors, AuthControllerRefreshResponses, ChatControllerClearConversationsData, ChatControllerClearConversationsErrors, ChatControllerClearConversationsResponses, ChatControllerCreateConversationData, ChatControllerCreateConversationErrors, ChatControllerCreateConversationResponses, ChatControllerDeleteConversationData, ChatControllerDeleteConversationErrors, ChatControllerDeleteConversationResponses, ChatControllerDeleteMessageData, ChatControllerDeleteMessageErrors, ChatControllerDeleteMessageResponses, ChatControllerGetConversationData, ChatControllerGetConversationErrors, ChatControllerGetConversationResponses, ChatControllerGetConversationsData, ChatControllerGetConversationsErrors, ChatControllerGetConversationsResponses, ChatControllerGetMessagesData, ChatControllerGetMessagesErrors, ChatControllerGetMessagesResponses, ChatControllerQueryData, ChatControllerQueryErrors, ChatControllerQueryResponses, ChatControllerUpdateConversationData, ChatControllerUpdateConversationErrors, ChatControllerUpdateConversationResponses, RagControllerDeleteFileData, RagControllerDeleteFileErrors, RagControllerDeleteFileResponses, RagControllerGetFileData, RagControllerGetFileErrors, RagControllerGetFileResponses, RagControllerGetFilesData, RagControllerGetFilesErrors, RagControllerGetFilesResponses, RagControllerIngestData, RagControllerIngestErrors, RagControllerIngestResponses, WorkspacesControllerCreateData, WorkspacesControllerCreateErrors, WorkspacesControllerCreateResponses, WorkspacesControllerFindAllData, WorkspacesControllerFindAllErrors, WorkspacesControllerFindAllResponses, WorkspacesControllerFindOneData, WorkspacesControllerFindOneErrors, WorkspacesControllerFindOneResponses, WorkspacesControllerRemoveData, WorkspacesControllerRemoveErrors, WorkspacesControllerRemoveResponses, WorkspacesControllerUpdateData, WorkspacesControllerUpdateErrors, WorkspacesControllerUpdateResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -17,8 +17,6 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
      */
     meta?: Record<string, unknown>;
 };
-
-export const appControllerGetHello = <ThrowOnError extends boolean = false>(options?: Options<AppControllerGetHelloData, ThrowOnError>) => (options?.client ?? client).get<AppControllerGetHelloResponses, unknown, ThrowOnError>({ url: '/', ...options });
 
 /**
  * Get all files in a workspace
@@ -188,6 +186,8 @@ export const authControllerLogout = <ThrowOnError extends boolean = false>(optio
 
 /**
  * Ask a question about the documents in a workspace
+ *
+ * Asks a question and optionally continues an existing conversation. If conversationId is provided, the question will be added to that conversation with context awareness. If not, a new conversation will be created.
  */
 export const chatControllerQuery = <ThrowOnError extends boolean = false>(options: Options<ChatControllerQueryData, ThrowOnError>) => (options.client ?? client).post<ChatControllerQueryResponses, ChatControllerQueryErrors, ThrowOnError>({
     security: [{
@@ -204,33 +204,106 @@ export const chatControllerQuery = <ThrowOnError extends boolean = false>(option
 });
 
 /**
- * Clear all chat history for a workspace
+ * Clear all conversations for a workspace
  */
-export const chatControllerClearHistory = <ThrowOnError extends boolean = false>(options: Options<ChatControllerClearHistoryData, ThrowOnError>) => (options.client ?? client).delete<ChatControllerClearHistoryResponses, ChatControllerClearHistoryErrors, ThrowOnError>({
+export const chatControllerClearConversations = <ThrowOnError extends boolean = false>(options: Options<ChatControllerClearConversationsData, ThrowOnError>) => (options.client ?? client).delete<ChatControllerClearConversationsResponses, ChatControllerClearConversationsErrors, ThrowOnError>({
     security: [{
             in: 'cookie',
             name: 'access_token',
             type: 'apiKey'
         }],
-    url: '/workspaces/{workspaceId}/chat',
+    url: '/workspaces/{workspaceId}/chat/conversations',
     ...options
 });
 
 /**
- * Get chat history for a workspace
+ * Get all conversations for a workspace
  */
-export const chatControllerGetChatHistory = <ThrowOnError extends boolean = false>(options: Options<ChatControllerGetChatHistoryData, ThrowOnError>) => (options.client ?? client).get<ChatControllerGetChatHistoryResponses, ChatControllerGetChatHistoryErrors, ThrowOnError>({
+export const chatControllerGetConversations = <ThrowOnError extends boolean = false>(options: Options<ChatControllerGetConversationsData, ThrowOnError>) => (options.client ?? client).get<ChatControllerGetConversationsResponses, ChatControllerGetConversationsErrors, ThrowOnError>({
     security: [{
             in: 'cookie',
             name: 'access_token',
             type: 'apiKey'
         }],
-    url: '/workspaces/{workspaceId}/chat',
+    url: '/workspaces/{workspaceId}/chat/conversations',
     ...options
 });
 
 /**
- * Delete a specific chat message
+ * Create a new conversation
+ */
+export const chatControllerCreateConversation = <ThrowOnError extends boolean = false>(options: Options<ChatControllerCreateConversationData, ThrowOnError>) => (options.client ?? client).post<ChatControllerCreateConversationResponses, ChatControllerCreateConversationErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'access_token',
+            type: 'apiKey'
+        }],
+    url: '/workspaces/{workspaceId}/chat/conversations',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Delete a conversation and all its messages
+ */
+export const chatControllerDeleteConversation = <ThrowOnError extends boolean = false>(options: Options<ChatControllerDeleteConversationData, ThrowOnError>) => (options.client ?? client).delete<ChatControllerDeleteConversationResponses, ChatControllerDeleteConversationErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'access_token',
+            type: 'apiKey'
+        }],
+    url: '/workspaces/{workspaceId}/chat/conversations/{conversationId}',
+    ...options
+});
+
+/**
+ * Get a specific conversation with its messages
+ */
+export const chatControllerGetConversation = <ThrowOnError extends boolean = false>(options: Options<ChatControllerGetConversationData, ThrowOnError>) => (options.client ?? client).get<ChatControllerGetConversationResponses, ChatControllerGetConversationErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'access_token',
+            type: 'apiKey'
+        }],
+    url: '/workspaces/{workspaceId}/chat/conversations/{conversationId}',
+    ...options
+});
+
+/**
+ * Update a conversation title
+ */
+export const chatControllerUpdateConversation = <ThrowOnError extends boolean = false>(options: Options<ChatControllerUpdateConversationData, ThrowOnError>) => (options.client ?? client).patch<ChatControllerUpdateConversationResponses, ChatControllerUpdateConversationErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'access_token',
+            type: 'apiKey'
+        }],
+    url: '/workspaces/{workspaceId}/chat/conversations/{conversationId}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Get all messages in a conversation
+ */
+export const chatControllerGetMessages = <ThrowOnError extends boolean = false>(options: Options<ChatControllerGetMessagesData, ThrowOnError>) => (options.client ?? client).get<ChatControllerGetMessagesResponses, ChatControllerGetMessagesErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'access_token',
+            type: 'apiKey'
+        }],
+    url: '/workspaces/{workspaceId}/chat/conversations/{conversationId}/messages',
+    ...options
+});
+
+/**
+ * Delete a specific message from a conversation
  */
 export const chatControllerDeleteMessage = <ThrowOnError extends boolean = false>(options: Options<ChatControllerDeleteMessageData, ThrowOnError>) => (options.client ?? client).delete<ChatControllerDeleteMessageResponses, ChatControllerDeleteMessageErrors, ThrowOnError>({
     security: [{
@@ -238,19 +311,6 @@ export const chatControllerDeleteMessage = <ThrowOnError extends boolean = false
             name: 'access_token',
             type: 'apiKey'
         }],
-    url: '/workspaces/{workspaceId}/chat/{messageId}',
-    ...options
-});
-
-/**
- * Get a specific chat message
- */
-export const chatControllerGetMessage = <ThrowOnError extends boolean = false>(options: Options<ChatControllerGetMessageData, ThrowOnError>) => (options.client ?? client).get<ChatControllerGetMessageResponses, ChatControllerGetMessageErrors, ThrowOnError>({
-    security: [{
-            in: 'cookie',
-            name: 'access_token',
-            type: 'apiKey'
-        }],
-    url: '/workspaces/{workspaceId}/chat/{messageId}',
+    url: '/workspaces/{workspaceId}/chat/conversations/{conversationId}/messages/{messageId}',
     ...options
 });

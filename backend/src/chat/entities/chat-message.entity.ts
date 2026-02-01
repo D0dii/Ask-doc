@@ -6,8 +6,8 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { Workspace } from '../../workspaces/entities/workspace.entity';
 import { User } from '../../users/entities/user.entity';
+import { ChatConversation } from './chat-conversation.entity';
 
 @Entity()
 export class ChatMessage {
@@ -28,11 +28,13 @@ export class ChatMessage {
   }>;
 
   @Column()
-  workspaceId: string;
+  conversationId: string;
 
-  @ManyToOne(() => Workspace, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'workspaceId' })
-  workspace: Workspace;
+  @ManyToOne(() => ChatConversation, (conversation) => conversation.messages, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'conversationId' })
+  conversation: ChatConversation;
 
   @Column()
   userId: string;

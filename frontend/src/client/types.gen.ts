@@ -160,29 +160,18 @@ export type LogoutResponseDto = {
     ok: boolean;
 };
 
-export type QueryDto = {
+export type QueryInConversationDto = {
     /**
      * The question to ask about the documents
      */
     question: string;
+    /**
+     * ID of an existing conversation to continue. If not provided, a new conversation will be created.
+     */
+    conversationId?: string;
 };
 
-export type SourceDto = {
-    /**
-     * The file ID this chunk belongs to
-     */
-    fileId: string;
-    /**
-     * The text content of the chunk
-     */
-    text: string;
-    /**
-     * Similarity score (0-1)
-     */
-    score: number;
-};
-
-export type QueryResponseDto = {
+export type QueryInConversationResponseDto = {
     /**
      * The AI-generated answer
      */
@@ -190,7 +179,70 @@ export type QueryResponseDto = {
     /**
      * Source documents used to generate the answer
      */
-    sources: Array<SourceDto>;
+    sources: Array<{
+        fileId?: string;
+        text?: string;
+        score?: number;
+    }>;
+    /**
+     * The conversation ID (new or existing)
+     */
+    conversationId: string;
+    /**
+     * The message ID of this Q&A
+     */
+    messageId: string;
+};
+
+export type CreateConversationDto = {
+    /**
+     * Optional title for the conversation
+     */
+    title?: string;
+};
+
+export type ConversationResponseDto = {
+    /**
+     * Unique identifier of the conversation
+     */
+    id: string;
+    /**
+     * Title of the conversation
+     */
+    title: {
+        [key: string]: unknown;
+    } | null;
+    /**
+     * ID of the workspace this conversation belongs to
+     */
+    workspaceId: string;
+    /**
+     * ID of the user who created the conversation
+     */
+    userId: string;
+    /**
+     * Number of messages in the conversation
+     */
+    messageCount: number;
+    /**
+     * When the conversation was created
+     */
+    createdAt: string;
+    /**
+     * When the conversation was last updated
+     */
+    updatedAt: string;
+};
+
+export type ConversationListResponseDto = {
+    /**
+     * List of conversations
+     */
+    conversations: Array<ConversationResponseDto>;
+    /**
+     * Total number of conversations
+     */
+    total: number;
 };
 
 export type ChatMessageSourceDto = {
@@ -226,9 +278,9 @@ export type ChatMessageResponseDto = {
      */
     sources: Array<ChatMessageSourceDto> | null;
     /**
-     * ID of the workspace this message belongs to
+     * ID of the conversation this message belongs to
      */
-    workspaceId: string;
+    conversationId: string;
     /**
      * ID of the user who asked the question
      */
@@ -239,26 +291,48 @@ export type ChatMessageResponseDto = {
     createdAt: string;
 };
 
-export type ChatHistoryResponseDto = {
+export type ConversationWithMessagesDto = {
     /**
-     * List of chat messages
+     * Unique identifier of the conversation
+     */
+    id: string;
+    /**
+     * Title of the conversation
+     */
+    title: {
+        [key: string]: unknown;
+    } | null;
+    /**
+     * ID of the workspace this conversation belongs to
+     */
+    workspaceId: string;
+    /**
+     * ID of the user who created the conversation
+     */
+    userId: string;
+    /**
+     * Number of messages in the conversation
+     */
+    messageCount: number;
+    /**
+     * When the conversation was created
+     */
+    createdAt: string;
+    /**
+     * When the conversation was last updated
+     */
+    updatedAt: string;
+    /**
+     * Messages in the conversation
      */
     messages: Array<ChatMessageResponseDto>;
+};
+
+export type UpdateConversationDto = {
     /**
-     * Total number of messages
+     * New title for the conversation
      */
-    total: number;
-};
-
-export type AppControllerGetHelloData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/';
-};
-
-export type AppControllerGetHelloResponses = {
-    200: unknown;
+    title: string;
 };
 
 export type RagControllerGetFilesData = {
@@ -605,7 +679,7 @@ export type AuthControllerLogoutResponses = {
 export type AuthControllerLogoutResponse = AuthControllerLogoutResponses[keyof AuthControllerLogoutResponses];
 
 export type ChatControllerQueryData = {
-    body: QueryDto;
+    body: QueryInConversationDto;
     path: {
         /**
          * Workspace ID
@@ -626,7 +700,7 @@ export type ChatControllerQueryErrors = {
      */
     401: unknown;
     /**
-     * Workspace not found
+     * Workspace or conversation not found
      */
     404: unknown;
 };
@@ -635,12 +709,12 @@ export type ChatControllerQueryResponses = {
     /**
      * AI-generated answer with sources
      */
-    200: QueryResponseDto;
+    200: QueryInConversationResponseDto;
 };
 
 export type ChatControllerQueryResponse = ChatControllerQueryResponses[keyof ChatControllerQueryResponses];
 
-export type ChatControllerClearHistoryData = {
+export type ChatControllerClearConversationsData = {
     body?: never;
     path: {
         /**
@@ -649,24 +723,24 @@ export type ChatControllerClearHistoryData = {
         workspaceId: string;
     };
     query?: never;
-    url: '/workspaces/{workspaceId}/chat';
+    url: '/workspaces/{workspaceId}/chat/conversations';
 };
 
-export type ChatControllerClearHistoryErrors = {
+export type ChatControllerClearConversationsErrors = {
     /**
      * Unauthorized
      */
     401: unknown;
 };
 
-export type ChatControllerClearHistoryResponses = {
+export type ChatControllerClearConversationsResponses = {
     /**
-     * Chat history cleared successfully
+     * All conversations cleared successfully
      */
     200: unknown;
 };
 
-export type ChatControllerGetChatHistoryData = {
+export type ChatControllerGetConversationsData = {
     body?: never;
     path: {
         /**
@@ -676,40 +750,210 @@ export type ChatControllerGetChatHistoryData = {
     };
     query?: {
         /**
-         * Number of messages to return (default: 50)
+         * Number of conversations to return (default: 50)
          */
         limit?: number;
         /**
-         * Number of messages to skip (default: 0)
+         * Number of conversations to skip (default: 0)
          */
         offset?: number;
     };
-    url: '/workspaces/{workspaceId}/chat';
+    url: '/workspaces/{workspaceId}/chat/conversations';
 };
 
-export type ChatControllerGetChatHistoryErrors = {
+export type ChatControllerGetConversationsErrors = {
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+};
+
+export type ChatControllerGetConversationsResponses = {
+    /**
+     * List of conversations
+     */
+    200: ConversationListResponseDto;
+};
+
+export type ChatControllerGetConversationsResponse = ChatControllerGetConversationsResponses[keyof ChatControllerGetConversationsResponses];
+
+export type ChatControllerCreateConversationData = {
+    body: CreateConversationDto;
+    path: {
+        /**
+         * Workspace ID
+         */
+        workspaceId: string;
+    };
+    query?: never;
+    url: '/workspaces/{workspaceId}/chat/conversations';
+};
+
+export type ChatControllerCreateConversationErrors = {
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+};
+
+export type ChatControllerCreateConversationResponses = {
+    /**
+     * Conversation created successfully
+     */
+    201: ConversationResponseDto;
+};
+
+export type ChatControllerCreateConversationResponse = ChatControllerCreateConversationResponses[keyof ChatControllerCreateConversationResponses];
+
+export type ChatControllerDeleteConversationData = {
+    body?: never;
+    path: {
+        /**
+         * Conversation ID
+         */
+        conversationId: string;
+        /**
+         * Workspace ID
+         */
+        workspaceId: string;
+    };
+    query?: never;
+    url: '/workspaces/{workspaceId}/chat/conversations/{conversationId}';
+};
+
+export type ChatControllerDeleteConversationErrors = {
     /**
      * Unauthorized
      */
     401: unknown;
     /**
-     * Workspace not found
+     * Conversation not found
      */
     404: unknown;
 };
 
-export type ChatControllerGetChatHistoryResponses = {
+export type ChatControllerDeleteConversationResponses = {
     /**
-     * Chat history retrieved successfully
+     * Conversation deleted successfully
      */
-    200: ChatHistoryResponseDto;
+    200: unknown;
 };
 
-export type ChatControllerGetChatHistoryResponse = ChatControllerGetChatHistoryResponses[keyof ChatControllerGetChatHistoryResponses];
+export type ChatControllerGetConversationData = {
+    body?: never;
+    path: {
+        /**
+         * Conversation ID
+         */
+        conversationId: string;
+        /**
+         * Workspace ID
+         */
+        workspaceId: string;
+    };
+    query?: never;
+    url: '/workspaces/{workspaceId}/chat/conversations/{conversationId}';
+};
+
+export type ChatControllerGetConversationErrors = {
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Conversation not found
+     */
+    404: unknown;
+};
+
+export type ChatControllerGetConversationResponses = {
+    /**
+     * Conversation with messages
+     */
+    200: ConversationWithMessagesDto;
+};
+
+export type ChatControllerGetConversationResponse = ChatControllerGetConversationResponses[keyof ChatControllerGetConversationResponses];
+
+export type ChatControllerUpdateConversationData = {
+    body: UpdateConversationDto;
+    path: {
+        /**
+         * Conversation ID
+         */
+        conversationId: string;
+        /**
+         * Workspace ID
+         */
+        workspaceId: string;
+    };
+    query?: never;
+    url: '/workspaces/{workspaceId}/chat/conversations/{conversationId}';
+};
+
+export type ChatControllerUpdateConversationErrors = {
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Conversation not found
+     */
+    404: unknown;
+};
+
+export type ChatControllerUpdateConversationResponses = {
+    /**
+     * Conversation updated successfully
+     */
+    200: ConversationResponseDto;
+};
+
+export type ChatControllerUpdateConversationResponse = ChatControllerUpdateConversationResponses[keyof ChatControllerUpdateConversationResponses];
+
+export type ChatControllerGetMessagesData = {
+    body?: never;
+    path: {
+        /**
+         * Conversation ID
+         */
+        conversationId: string;
+        /**
+         * Workspace ID
+         */
+        workspaceId: string;
+    };
+    query?: never;
+    url: '/workspaces/{workspaceId}/chat/conversations/{conversationId}/messages';
+};
+
+export type ChatControllerGetMessagesErrors = {
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Conversation not found
+     */
+    404: unknown;
+};
+
+export type ChatControllerGetMessagesResponses = {
+    /**
+     * List of messages in the conversation
+     */
+    200: Array<ChatMessageResponseDto>;
+};
+
+export type ChatControllerGetMessagesResponse = ChatControllerGetMessagesResponses[keyof ChatControllerGetMessagesResponses];
 
 export type ChatControllerDeleteMessageData = {
     body?: never;
     path: {
+        /**
+         * Conversation ID
+         */
+        conversationId: string;
         /**
          * Message ID
          */
@@ -720,7 +964,7 @@ export type ChatControllerDeleteMessageData = {
         workspaceId: string;
     };
     query?: never;
-    url: '/workspaces/{workspaceId}/chat/{messageId}';
+    url: '/workspaces/{workspaceId}/chat/conversations/{conversationId}/messages/{messageId}';
 };
 
 export type ChatControllerDeleteMessageErrors = {
@@ -740,39 +984,3 @@ export type ChatControllerDeleteMessageResponses = {
      */
     200: unknown;
 };
-
-export type ChatControllerGetMessageData = {
-    body?: never;
-    path: {
-        /**
-         * Message ID
-         */
-        messageId: string;
-        /**
-         * Workspace ID
-         */
-        workspaceId: string;
-    };
-    query?: never;
-    url: '/workspaces/{workspaceId}/chat/{messageId}';
-};
-
-export type ChatControllerGetMessageErrors = {
-    /**
-     * Unauthorized
-     */
-    401: unknown;
-    /**
-     * Message not found
-     */
-    404: unknown;
-};
-
-export type ChatControllerGetMessageResponses = {
-    /**
-     * Chat message retrieved successfully
-     */
-    200: ChatMessageResponseDto;
-};
-
-export type ChatControllerGetMessageResponse = ChatControllerGetMessageResponses[keyof ChatControllerGetMessageResponses];
