@@ -21,7 +21,7 @@ import {
   ApiBody,
   ApiParam,
 } from '@nestjs/swagger';
-import { RagService } from './rag.service';
+import { FilesService } from './services';
 import { JwtCookieGuard } from '../auth/guards/jwt-cookie.guard';
 import { WorkspaceAccessGuard } from '../workspaces/guards/workspace-access.guard';
 import type { WorkspaceRequest } from '../auth/types/auth.types';
@@ -36,7 +36,7 @@ const ALLOWED_MIME_TYPES = ['application/pdf'];
 @ApiParam({ name: 'workspaceId', description: 'Workspace ID', type: String })
 @UseGuards(JwtCookieGuard, WorkspaceAccessGuard)
 export class RagController {
-  constructor(private readonly ragService: RagService) {}
+  constructor(private readonly filesService: FilesService) {}
 
   @Get()
   @ApiOperation({ summary: 'Get all files in a workspace' })
@@ -48,7 +48,7 @@ export class RagController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'Workspace not found' })
   async getFiles(@Req() req: WorkspaceRequest): Promise<FileResponseDto[]> {
-    return this.ragService.getFilesByWorkspace(req.workspace.id);
+    return this.filesService.getFilesByWorkspace(req.workspace.id);
   }
 
   @Get(':fileId')
@@ -65,7 +65,7 @@ export class RagController {
     @Req() req: WorkspaceRequest,
     @Param('fileId') fileId: string,
   ): Promise<FileResponseDto> {
-    const file = await this.ragService.getFileById(fileId, req.workspace.id);
+    const file = await this.filesService.getFileById(fileId, req.workspace.id);
     if (!file) {
       throw new NotFoundException('File not found');
     }
@@ -116,7 +116,7 @@ export class RagController {
     }
 
     // Save file to DB and start processing (fire and forget)
-    const savedFile = await this.ragService.createAndProcessFile(
+    const savedFile = await this.filesService.createAndProcessFile(
       file,
       req.workspace.id,
     );
@@ -138,7 +138,7 @@ export class RagController {
     @Req() req: WorkspaceRequest,
     @Param('fileId') fileId: string,
   ): Promise<{ message: string }> {
-    await this.ragService.deleteFile(fileId, req.workspace.id);
+    await this.filesService.deleteFile(fileId, req.workspace.id);
     return { message: 'File deleted successfully' };
   }
 }

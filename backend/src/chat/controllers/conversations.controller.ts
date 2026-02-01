@@ -20,10 +20,10 @@ import {
   ApiParam,
   ApiQuery,
 } from '@nestjs/swagger';
-import { ChatService } from './chat.service';
-import { JwtCookieGuard } from '../auth/guards/jwt-cookie.guard';
-import { WorkspaceAccessGuard } from '../workspaces/guards/workspace-access.guard';
-import type { WorkspaceRequest } from '../auth/types/auth.types';
+import { ConversationsService } from '../services';
+import { JwtCookieGuard } from '../../auth/guards/jwt-cookie.guard';
+import { WorkspaceAccessGuard } from '../../workspaces/guards/workspace-access.guard';
+import type { WorkspaceRequest } from '../../auth/types/auth.types';
 import {
   ChatMessageResponseDto,
   ConversationResponseDto,
@@ -31,55 +31,19 @@ import {
   ConversationListResponseDto,
   CreateConversationDto,
   UpdateConversationDto,
-  QueryInConversationDto,
-  QueryInConversationResponseDto,
-} from './dtos';
+} from '../dtos';
 
-@ApiTags('Chat')
+@ApiTags('Chat Conversations')
 @ApiCookieAuth()
-@Controller('workspaces/:workspaceId/chat')
+@Controller('workspaces/:workspaceId/chat/conversations')
 @ApiParam({ name: 'workspaceId', description: 'Workspace ID', type: String })
 @UseGuards(JwtCookieGuard, WorkspaceAccessGuard)
-export class ChatController {
-  constructor(private readonly chatService: ChatService) {}
-
-  // ==================== QUERY ====================
-
-  @Post('query')
-  @ApiOperation({
-    summary: 'Ask a question about the documents in a workspace',
-    description:
-      'Asks a question and optionally continues an existing conversation. If conversationId is provided, the question will be added to that conversation with context awareness. If not, a new conversation will be created.',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'AI-generated answer with sources',
-    type: QueryInConversationResponseDto,
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Bad request - no processed documents in workspace',
-  })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({
-    status: 404,
-    description: 'Workspace or conversation not found',
-  })
-  async query(
-    @Req() req: WorkspaceRequest,
-    @Body() body: QueryInConversationDto,
-  ): Promise<QueryInConversationResponseDto> {
-    return this.chatService.query(
-      req.workspace.id,
-      req.user.id,
-      body.question,
-      body.conversationId,
-    );
-  }
+export class ConversationsController {
+  constructor(private readonly conversationsService: ConversationsService) {}
 
   // ==================== CONVERSATIONS ====================
 
-  @Post('conversations')
+  @Post()
   @ApiOperation({ summary: 'Create a new conversation' })
   @ApiResponse({
     status: 201,
@@ -91,7 +55,7 @@ export class ChatController {
     @Req() req: WorkspaceRequest,
     @Body() body: CreateConversationDto,
   ): Promise<ConversationResponseDto> {
-    const conversation = await this.chatService.createConversation(
+    const conversation = await this.conversationsService.createConversation(
       req.workspace.id,
       req.user.id,
       body.title,
@@ -103,7 +67,7 @@ export class ChatController {
     };
   }
 
-  @Get('conversations')
+  @Get()
   @ApiOperation({ summary: 'Get all conversations for a workspace' })
   @ApiQuery({
     name: 'limit',
@@ -129,7 +93,7 @@ export class ChatController {
     @Query('offset') offset?: number,
   ): Promise<ConversationListResponseDto> {
     const { conversations, total } =
-      await this.chatService.getConversationsByWorkspace(
+      await this.conversationsService.getConversationsByWorkspace(
         req.workspace.id,
         limit ?? 50,
         offset ?? 0,
@@ -139,16 +103,17 @@ export class ChatController {
     const conversationsWithCounts = await Promise.all(
       conversations.map(async (conv) => ({
         ...conv,
-        messageCount: await this.chatService.getMessageCountByConversation(
-          conv.id,
-        ),
+        messageCount:
+          await this.conversationsService.getMessageCountByConversation(
+            conv.id,
+          ),
       })),
     );
 
     return { conversations: conversationsWithCounts, total };
   }
 
-  @Get('conversations/:conversationId')
+  @Get(':conversationId')
   @ApiOperation({ summary: 'Get a specific conversation with its messages' })
   @ApiParam({
     name: 'conversationId',
@@ -166,10 +131,11 @@ export class ChatController {
     @Req() req: WorkspaceRequest,
     @Param('conversationId', ParseUUIDPipe) conversationId: string,
   ): Promise<ConversationWithMessagesDto> {
-    const conversation = await this.chatService.getConversationWithMessages(
-      conversationId,
-      req.workspace.id,
-    );
+    const conversation =
+      await this.conversationsService.getConversationWithMessages(
+        conversationId,
+        req.workspace.id,
+      );
 
     if (!conversation) {
       throw new NotFoundException('Conversation not found');
@@ -181,7 +147,7 @@ export class ChatController {
     };
   }
 
-  @Patch('conversations/:conversationId')
+  @Patch(':conversationId')
   @ApiOperation({ summary: 'Update a conversation title' })
   @ApiParam({
     name: 'conversationId',
@@ -200,11 +166,12 @@ export class ChatController {
     @Param('conversationId', ParseUUIDPipe) conversationId: string,
     @Body() body: UpdateConversationDto,
   ): Promise<ConversationResponseDto> {
-    const conversation = await this.chatService.updateConversationTitle(
-      conversationId,
-      req.workspace.id,
-      body.title,
-    );
+    const conversation =
+      await this.conversationsService.updateConversationTitle(
+        conversationId,
+        req.workspace.id,
+        body.title,
+      );
 
     if (!conversation) {
       throw new NotFoundException('Conversation not found');
@@ -212,13 +179,14 @@ export class ChatController {
 
     return {
       ...conversation,
-      messageCount: await this.chatService.getMessageCountByConversation(
-        conversation.id,
-      ),
+      messageCount:
+        await this.conversationsService.getMessageCountByConversation(
+          conversation.id,
+        ),
     };
   }
 
-  @Delete('conversations/:conversationId')
+  @Delete(':conversationId')
   @ApiOperation({ summary: 'Delete a conversation and all its messages' })
   @ApiParam({
     name: 'conversationId',
@@ -235,7 +203,7 @@ export class ChatController {
     @Req() req: WorkspaceRequest,
     @Param('conversationId', ParseUUIDPipe) conversationId: string,
   ): Promise<{ success: boolean }> {
-    const deleted = await this.chatService.deleteConversation(
+    const deleted = await this.conversationsService.deleteConversation(
       conversationId,
       req.workspace.id,
     );
@@ -247,7 +215,7 @@ export class ChatController {
     return { success: true };
   }
 
-  @Delete('conversations')
+  @Delete()
   @ApiOperation({ summary: 'Clear all conversations for a workspace' })
   @ApiResponse({
     status: 200,
@@ -257,16 +225,17 @@ export class ChatController {
   async clearConversations(
     @Req() req: WorkspaceRequest,
   ): Promise<{ deletedCount: number }> {
-    const deletedCount = await this.chatService.clearWorkspaceConversations(
-      req.workspace.id,
-    );
+    const deletedCount =
+      await this.conversationsService.clearWorkspaceConversations(
+        req.workspace.id,
+      );
 
     return { deletedCount };
   }
 
-  // ==================== MESSAGES (within conversations) ====================
+  // ==================== MESSAGES ====================
 
-  @Get('conversations/:conversationId/messages')
+  @Get(':conversationId/messages')
   @ApiOperation({ summary: 'Get all messages in a conversation' })
   @ApiParam({
     name: 'conversationId',
@@ -285,7 +254,7 @@ export class ChatController {
     @Param('conversationId', ParseUUIDPipe) conversationId: string,
   ): Promise<ChatMessageResponseDto[]> {
     // Verify conversation exists in this workspace
-    const conversation = await this.chatService.getConversationById(
+    const conversation = await this.conversationsService.getConversationById(
       conversationId,
       req.workspace.id,
     );
@@ -294,10 +263,10 @@ export class ChatController {
       throw new NotFoundException('Conversation not found');
     }
 
-    return this.chatService.getMessagesByConversation(conversationId);
+    return this.conversationsService.getMessagesByConversation(conversationId);
   }
 
-  @Delete('conversations/:conversationId/messages/:messageId')
+  @Delete(':conversationId/messages/:messageId')
   @ApiOperation({ summary: 'Delete a specific message from a conversation' })
   @ApiParam({
     name: 'conversationId',
@@ -317,7 +286,7 @@ export class ChatController {
     @Param('messageId', ParseUUIDPipe) messageId: string,
   ): Promise<{ success: boolean }> {
     // Verify conversation exists in this workspace
-    const conversation = await this.chatService.getConversationById(
+    const conversation = await this.conversationsService.getConversationById(
       conversationId,
       req.workspace.id,
     );
@@ -326,7 +295,7 @@ export class ChatController {
       throw new NotFoundException('Conversation not found');
     }
 
-    const deleted = await this.chatService.deleteMessage(
+    const deleted = await this.conversationsService.deleteMessage(
       messageId,
       conversationId,
     );

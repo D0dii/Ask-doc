@@ -1,7 +1,7 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ChatController } from './chat.controller';
-import { ChatService } from './chat.service';
+import { QueryController, ConversationsController } from './controllers';
+import { ConversationsService, QueryService } from './services';
 import { ChatMessage } from './entities/chat-message.entity';
 import { ChatConversation } from './entities/chat-conversation.entity';
 import { WorkspacesModule } from '../workspaces/workspaces.module';
@@ -15,8 +15,8 @@ import { RagModule } from '../rag/rag.module';
     forwardRef(() => RagModule), // For search functionality
     AuthModule,
   ],
-  controllers: [ChatController],
-  providers: [ChatService],
-  exports: [ChatService],
+  controllers: [QueryController, ConversationsController],
+  providers: [ConversationsService, QueryService],
+  exports: [ConversationsService, QueryService],
 })
 export class ChatModule {}
