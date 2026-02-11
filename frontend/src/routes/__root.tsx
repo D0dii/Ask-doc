@@ -1,20 +1,9 @@
-import { useAuth } from "@/features/auth/auth-provider";
+import { useAuth, UserMenu } from "@/features/auth";
 import { createRootRoute, Link, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { LogOut, User, ChevronDown } from "lucide-react";
 
 function RootLayout() {
-  const { user, isLoading, isAuthenticated, login, logout } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   return (
     <>
@@ -35,47 +24,7 @@ function RootLayout() {
           </nav>
 
           <div className="flex items-center gap-4">
-            {isLoading ? (
-              <div className="flex items-center gap-3">
-                <Skeleton className="h-8 w-8 rounded-full" />
-                <Skeleton className="h-4 w-20" />
-              </div>
-            ) : isAuthenticated && user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="flex items-center gap-2 px-2">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={user.picture ?? undefined} alt={user.firstName || "User"} />
-                      <AvatarFallback>
-                        {user.firstName?.[0] || user.email?.[0]?.toUpperCase() || "U"}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="text-sm font-medium hidden sm:inline-block">
-                      {user.firstName || user.email}
-                    </span>
-                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem className="flex items-center gap-2">
-                    <User className="h-4 w-4" />
-                    <span>Profile</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={logout}
-                    className="flex items-center gap-2 text-destructive focus:text-destructive"
-                  >
-                    <LogOut className="h-4 w-4" />
-                    <span>Logout</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <Button onClick={login} size="sm">
-                Login with Google
-              </Button>
-            )}
+            <UserMenu />
           </div>
         </div>
       </header>

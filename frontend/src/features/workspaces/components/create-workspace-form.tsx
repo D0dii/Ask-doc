@@ -1,0 +1,36 @@
+import { useState, useCallback } from "react";
+import { useCreateWorkspace } from "../hooks/use-create-workspace";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Plus } from "lucide-react";
+
+export function CreateWorkspaceForm() {
+  const [newWorkspaceName, setNewWorkspaceName] = useState("");
+  const createMutation = useCreateWorkspace();
+
+  const handleCreate = useCallback(() => {
+    if (newWorkspaceName.trim()) {
+      createMutation.mutate(
+        { body: { name: newWorkspaceName.trim() } },
+        { onSuccess: () => setNewWorkspaceName("") },
+      );
+    }
+  }, [newWorkspaceName, createMutation]);
+
+  return (
+    <div className="flex gap-2">
+      <Input
+        type="text"
+        value={newWorkspaceName}
+        onChange={(e) => setNewWorkspaceName(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && handleCreate()}
+        placeholder="New workspace name..."
+        className="w-48"
+      />
+      <Button onClick={handleCreate} disabled={!newWorkspaceName.trim() || createMutation.isPending}>
+        <Plus className="h-4 w-4 mr-2" />
+        {createMutation.isPending ? "Creating..." : "Create"}
+      </Button>
+    </div>
+  );
+}

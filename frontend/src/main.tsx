@@ -7,7 +7,7 @@ import { routeTree } from "./routeTree.gen";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { getContext } from "./lib/tanstack-query/get-context";
 import { setupApiClient } from "./lib/api-client";
-import { AuthProvider, type AuthContextType } from "./features/auth/auth-provider";
+import { AuthProvider, type AuthContextType } from "@/features/auth";
 
 const queryClientContext = getContext();
 
@@ -44,6 +44,6 @@ if (!rootElement.innerHTML) {
           <RouterProvider router={router} />
         </QueryClientProvider>
       </AuthProvider>
-    </StrictMode>
+    </StrictMode>,
   );
 }
