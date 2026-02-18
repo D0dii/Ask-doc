@@ -27,6 +27,7 @@ export function setupApiClient() {
   client.setConfig({
     baseUrl: import.meta.env.VITE_backend_url,
     credentials: "include",
+    throwOnError: true,
   });
 
   console.log("Setting up API client interceptors");

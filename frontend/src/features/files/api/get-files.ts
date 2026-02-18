@@ -2,8 +2,10 @@ import { useQuery } from "@tanstack/react-query";
 import { ragControllerGetFiles } from "@/client";
 import type { FileResponseDto } from "../types/file";
 
-const getFiles = (workspaceId: string) =>
-  ragControllerGetFiles({ path: { workspaceId }, throwOnError: true }).then(({ data }) => data);
+const getFiles = async (workspaceId: string) => {
+  const { data } = await ragControllerGetFiles({ path: { workspaceId }, throwOnError: true });
+  return data;
+};
 
 const hasProcessingFiles = (files: FileResponseDto[] | undefined) =>
   files?.some((file) => file.status === "processing" || file.status === "pending");

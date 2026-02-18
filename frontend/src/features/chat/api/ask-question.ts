@@ -1,8 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { chatControllerQuery } from "@/client";
 
-const askQuestion = (workspaceId: string, body: { question: string; conversationId?: string }) =>
-  chatControllerQuery({ path: { workspaceId }, body, throwOnError: true }).then(({ data }) => data);
+const askQuestion = async (workspaceId: string, body: { question: string; conversationId?: string }) => {
+  const { data } = await chatControllerQuery({ path: { workspaceId }, body, throwOnError: true });
+  return data;
+};
 
 export const useAskQuestion = (workspaceId: string) => {
   const queryClient = useQueryClient();

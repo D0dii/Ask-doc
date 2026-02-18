@@ -1,8 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ragControllerIngest } from "@/client";
 
-const uploadFile = (workspaceId: string, file: File) =>
-  ragControllerIngest({ path: { workspaceId }, body: { file }, throwOnError: true }).then(({ data }) => data);
+const uploadFile = async (workspaceId: string, file: File) => {
+  const { data } = await ragControllerIngest({ path: { workspaceId }, body: { file }, throwOnError: true });
+  return data;
+};
 
 export const useUploadFile = (workspaceId: string) => {
   const queryClient = useQueryClient();

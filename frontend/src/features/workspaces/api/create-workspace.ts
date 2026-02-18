@@ -2,8 +2,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { workspacesControllerCreate } from "@/client";
 import type { CreateWorkspaceDto } from "../types/workspace";
 
-const createWorkspace = (body: CreateWorkspaceDto) =>
-  workspacesControllerCreate({ body, throwOnError: true }).then(({ data }) => data);
+const createWorkspace = async (body: CreateWorkspaceDto) => {
+  const { data } = await workspacesControllerCreate({ body, throwOnError: true });
+  return data;
+};
 
 export const useCreateWorkspace = () => {
   const queryClient = useQueryClient();

@@ -1,10 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { chatControllerGetConversation } from "@/client";
 
-const getConversation = (workspaceId: string, conversationId: string) =>
-  chatControllerGetConversation({ path: { workspaceId, conversationId }, throwOnError: true }).then(
-    ({ data }) => data,
-  );
+const getConversation = async (workspaceId: string, conversationId: string) => {
+  const { data } = await chatControllerGetConversation({
+    path: { workspaceId, conversationId },
+    throwOnError: true,
+  });
+  return data;
+};
 
 export const useActiveConversation = (workspaceId: string, conversationId: string | null) => {
   const { data: activeConversation, isLoading } = useQuery({
