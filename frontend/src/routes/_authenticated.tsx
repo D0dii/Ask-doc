@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
-import { WorkspaceSidebar } from "@/features/workspaces";
+import { WorkspaceSidebar } from "@/features/workspaces/components/workspace-sidebar";
 import { Separator } from "@/components/ui/separator";
 import { LayoutDashboard, FolderOpen, Settings } from "lucide-react";
 

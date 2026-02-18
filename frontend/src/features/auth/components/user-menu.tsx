@@ -1,4 +1,4 @@
-import { useAuth } from "../hooks/use-auth";
+import { useAuth } from "../auth-provider";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";

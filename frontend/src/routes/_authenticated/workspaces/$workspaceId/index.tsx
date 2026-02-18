@@ -1,7 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { FileUpload, FileList, useFiles } from "@/features/files";
-import { ConversationList, ChatPanel } from "@/features/chat";
+import { FileUpload } from "@/features/files/components/file-upload";
+import { FileList } from "@/features/files/components/file-list";
+import { useFiles } from "@/features/files/api/get-files";
+import { ConversationList } from "@/features/chat/components/conversation-list";
+import { ChatPanel } from "@/features/chat/components/chat-panel";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/_authenticated/workspaces/$workspaceId/")({

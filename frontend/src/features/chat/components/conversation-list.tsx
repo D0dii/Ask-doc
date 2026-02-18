@@ -1,5 +1,5 @@
-import { useConversations } from "../hooks/use-conversations";
-import { useDeleteConversation } from "../hooks/use-delete-conversation";
+import { useConversations } from "../api/get-conversations";
+import { useDeleteConversation } from "../api/delete-conversation";
 import { ConversationItem } from "./conversation-item";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,11 +16,17 @@ export function ConversationList({
   onSelectConversation: (id: string | null) => void;
 }) {
   const { conversations } = useConversations(workspaceId);
-  const { handleDelete, isPending: isDeleting } = useDeleteConversation({
-    workspaceId,
-    activeConversationId,
-    onActiveDeleted: () => onSelectConversation(null),
-  });
+  const deleteMutation = useDeleteConversation(workspaceId);
+
+  const handleDelete = (conversationId: string) => {
+    deleteMutation.mutate(conversationId, {
+      onSuccess: () => {
+        if (activeConversationId === conversationId) {
+          onSelectConversation(null);
+        }
+      },
+    });
+  };
 
   return (
     <Card>
@@ -38,7 +44,7 @@ export function ConversationList({
       </CardHeader>
       <CardContent>
         {conversations.length > 0 ? (
-          <ScrollArea className="h-[200px] pr-4">
+          <ScrollArea className="h-50 pr-4">
             <div className="space-y-2">
               {conversations.map((conv) => (
                 <ConversationItem
@@ -47,7 +53,7 @@ export function ConversationList({
                   isActive={conv.id === activeConversationId}
                   onClick={() => onSelectConversation(conv.id)}
                   onDelete={() => handleDelete(conv.id)}
-                  isDeleting={isDeleting}
+                  isDeleting={deleteMutation.isPending}
                 />
               ))}
             </div>

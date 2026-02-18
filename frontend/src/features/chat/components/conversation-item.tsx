@@ -1,4 +1,4 @@
-import type { ConversationResponseDto } from "../types";
+import type { ConversationResponseDto } from "../types/chat";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,

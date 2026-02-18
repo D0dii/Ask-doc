@@ -1,12 +1,29 @@
-import { useUploadFile } from "../hooks/use-upload-file";
+import { useRef, useState, useCallback } from "react";
+import { useUploadFile } from "../api/upload-file";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Upload, Loader2 } from "lucide-react";
 
 export function FileUpload({ workspaceId }: { workspaceId: string }) {
-  const { fileInputRef, selectedFile, handleFileChange, handleUpload, isPending, isError } =
-    useUploadFile(workspaceId);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const uploadMutation = useUploadFile(workspaceId);
+
+  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedFile(e.target.files?.[0] || null);
+  }, []);
+
+  const handleUpload = useCallback(() => {
+    if (selectedFile) {
+      uploadMutation.mutate(selectedFile, {
+        onSuccess: () => {
+          setSelectedFile(null);
+          if (fileInputRef.current) fileInputRef.current.value = "";
+        },
+      });
+    }
+  }, [selectedFile, uploadMutation]);
 
   return (
     <Card>
@@ -26,11 +43,15 @@ export function FileUpload({ workspaceId }: { workspaceId: string }) {
             onChange={handleFileChange}
             className="flex-1"
           />
-          <Button onClick={handleUpload} disabled={!selectedFile || isPending} size="sm">
-            {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+          <Button onClick={handleUpload} disabled={!selectedFile || uploadMutation.isPending} size="sm">
+            {uploadMutation.isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Upload className="h-4 w-4" />
+            )}
           </Button>
         </div>
-        {isError && <p className="text-sm text-destructive mt-2">Upload failed.</p>}
+        {uploadMutation.isError && <p className="text-sm text-destructive mt-2">Upload failed.</p>}
       </CardContent>
     </Card>
   );

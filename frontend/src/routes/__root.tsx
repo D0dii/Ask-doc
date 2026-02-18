@@ -1,4 +1,5 @@
-import { useAuth, UserMenu } from "@/features/auth";
+import { useAuth } from "@/features/auth/auth-provider";
+import { UserMenu } from "@/features/auth/components/user-menu";
 import { createRootRoute, Link, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 

@@ -1,4 +1,4 @@
-import type { FileResponseDto } from "../types";
+import type { FileResponseDto } from "../types/file";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {

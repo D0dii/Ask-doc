@@ -1,6 +1,6 @@
 import { useCallback } from "react";
-import { useWorkspaces } from "../hooks/use-workspaces";
-import { useDeleteWorkspace } from "../hooks/use-delete-workspace";
+import { useWorkspaces } from "../api/get-workspaces";
+import { useDeleteWorkspace } from "../api/delete-workspace";
 import { WorkspaceCard } from "./workspace-card";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -12,7 +12,7 @@ export function WorkspaceList() {
 
   const handleDelete = useCallback(
     (workspaceId: string) => {
-      deleteMutation.mutate({ path: { id: workspaceId } });
+      deleteMutation.mutate(workspaceId);
     },
     [deleteMutation],
   );

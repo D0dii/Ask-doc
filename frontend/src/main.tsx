@@ -7,7 +7,7 @@ import { routeTree } from "./routeTree.gen";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { getContext } from "./lib/tanstack-query/get-context";
 import { setupApiClient } from "./lib/api-client";
-import { AuthProvider, type AuthContextType } from "@/features/auth";
+import { AuthProvider, type AuthContextType } from "@/features/auth/auth-provider";
 
 const queryClientContext = getContext();
 

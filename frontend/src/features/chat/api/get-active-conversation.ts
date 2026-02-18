@@ -1,11 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
-import { chatControllerGetConversationOptions } from "../api/queries";
+import { chatControllerGetConversation } from "@/client";
 
-export function useActiveConversation(workspaceId: string, conversationId: string | null) {
+const getConversation = (workspaceId: string, conversationId: string) =>
+  chatControllerGetConversation({ path: { workspaceId, conversationId }, throwOnError: true }).then(
+    ({ data }) => data,
+  );
+
+export const useActiveConversation = (workspaceId: string, conversationId: string | null) => {
   const { data: activeConversation, isLoading } = useQuery({
-    ...chatControllerGetConversationOptions({
-      path: { workspaceId, conversationId: conversationId! },
-    }),
+    queryKey: ["workspaces", workspaceId, "conversations", conversationId],
+    queryFn: () => getConversation(workspaceId, conversationId!),
     enabled: !!conversationId,
   });
 
@@ -18,4 +22,4 @@ export function useActiveConversation(workspaceId: string, conversationId: strin
   };
 
   return { activeConversation, messages, isLoading, getTitle };
-}
+};

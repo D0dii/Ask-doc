@@ -1,4 +1,4 @@
-import type { ChatMessageSourceDto } from "../types";
+import type { ChatMessageSourceDto } from "../types/chat";
 import { Badge } from "@/components/ui/badge";
 
 export function SourceItem({ source, index }: { source: ChatMessageSourceDto; index: number }) {

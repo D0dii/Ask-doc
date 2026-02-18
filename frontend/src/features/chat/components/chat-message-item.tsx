@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { ChatMessageResponseDto } from "../types";
+import type { ChatMessageResponseDto } from "../types/chat";
 import { SourceItem } from "./source-item";
 import { Button } from "@/components/ui/button";
 import { MessageSquare, Sparkles } from "lucide-react";

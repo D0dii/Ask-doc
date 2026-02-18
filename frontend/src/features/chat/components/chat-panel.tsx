@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from "react";
-import { useActiveConversation } from "../hooks/use-active-conversation";
-import { useAskQuestion } from "../hooks/use-ask-question";
+import { useActiveConversation } from "../api/get-active-conversation";
+import { useAskQuestion } from "../api/ask-question";
 import { ChatMessageItem } from "./chat-message-item";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,12 +28,7 @@ export function ChatPanel({
     getTitle,
   } = useActiveConversation(workspaceId, activeConversationId);
 
-  const queryMutation = useAskQuestion({
-    workspaceId,
-    activeConversationId,
-    onConversationCreated: (id) => onSelectConversation(id),
-    onSuccess: () => setQuestion(""),
-  });
+  const queryMutation = useAskQuestion(workspaceId);
 
   // Scroll to bottom when new messages arrive
   useEffect(() => {
@@ -52,18 +47,25 @@ export function ChatPanel({
 
   const handleAsk = useCallback(() => {
     if (question.trim()) {
-      queryMutation.mutate({
-        path: { workspaceId },
-        body: {
+      queryMutation.mutate(
+        {
           question,
           conversationId: activeConversationId || undefined,
         },
-      });
+        {
+          onSuccess: (data) => {
+            if (!activeConversationId) {
+              onSelectConversation(data.conversationId);
+            }
+            setQuestion("");
+          },
+        },
+      );
     }
-  }, [question, workspaceId, activeConversationId, queryMutation]);
+  }, [question, activeConversationId, queryMutation, onSelectConversation]);
 
   return (
-    <Card className="flex flex-col min-h-[600px]">
+    <Card className="flex flex-col min-h-150">
       <CardHeader className="pb-3">
         <div className="flex items-center gap-2">
           {activeConversationId && (
@@ -86,7 +88,7 @@ export function ChatPanel({
       </CardHeader>
       <CardContent className="flex-1 flex flex-col">
         {/* Chat History Display */}
-        <ScrollArea ref={scrollAreaRef} className="flex-1 min-h-[400px] mb-4">
+        <ScrollArea ref={scrollAreaRef} className="flex-1 min-h-100 mb-4">
           {messagesLoading && activeConversationId ? (
             <div className="flex items-center justify-center h-full py-12">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />

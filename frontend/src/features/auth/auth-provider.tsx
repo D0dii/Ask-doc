@@ -1,5 +1,5 @@
 import { client } from "@/client/client.gen";
-import type { User } from "./types";
+import type { User } from "./types/user";
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
 
 export interface AuthContextType {

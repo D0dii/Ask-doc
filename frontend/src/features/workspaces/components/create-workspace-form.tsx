@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { useCreateWorkspace } from "../hooks/use-create-workspace";
+import { useCreateWorkspace } from "../api/create-workspace";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus } from "lucide-react";
@@ -10,10 +10,7 @@ export function CreateWorkspaceForm() {
 
   const handleCreate = useCallback(() => {
     if (newWorkspaceName.trim()) {
-      createMutation.mutate(
-        { body: { name: newWorkspaceName.trim() } },
-        { onSuccess: () => setNewWorkspaceName("") },
-      );
+      createMutation.mutate({ name: newWorkspaceName.trim() }, { onSuccess: () => setNewWorkspaceName("") });
     }
   }, [newWorkspaceName, createMutation]);
 

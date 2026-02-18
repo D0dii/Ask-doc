@@ -1,5 +1,5 @@
-import { useFiles } from "../hooks/use-files";
-import { useDeleteFile } from "../hooks/use-delete-file";
+import { useFiles } from "../api/get-files";
+import { useDeleteFile } from "../api/delete-file";
 import { FileItem } from "./file-item";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,7 +8,7 @@ import { FileText } from "lucide-react";
 
 export function FileList({ workspaceId }: { workspaceId: string }) {
   const { files, processedFilesCount } = useFiles(workspaceId);
-  const { handleDelete, isPending: isDeleting } = useDeleteFile(workspaceId);
+  const deleteMutation = useDeleteFile(workspaceId);
 
   return (
     <Card>
@@ -25,10 +25,15 @@ export function FileList({ workspaceId }: { workspaceId: string }) {
       </CardHeader>
       <CardContent>
         {files && files.length > 0 ? (
-          <ScrollArea className="h-[180px] pr-4">
+          <ScrollArea className="h-45 pr-4">
             <div className="space-y-2">
               {files.map((file) => (
-                <FileItem key={file.id} file={file} onDelete={handleDelete} isDeleting={isDeleting} />
+                <FileItem
+                  key={file.id}
+                  file={file}
+                  onDelete={(id) => deleteMutation.mutate(id)}
+                  isDeleting={deleteMutation.isPending}
+                />
               ))}
             </div>
           </ScrollArea>
