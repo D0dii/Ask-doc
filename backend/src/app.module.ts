@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { RagModule } from './rag/rag.module';
 import { AuthModule } from './auth/auth.module';
 import { WorkspacesModule } from './workspaces/workspaces.module';
 import { ChatModule } from './chat/chat.module';
+import { DocumentsModule } from './documents/documents.module';
+import { IngestionModule } from './ingestion/ingestion.module';
+import { RetrievalModule } from './retrieval/retrieval.module';
 
 @Module({
   imports: [
@@ -24,7 +26,9 @@ import { ChatModule } from './chat/chat.module';
         synchronize: true, // dev only; switch to migrations in prod
       }),
     }),
-    RagModule,
+    DocumentsModule,
+    IngestionModule,
+    RetrievalModule,
     AuthModule,
     WorkspacesModule,
     ChatModule,

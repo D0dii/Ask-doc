@@ -21,46 +21,42 @@ import {
   ApiBody,
   ApiParam,
 } from '@nestjs/swagger';
-import { FilesService } from './services';
 import { JwtCookieGuard } from '../auth/guards/jwt-cookie.guard';
 import { WorkspaceAccessGuard } from '../workspaces/guards/workspace-access.guard';
 import type { WorkspaceRequest } from '../auth/types/auth.types';
 import { FileResponseDto, IngestResponseDto } from './dtos';
 import { FileStatus } from './entities/file.entity';
+import { FilesService } from './services/files.service';
 
 const ALLOWED_MIME_TYPES = ['application/pdf'];
 
-@ApiTags('RAG')
+@ApiTags('Documents')
 @ApiCookieAuth()
-@Controller('workspaces/:workspaceId/files')
+@Controller('workspaces/:workspaceId/documents')
 @ApiParam({ name: 'workspaceId', description: 'Workspace ID', type: String })
 @UseGuards(JwtCookieGuard, WorkspaceAccessGuard)
-export class RagController {
+export class DocumentsController {
   constructor(private readonly filesService: FilesService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Get all files in a workspace' })
+  @ApiOperation({ summary: 'Get all documents in a workspace' })
   @ApiResponse({
     status: 200,
-    description: 'List of files',
+    description: 'List of documents',
     type: [FileResponseDto],
   })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 404, description: 'Workspace not found' })
   async getFiles(@Req() req: WorkspaceRequest): Promise<FileResponseDto[]> {
     return this.filesService.getFilesByWorkspace(req.workspace.id);
   }
 
   @Get(':fileId')
-  @ApiOperation({ summary: 'Get a specific file by ID' })
-  @ApiParam({ name: 'fileId', description: 'File ID', type: String })
+  @ApiOperation({ summary: 'Get a specific document by ID' })
+  @ApiParam({ name: 'fileId', description: 'Document ID', type: String })
   @ApiResponse({
     status: 200,
-    description: 'File details',
+    description: 'Document details',
     type: FileResponseDto,
   })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 404, description: 'File not found' })
   async getFile(
     @Req() req: WorkspaceRequest,
     @Param('fileId') fileId: string,
@@ -74,7 +70,7 @@ export class RagController {
 
   @Post()
   @UseInterceptors(FileInterceptor('file'))
-  @ApiOperation({ summary: 'Upload and ingest a PDF file' })
+  @ApiOperation({ summary: 'Upload and ingest a PDF document' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -83,7 +79,7 @@ export class RagController {
         file: {
           type: 'string',
           format: 'binary',
-          description: 'PDF file to upload',
+          description: 'PDF document to upload',
         },
       },
       required: ['file'],
@@ -91,15 +87,9 @@ export class RagController {
   })
   @ApiResponse({
     status: 201,
-    description: 'File upload started',
+    description: 'Document upload started',
     type: IngestResponseDto,
   })
-  @ApiResponse({
-    status: 400,
-    description: 'Bad request - file is required or invalid file type',
-  })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 404, description: 'Workspace not found' })
   async ingest(
     @Req() req: WorkspaceRequest,
     @UploadedFile() file: Express.Multer.File,
@@ -108,14 +98,12 @@ export class RagController {
       throw new BadRequestException('File is required');
     }
 
-    // Validate file type
     if (!ALLOWED_MIME_TYPES.includes(file.mimetype)) {
       throw new BadRequestException(
         `Invalid file type. Only PDF files are allowed. Received: ${file.mimetype}`,
       );
     }
 
-    // Save file to DB and start processing (fire and forget)
     const savedFile = await this.filesService.createAndProcessFile(
       file,
       req.workspace.id,
@@ -129,11 +117,8 @@ export class RagController {
   }
 
   @Delete(':fileId')
-  @ApiOperation({ summary: 'Delete a file' })
-  @ApiParam({ name: 'fileId', description: 'File ID', type: String })
-  @ApiResponse({ status: 200, description: 'File deleted successfully' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 404, description: 'File not found' })
+  @ApiOperation({ summary: 'Delete a document' })
+  @ApiParam({ name: 'fileId', description: 'Document ID', type: String })
   async deleteFile(
     @Req() req: WorkspaceRequest,
     @Param('fileId') fileId: string,

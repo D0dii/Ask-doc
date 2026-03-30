@@ -1,4 +1,4 @@
-import { Module, forwardRef } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { QueryController, ConversationsController } from './controllers';
 import { ConversationsService, QueryService } from './services';
@@ -6,13 +6,13 @@ import { ChatMessage } from './entities/chat-message.entity';
 import { ChatConversation } from './entities/chat-conversation.entity';
 import { WorkspacesModule } from '../workspaces/workspaces.module';
 import { AuthModule } from '../auth/auth.module';
-import { RagModule } from '../rag/rag.module';
+import { RetrievalModule } from '../retrieval/retrieval.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([ChatMessage, ChatConversation]),
-    forwardRef(() => WorkspacesModule),
-    forwardRef(() => RagModule), // For search functionality
+    WorkspacesModule,
+    RetrievalModule,
     AuthModule,
   ],
   controllers: [QueryController, ConversationsController],

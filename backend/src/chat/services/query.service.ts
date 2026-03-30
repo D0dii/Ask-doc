@@ -1,8 +1,8 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { groq } from '@ai-sdk/groq';
-import { generateText } from 'ai';
-import { FilesService, SearchResult } from '../../rag/services';
+import { RetrievalService } from '../../retrieval/services';
 import { LLM_MODELS, CHAT_CONFIG } from '../../shared/constants';
+import { LlmService } from '../../shared/llm-client';
+import type { VectorSearchResult } from '../../shared/vector-store';
 import {
   QUESTION_REWRITER_SYSTEM_PROMPT,
   QUESTION_REWRITER_PROMPT_TEMPLATE,
@@ -17,7 +17,7 @@ import { ConversationsService } from './conversations.service';
 
 export interface QueryResult {
   answer: string;
-  sources: SearchResult[];
+  sources: VectorSearchResult[];
   conversationId: string;
   messageId: string;
 }
@@ -33,7 +33,8 @@ export class QueryService {
 
   constructor(
     private conversationsService: ConversationsService,
-    private filesService: FilesService,
+    private retrievalService: RetrievalService,
+    private llmService: LlmService,
   ) {}
 
   // ==================== MAIN QUERY FLOW ====================
@@ -69,7 +70,7 @@ export class QueryService {
     );
 
     // 4. Search for relevant document chunks using the standalone question
-    const sources = await this.filesService.search(
+    const sources = await this.retrievalService.retrieve(
       workspaceId,
       standaloneQuestion,
     );
@@ -164,8 +165,8 @@ export class QueryService {
     const historyText = formatConversationHistory(conversationHistory);
 
     try {
-      const { text } = await generateText({
-        model: groq(LLM_MODELS.GROQ.DEFAULT),
+      const text = await this.llmService.generateText({
+        model: LLM_MODELS.GROQ.DEFAULT,
         system: QUESTION_REWRITER_SYSTEM_PROMPT,
         prompt: QUESTION_REWRITER_PROMPT_TEMPLATE(historyText, question),
       });
@@ -179,7 +180,7 @@ export class QueryService {
 
   private async generateAnswer(
     question: string,
-    sources: SearchResult[],
+    sources: VectorSearchResult[],
     conversationHistory: ConversationMessage[],
   ): Promise<string> {
     const context = formatSourcesContext(sources);
@@ -190,8 +191,8 @@ export class QueryService {
         ? formatConversationHistory(conversationHistory)
         : undefined;
 
-    const { text } = await generateText({
-      model: groq(LLM_MODELS.GROQ.DEFAULT),
+    return this.llmService.generateText({
+      model: LLM_MODELS.GROQ.DEFAULT,
       system: ANSWER_GENERATOR_SYSTEM_PROMPT,
       prompt: ANSWER_GENERATOR_PROMPT_TEMPLATE({
         conversationHistory: conversationContext,
@@ -199,8 +200,6 @@ export class QueryService {
         question,
       }),
     });
-
-    return text;
   }
 
   private async generateConversationTitle(
@@ -208,8 +207,8 @@ export class QueryService {
     answer: string,
   ): Promise<string> {
     try {
-      const { text } = await generateText({
-        model: groq(LLM_MODELS.GROQ.DEFAULT),
+      const text = await this.llmService.generateText({
+        model: LLM_MODELS.GROQ.DEFAULT,
         system: TITLE_GENERATOR_SYSTEM_PROMPT,
         prompt: TITLE_GENERATOR_PROMPT_TEMPLATE(question, answer),
       });

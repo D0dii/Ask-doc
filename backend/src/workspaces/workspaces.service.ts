@@ -1,16 +1,15 @@
-import { Injectable, Inject, forwardRef } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Workspace } from './entities/workspace.entity';
-import { FilesService } from '../rag/services';
+import { VectorService } from '../shared/vector-store';
 
 @Injectable()
 export class WorkspacesService {
   constructor(
     @InjectRepository(Workspace)
     private readonly workspaceRepository: Repository<Workspace>,
-    @Inject(forwardRef(() => FilesService))
-    private readonly filesService: FilesService,
+    private readonly vectorService: VectorService,
   ) {}
 
   async create(data: {
@@ -53,8 +52,8 @@ export class WorkspacesService {
     const workspace = await this.findOneByOwner(id, ownerId);
     if (!workspace) return false;
 
-    // Cascade delete: remove all files and vectors first
-    await this.filesService.deleteAllByWorkspace(id);
+    // Remove vectors scoped to this workspace before deleting the workspace row
+    await this.vectorService.deleteByWorkspaceId(id);
 
     await this.workspaceRepository.remove(workspace);
     return true;
