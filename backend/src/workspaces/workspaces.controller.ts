@@ -19,11 +19,9 @@ import {
 import { WorkspacesService } from './workspaces.service';
 import { JwtCookieGuard } from '../auth/guards/jwt-cookie.guard';
 import type { UserRequest } from '../auth/types/auth.types';
-import {
-  CreateWorkspaceDto,
-  UpdateWorkspaceDto,
-  WorkspaceResponseDto,
-} from './dtos';
+import { CreateWorkspaceDto } from './dtos/create-workspace.dto';
+import { UpdateWorkspaceDto } from './dtos/update-workspace.dto';
+import { WorkspaceResponseDto } from './dtos/workspace-response.dto';
 
 @ApiTags('Workspaces')
 @ApiCookieAuth()

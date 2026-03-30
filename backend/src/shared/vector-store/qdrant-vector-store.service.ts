@@ -1,7 +1,7 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { QdrantClient } from '@qdrant/js-client-rest';
-import { EMBEDDING_MODELS, RAG_CONFIG } from '../constants';
+import { EMBEDDING_MODELS, RAG_CONFIG } from '../constants/ai-models.constants';
 import {
   type VectorPoint,
   type VectorSearchResult,

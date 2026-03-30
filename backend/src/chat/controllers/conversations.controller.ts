@@ -20,18 +20,18 @@ import {
   ApiParam,
   ApiQuery,
 } from '@nestjs/swagger';
-import { ConversationsService } from '../services';
+import { ConversationsService } from '../services/conversations.service';
 import { JwtCookieGuard } from '../../auth/guards/jwt-cookie.guard';
 import { WorkspaceAccessGuard } from '../../workspaces/guards/workspace-access.guard';
 import type { WorkspaceRequest } from '../../auth/types/auth.types';
 import {
-  ChatMessageResponseDto,
   ConversationResponseDto,
   ConversationWithMessagesDto,
   ConversationListResponseDto,
   CreateConversationDto,
   UpdateConversationDto,
-} from '../dtos';
+} from '../dtos/chat-conversation.dto';
+import { ChatMessageResponseDto } from '../dtos/chat-message.dto';
 
 @ApiTags('Chat Conversations')
 @ApiCookieAuth()

@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { QueryController, ConversationsController } from './controllers';
-import { ConversationsService, QueryService } from './services';
+import { QueryController } from './controllers/query.controller';
+import { ConversationsController } from './controllers/conversations.controller';
+import { ConversationsService } from './services/conversations.service';
+import { QueryService } from './services/query.service';
 import { ChatMessage } from './entities/chat-message.entity';
 import { ChatConversation } from './entities/chat-conversation.entity';
 import { WorkspacesModule } from '../workspaces/workspaces.module';

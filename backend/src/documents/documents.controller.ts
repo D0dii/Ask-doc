@@ -24,7 +24,8 @@ import {
 import { JwtCookieGuard } from '../auth/guards/jwt-cookie.guard';
 import { WorkspaceAccessGuard } from '../workspaces/guards/workspace-access.guard';
 import type { WorkspaceRequest } from '../auth/types/auth.types';
-import { FileResponseDto, IngestResponseDto } from './dtos';
+import { FileResponseDto } from './dtos/file-response.dto';
+import { IngestResponseDto } from './dtos/ingest-response.dto';
 import { FileStatus } from './entities/file.entity';
 import { FilesService } from './services/files.service';
 

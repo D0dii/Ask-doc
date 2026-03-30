@@ -6,14 +6,14 @@ import {
   ApiCookieAuth,
   ApiParam,
 } from '@nestjs/swagger';
-import { QueryService } from '../services';
+import { QueryService } from '../services/query.service';
 import { JwtCookieGuard } from '../../auth/guards/jwt-cookie.guard';
 import { WorkspaceAccessGuard } from '../../workspaces/guards/workspace-access.guard';
 import type { WorkspaceRequest } from '../../auth/types/auth.types';
 import {
   QueryInConversationDto,
   QueryInConversationResponseDto,
-} from '../dtos';
+} from '../dtos/chat-conversation.dto';
 
 @ApiTags('Chat')
 @ApiCookieAuth()

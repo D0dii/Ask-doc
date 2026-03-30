@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { File } from '../documents/entities/file.entity';
-import { SharedModule } from '../shared';
+import { SharedModule } from '../shared/shared.module';
 import { IngestionService } from './services/ingestion.service';
 
 @Module({

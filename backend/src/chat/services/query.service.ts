@@ -1,8 +1,11 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { RetrievalService } from '../../retrieval/services';
-import { LLM_MODELS, CHAT_CONFIG } from '../../shared/constants';
-import { LlmService } from '../../shared/llm-client';
-import type { VectorSearchResult } from '../../shared/vector-store';
+import { RetrievalService } from '../../retrieval/services/retrieval.service';
+import {
+  LLM_MODELS,
+  CHAT_CONFIG,
+} from '../../shared/constants/ai-models.constants';
+import { LlmService } from '../../shared/llm-client/llm.service';
+import type { VectorSearchResult } from '../../shared/vector-store/vector-store.port';
 import {
   QUESTION_REWRITER_SYSTEM_PROMPT,
   QUESTION_REWRITER_PROMPT_TEMPLATE,
@@ -12,7 +15,7 @@ import {
   TITLE_GENERATOR_PROMPT_TEMPLATE,
   formatConversationHistory,
   formatSourcesContext,
-} from '../constants';
+} from '../constants/prompts.constants';
 import { ConversationsService } from './conversations.service';
 
 export interface QueryResult {

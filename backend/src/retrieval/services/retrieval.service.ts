@@ -2,7 +2,8 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { File, FileStatus } from '../../documents/entities/file.entity';
-import { VectorService, VectorSearchResult } from '../../shared/vector-store';
+import { VectorService } from '../../shared/vector-store/vector.service';
+import type { VectorSearchResult } from '../../shared/vector-store/vector-store.port';
 
 @Injectable()
 export class RetrievalService {

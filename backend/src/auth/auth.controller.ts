@@ -24,7 +24,9 @@ import type {
   UserRequest,
 } from './types/auth.types';
 import { JwtCookieGuard } from './guards/jwt-cookie.guard';
-import { UserResponseDto, RefreshResponseDto, LogoutResponseDto } from './dtos';
+import { UserResponseDto } from './dtos/user-response.dto';
+import { RefreshResponseDto } from './dtos/refresh-response.dto';
+import { LogoutResponseDto } from './dtos/logout-response.dto';
 
 @ApiTags('Auth')
 @Controller('auth')

@@ -1,15 +1,15 @@
 import { Injectable, Inject, Logger } from '@nestjs/common';
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 import { v4 as uuidv4 } from 'uuid';
-import { EMBEDDING_MODELS, RAG_CONFIG } from '../constants';
-import { LLM_CLIENT } from '../llm-client';
+import { EMBEDDING_MODELS, RAG_CONFIG } from '../constants/ai-models.constants';
+import { LLM_CLIENT } from '../llm-client/llm-client.port';
 import {
   VECTOR_STORE,
   type VectorPoint,
   type VectorSearchResult,
   type VectorStorePort,
 } from './vector-store.port';
-import type { LlmClientPort } from '../llm-client';
+import type { LlmClientPort } from '../llm-client/llm-client.port';
 
 @Injectable()
 export class VectorService {
