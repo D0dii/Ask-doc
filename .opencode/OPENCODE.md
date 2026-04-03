@@ -70,3 +70,9 @@ This file is the primary instruction set for coding agents working in this repos
 - Security constraints: `.opencode/rules/security-rules.md`
 - Delivery playbook: `.opencode/workflows/ship-feature.md`
 - Learning log: `.opencode/docs/agent-learning-log.md`
+
+## Project Subagents
+- `askdoc-frontend`: `.opencode/agents/askdoc-frontend-agent.md`
+- `askdoc-backend`: `.opencode/agents/askdoc-backend-agent.md`
+
+Note: this repo relies on `.opencode/agents/` discovery; no project `opencode.json` is required.
