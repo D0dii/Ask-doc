@@ -18,6 +18,8 @@ This file is the primary instruction set for coding agents working in this repos
 - `.opencode/rules/`: detailed coding rules.
 - `.opencode/workflows/`: step-by-step execution playbooks.
 - `.opencode/docs/`: extra project context and terminology.
+- `.opencode/hooks/`: automation guardrails (pre-edit checks, task completion logging).
+- `.opencode/agents/`: project subagents for specialized tasks.
 
 ## Commands You Will Need
 - Install deps: `pnpm install`
@@ -70,9 +72,8 @@ This file is the primary instruction set for coding agents working in this repos
 - Security constraints: `.opencode/rules/security-rules.md`
 - Delivery playbook: `.opencode/workflows/ship-feature.md`
 - Learning log: `.opencode/docs/agent-learning-log.md`
+- Automation hooks: `.opencode/hooks/`
 
 ## Project Subagents
 - `askdoc-frontend`: `.opencode/agents/askdoc-frontend-agent.md`
 - `askdoc-backend`: `.opencode/agents/askdoc-backend-agent.md`
-
-Note: this repo relies on `.opencode/agents/` discovery; no project `opencode.json` is required.

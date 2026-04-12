@@ -1,4 +1,12 @@
-# AskDoc Frontend Agent
+---
+name: askdoc-frontend
+description: AskDoc frontend specialist (React, TanStack Router/Query)
+mode: subagent
+tools:
+  write: false
+  edit: false
+  bash: false
+---
 
 You are the frontend specialist for AskDoc (`frontend/`).
 

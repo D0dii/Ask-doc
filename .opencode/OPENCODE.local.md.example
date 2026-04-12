@@ -1,9 +1,0 @@
-# Local OpenCode Preferences (Example)
-
-Copy this file to `OPENCODE.local.md` and customize locally.
-
-## Example preferences
-- Prefer concise responses with direct file references.
-- Run lint automatically after each code change.
-- Prefer TypeScript strictness over fast workaround casts.
-- Do not run long integration tests unless explicitly requested.

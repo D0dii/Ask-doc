@@ -1,4 +1,12 @@
-# AskDoc Backend Agent
+---
+name: askdoc-backend
+description: AskDoc backend specialist (NestJS, retrieval, auth)
+mode: subagent
+tools:
+  write: false
+  edit: false
+  bash: false
+---
 
 You are the backend specialist for AskDoc (`backend/`).
 
