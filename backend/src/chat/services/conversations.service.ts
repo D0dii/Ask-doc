@@ -2,165 +2,127 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ChatMessage } from '../entities/chat-message.entity';
-import { ChatConversation } from '../entities/chat-conversation.entity';
+import { ChatThread } from '../entities/chat-thread.entity';
 
 @Injectable()
 export class ConversationsService {
   constructor(
     @InjectRepository(ChatMessage)
     private chatMessageRepository: Repository<ChatMessage>,
-    @InjectRepository(ChatConversation)
-    private conversationRepository: Repository<ChatConversation>,
+    @InjectRepository(ChatThread)
+    private threadRepository: Repository<ChatThread>,
   ) {}
 
-  // ==================== CONVERSATION CRUD ====================
-
-  async createConversation(
-    workspaceId: string,
+  async getOrCreateThread(
+    knowledgeHubId: string,
     userId: string,
-    title?: string,
-  ): Promise<ChatConversation> {
-    const conversation = this.conversationRepository.create({
-      workspaceId,
+  ): Promise<ChatThread> {
+    const existing = await this.getThreadByKnowledgeHubId(knowledgeHubId);
+    if (existing) {
+      return existing;
+    }
+
+    const thread = this.threadRepository.create({
+      knowledgeHubId,
       userId,
-      title: title || null,
+      title: null,
     });
 
-    return this.conversationRepository.save(conversation);
+    try {
+      return await this.threadRepository.save(thread);
+    } catch {
+      const concurrent = await this.getThreadByKnowledgeHubId(knowledgeHubId);
+      if (concurrent) {
+        return concurrent;
+      }
+      throw new Error('Failed to create or retrieve chat thread');
+    }
   }
 
-  async getConversationsByWorkspace(
-    workspaceId: string,
-    limit = 50,
-    offset = 0,
-  ): Promise<{ conversations: ChatConversation[]; total: number }> {
-    const [conversations, total] =
-      await this.conversationRepository.findAndCount({
-        where: { workspaceId },
-        order: { updatedAt: 'DESC' },
-        take: limit,
-        skip: offset,
-      });
-
-    return { conversations, total };
-  }
-
-  async getConversationById(
-    conversationId: string,
-    workspaceId: string,
-  ): Promise<ChatConversation | null> {
-    return this.conversationRepository.findOne({
-      where: { id: conversationId, workspaceId },
+  async getThreadByKnowledgeHubId(
+    knowledgeHubId: string,
+  ): Promise<ChatThread | null> {
+    return this.threadRepository.findOne({
+      where: { knowledgeHubId },
     });
   }
 
-  async getConversationWithMessages(
-    conversationId: string,
-    workspaceId: string,
-  ): Promise<ChatConversation | null> {
-    return this.conversationRepository.findOne({
-      where: { id: conversationId, workspaceId },
-      relations: ['messages'],
-      order: { messages: { createdAt: 'ASC' } },
-    });
-  }
-
-  async updateConversationTitle(
-    conversationId: string,
-    workspaceId: string,
+  async updateThreadTitleByKnowledgeHub(
+    knowledgeHubId: string,
     title: string,
-  ): Promise<ChatConversation | null> {
-    const conversation = await this.getConversationById(
-      conversationId,
-      workspaceId,
-    );
+  ): Promise<ChatThread | null> {
+    const thread = await this.getThreadByKnowledgeHubId(knowledgeHubId);
 
-    if (!conversation) {
+    if (!thread) {
       return null;
     }
 
-    conversation.title = title;
-    return this.conversationRepository.save(conversation);
+    thread.title = title;
+    return this.threadRepository.save(thread);
   }
 
-  async deleteConversation(
-    conversationId: string,
-    workspaceId: string,
-  ): Promise<boolean> {
-    const result = await this.conversationRepository.delete({
-      id: conversationId,
-      workspaceId,
-    });
+  async touchThreadByKnowledgeHub(knowledgeHubId: string): Promise<void> {
+    const thread = await this.getThreadByKnowledgeHubId(knowledgeHubId);
+    if (!thread) {
+      return;
+    }
 
-    return (result.affected ?? 0) > 0;
-  }
-
-  async clearWorkspaceConversations(workspaceId: string): Promise<number> {
-    const result = await this.conversationRepository.delete({ workspaceId });
-    return result.affected ?? 0;
-  }
-
-  async touchConversation(conversationId: string): Promise<void> {
-    await this.conversationRepository.update(conversationId, {
+    await this.threadRepository.update(thread.id, {
       updatedAt: new Date(),
     });
   }
-
-  // ==================== MESSAGE CRUD ====================
 
   async createMessage(params: {
     question: string;
     answer: string;
     sources: Array<{ fileId: string; text: string; score: number }> | null;
-    conversationId: string;
+    threadId: string;
     userId: string;
   }): Promise<ChatMessage> {
     const message = this.chatMessageRepository.create({
       question: params.question,
       answer: params.answer,
       sources: params.sources ?? undefined,
-      conversationId: params.conversationId,
+      threadId: params.threadId,
       userId: params.userId,
     });
 
     return this.chatMessageRepository.save(message);
   }
 
-  async getMessagesByConversation(
-    conversationId: string,
-  ): Promise<ChatMessage[]> {
+  async getMessagesByThread(threadId: string): Promise<ChatMessage[]> {
     return this.chatMessageRepository.find({
-      where: { conversationId },
+      where: { threadId },
       order: { createdAt: 'ASC' },
     });
   }
 
-  async getRecentMessages(
-    conversationId: string,
+  async getRecentMessagesByThread(
+    threadId: string,
     limit: number,
   ): Promise<ChatMessage[]> {
     return this.chatMessageRepository.find({
-      where: { conversationId },
+      where: { threadId },
       order: { createdAt: 'DESC' },
       take: limit,
     });
   }
 
-  async deleteMessage(
+  async deleteMessageByThread(
     messageId: string,
-    conversationId: string,
+    threadId: string,
   ): Promise<boolean> {
     const result = await this.chatMessageRepository.delete({
       id: messageId,
-      conversationId,
+      threadId,
     });
 
     return (result.affected ?? 0) > 0;
   }
 
-  async getMessageCountByConversation(conversationId: string): Promise<number> {
+  async getMessageCountByThread(threadId: string): Promise<number> {
     return this.chatMessageRepository.count({
-      where: { conversationId },
+      where: { threadId },
     });
   }
 }

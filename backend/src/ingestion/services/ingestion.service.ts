@@ -18,13 +18,13 @@ export class IngestionService {
   async processFileAsync(
     fileId: string,
     fileBuffer: Buffer,
-    workspaceId: string,
+    knowledgeHubId: string,
   ): Promise<void> {
     try {
       this.logger.log(`Starting async processing for file: ${fileId}`);
 
       const text = await extractTextFromPdf(fileBuffer);
-      await this.vectorService.ingestDocument(text, workspaceId, fileId);
+      await this.vectorService.ingestDocument(text, knowledgeHubId, fileId);
 
       await this.fileRepository.update(fileId, {
         status: FileStatus.COMPLETED,

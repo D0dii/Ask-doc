@@ -7,7 +7,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
-import { ChatConversation } from './chat-conversation.entity';
+import { ChatThread } from './chat-thread.entity';
 
 @Entity()
 export class ChatMessage {
@@ -28,13 +28,13 @@ export class ChatMessage {
   }>;
 
   @Column()
-  conversationId: string;
+  threadId: string;
 
-  @ManyToOne(() => ChatConversation, (conversation) => conversation.messages, {
+  @ManyToOne(() => ChatThread, (thread) => thread.messages, {
     onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'conversationId' })
-  conversation: ChatConversation;
+  @JoinColumn({ name: 'threadId' })
+  thread: ChatThread;
 
   @Column()
   userId: string;

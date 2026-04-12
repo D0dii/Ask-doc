@@ -5,17 +5,19 @@ import { DocumentsController } from './documents.controller';
 import { FilesService } from './services/files.service';
 import { RetrievalModule } from '../retrieval/retrieval.module';
 import { IngestionModule } from '../ingestion/ingestion.module';
-import { WorkspacesModule } from '../workspaces/workspaces.module';
 import { AuthModule } from '../auth/auth.module';
-import { Workspace } from '../workspaces/entities/workspace.entity';
+import { SharedModule } from '../shared/shared.module';
+import { KnowledgeHub } from '../knowledge-hubs/entities/knowledge-hub.entity';
+import { KnowledgeHubsModule } from '../knowledge-hubs/knowledge-hubs.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([File, Workspace]),
+    TypeOrmModule.forFeature([File, KnowledgeHub]),
     RetrievalModule,
     IngestionModule,
-    WorkspacesModule,
+    KnowledgeHubsModule,
     AuthModule,
+    SharedModule,
   ],
   controllers: [DocumentsController],
   providers: [FilesService],

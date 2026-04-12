@@ -46,9 +46,9 @@ export class ConversationResponseDto {
   title: string | null;
 
   @ApiProperty({
-    description: 'ID of the workspace this conversation belongs to',
+    description: 'ID of the knowledge hub this conversation belongs to',
   })
-  workspaceId: string;
+  knowledgeHubId: string;
 
   @ApiProperty({ description: 'ID of the user who created the conversation' })
   userId: string;

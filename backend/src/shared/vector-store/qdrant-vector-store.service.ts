@@ -53,7 +53,7 @@ export class QdrantVectorStoreService implements VectorStorePort, OnModuleInit {
   }
 
   async searchByVector(params: {
-    workspaceId: string;
+    knowledgeHubId: string;
     vector: number[];
     limit: number;
   }): Promise<VectorSearchResult[]> {
@@ -63,8 +63,8 @@ export class QdrantVectorStoreService implements VectorStorePort, OnModuleInit {
       filter: {
         must: [
           {
-            key: 'workspaceId',
-            match: { value: params.workspaceId },
+            key: 'knowledgeHubId',
+            match: { value: params.knowledgeHubId },
           },
         ],
       },
@@ -91,13 +91,13 @@ export class QdrantVectorStoreService implements VectorStorePort, OnModuleInit {
     });
   }
 
-  async deleteByWorkspaceId(workspaceId: string): Promise<void> {
+  async deleteByKnowledgeHubId(knowledgeHubId: string): Promise<void> {
     await this.qdrant.delete(RAG_CONFIG.COLLECTION_NAME, {
       filter: {
         must: [
           {
-            key: 'workspaceId',
-            match: { value: workspaceId },
+            key: 'knowledgeHubId',
+            match: { value: knowledgeHubId },
           },
         ],
       },

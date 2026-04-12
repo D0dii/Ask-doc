@@ -1,40 +1,36 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class WorkspaceResponseDto {
+export class KnowledgeHubResponseDto {
   @ApiProperty({
-    description: 'Unique identifier of the workspace',
+    description: 'Unique identifier of the knowledge hub',
     example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
   })
   id: string;
 
   @ApiProperty({
-    description: 'Name of the workspace',
-    example: 'My Project',
+    description: 'Name of the knowledge hub',
+    example: 'Product Architecture',
   })
   name: string;
 
   @ApiProperty({
-    description: 'Description of the workspace',
-    example: 'A workspace for my project documents',
+    description: 'Description of the knowledge hub',
     nullable: true,
   })
   description: string | null;
 
   @ApiProperty({
-    description: 'ID of the workspace owner',
-    example: 'b2c3d4e5-f6a7-8901-bcde-f23456789012',
+    description: 'ID of the knowledge hub owner',
   })
   ownerId: string;
 
   @ApiProperty({
     description: 'Creation timestamp',
-    example: '2025-12-29T10:00:00.000Z',
   })
   createdAt: Date;
 
   @ApiProperty({
     description: 'Last update timestamp',
-    example: '2025-12-29T12:00:00.000Z',
   })
   updatedAt: Date;
 }

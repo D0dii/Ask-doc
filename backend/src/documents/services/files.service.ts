@@ -16,22 +16,22 @@ export class FilesService {
     private ingestionService: IngestionService,
   ) {}
 
-  async getFilesByWorkspace(workspaceId: string): Promise<File[]> {
+  async getFilesByKnowledgeHub(knowledgeHubId: string): Promise<File[]> {
     return this.fileRepository.find({
-      where: { workspaceId },
+      where: { knowledgeHubId },
       order: { createdAt: 'DESC' },
     });
   }
 
-  async getFileById(fileId: string, workspaceId: string): Promise<File | null> {
+  async getFileById(fileId: string, knowledgeHubId: string): Promise<File | null> {
     return this.fileRepository.findOne({
-      where: { id: fileId, workspaceId },
+      where: { id: fileId, knowledgeHubId },
     });
   }
 
   async createAndProcessFile(
     uploadedFile: Express.Multer.File,
-    workspaceId: string,
+    knowledgeHubId: string,
   ): Promise<File> {
     const file = this.fileRepository.create({
       name: uploadedFile.originalname,
@@ -39,13 +39,13 @@ export class FilesService {
       mimeType: uploadedFile.mimetype,
       size: uploadedFile.size,
       status: FileStatus.PROCESSING,
-      workspaceId,
+      knowledgeHubId,
     });
 
     const savedFile = await this.fileRepository.save(file);
 
     this.ingestionService
-      .processFileAsync(savedFile.id, uploadedFile.buffer, workspaceId)
+      .processFileAsync(savedFile.id, uploadedFile.buffer, knowledgeHubId)
       .catch((error: unknown) => {
         const message =
           error instanceof Error ? error.message : 'Unknown error';
@@ -55,9 +55,9 @@ export class FilesService {
     return savedFile;
   }
 
-  async deleteFile(fileId: string, workspaceId: string): Promise<void> {
+  async deleteFile(fileId: string, knowledgeHubId: string): Promise<void> {
     const file = await this.fileRepository.findOne({
-      where: { id: fileId, workspaceId },
+      where: { id: fileId, knowledgeHubId },
     });
 
     if (!file) {
@@ -77,25 +77,27 @@ export class FilesService {
     this.logger.log(`Deleted file record: ${fileId}`);
   }
 
-  async deleteAllByWorkspace(workspaceId: string): Promise<void> {
-    const files = await this.fileRepository.find({ where: { workspaceId } });
+  async deleteAllByKnowledgeHub(knowledgeHubId: string): Promise<void> {
+    const files = await this.fileRepository.find({
+      where: { knowledgeHubId },
+    });
 
     if (files.length === 0) {
       return;
     }
 
     try {
-      await this.vectorService.deleteByWorkspaceId(workspaceId);
+      await this.vectorService.deleteByKnowledgeHubId(knowledgeHubId);
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Unknown error';
       this.logger.error(
-        `Error deleting vectors for workspace ${workspaceId}: ${message}`,
+        `Error deleting vectors for knowledge hub ${knowledgeHubId}: ${message}`,
       );
     }
 
     await this.fileRepository.remove(files);
     this.logger.log(
-      `Deleted ${files.length} file records for workspace: ${workspaceId}`,
+      `Deleted ${files.length} file records for knowledge hub: ${knowledgeHubId}`,
     );
   }
 }

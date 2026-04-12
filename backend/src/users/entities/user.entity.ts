@@ -6,15 +6,15 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
-import { Workspace } from '../../workspaces/entities/workspace.entity';
+import { KnowledgeHub } from '../../knowledge-hubs/entities/knowledge-hub.entity';
 
 @Entity()
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @OneToMany(() => Workspace, (workspace) => workspace.owner)
-  workspaces: Workspace[];
+  @OneToMany(() => KnowledgeHub, (knowledgeHub) => knowledgeHub.owner)
+  knowledgeHubs: KnowledgeHub[];
 
   @Column({ unique: true })
   email: string;

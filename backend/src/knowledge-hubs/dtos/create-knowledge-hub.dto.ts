@@ -1,10 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
 
-export class CreateWorkspaceDto {
+export class CreateKnowledgeHubDto {
   @ApiProperty({
-    description: 'Name of the workspace',
-    example: 'My Project',
+    description: 'Name of the knowledge hub',
+    example: 'Product Architecture',
     maxLength: 255,
   })
   @IsString()
@@ -13,8 +13,8 @@ export class CreateWorkspaceDto {
   name: string;
 
   @ApiProperty({
-    description: 'Optional description of the workspace',
-    example: 'A workspace for my project documents',
+    description: 'Optional description of the knowledge hub',
+    example: 'All docs, notes, chat, and cards for the product architecture',
     required: false,
   })
   @IsString()

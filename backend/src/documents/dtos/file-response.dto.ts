@@ -30,8 +30,8 @@ export class FileResponseDto {
   })
   errorMessage?: string;
 
-  @ApiProperty({ description: 'Workspace ID this file belongs to' })
-  workspaceId: string;
+  @ApiProperty({ description: 'Knowledge hub ID this file belongs to' })
+  knowledgeHubId: string;
 
   @ApiProperty({ description: 'Created timestamp' })
   createdAt: Date;

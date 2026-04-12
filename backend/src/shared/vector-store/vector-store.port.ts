@@ -2,7 +2,7 @@ export interface VectorPayload {
   [key: string]: unknown;
   text: string;
   fileId: string;
-  workspaceId: string;
+  knowledgeHubId: string;
 }
 
 export interface VectorPoint {
@@ -20,12 +20,12 @@ export interface VectorSearchResult {
 export interface VectorStorePort {
   upsertPoints(points: VectorPoint[]): Promise<void>;
   searchByVector(params: {
-    workspaceId: string;
+    knowledgeHubId: string;
     vector: number[];
     limit: number;
   }): Promise<VectorSearchResult[]>;
   deleteByFileId(fileId: string): Promise<void>;
-  deleteByWorkspaceId(workspaceId: string): Promise<void>;
+  deleteByKnowledgeHubId(knowledgeHubId: string): Promise<void>;
 }
 
 export const VECTOR_STORE = Symbol('VECTOR_STORE');

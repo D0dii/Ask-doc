@@ -1,8 +1,8 @@
 import type { Request } from 'express';
 import type { User } from '../../users/entities/user.entity';
 
-// Minimal workspace interface to avoid circular dependencies
-export interface RequestWorkspace {
+// Minimal hub interfaces to avoid circular dependencies
+export interface RequestKnowledgeHub {
   id: string;
   name: string;
   ownerId: string;
@@ -36,11 +36,11 @@ export type JwtPayload = {
 
 export type UserRequest = Request & {
   user: User;
-  workspace?: RequestWorkspace;
+  knowledgeHub?: RequestKnowledgeHub;
 };
 
-// Request type for routes protected by WorkspaceAccessGuard
-export type WorkspaceRequest = Request & {
+// Request type for routes protected by KnowledgeHubAccessGuard
+export type KnowledgeHubRequest = Request & {
   user: User;
-  workspace: RequestWorkspace;
+  knowledgeHub: RequestKnowledgeHub;
 };

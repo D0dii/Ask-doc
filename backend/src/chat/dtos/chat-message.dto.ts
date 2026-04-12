@@ -29,9 +29,9 @@ export class ChatMessageResponseDto {
   sources: ChatMessageSourceDto[] | null;
 
   @ApiProperty({
-    description: 'ID of the conversation this message belongs to',
+    description: 'ID of the thread this message belongs to',
   })
-  conversationId: string;
+  threadId: string;
 
   @ApiProperty({ description: 'ID of the user who asked the question' })
   userId: string;

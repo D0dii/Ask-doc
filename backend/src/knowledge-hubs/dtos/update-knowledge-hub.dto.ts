@@ -1,10 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional, IsString, MaxLength } from 'class-validator';
 
-export class UpdateWorkspaceDto {
+export class UpdateKnowledgeHubDto {
   @ApiProperty({
-    description: 'Name of the workspace',
-    example: 'My Updated Project',
+    description: 'Name of the knowledge hub',
+    example: 'Updated Product Architecture',
     maxLength: 255,
     required: false,
   })
@@ -14,8 +14,8 @@ export class UpdateWorkspaceDto {
   name?: string;
 
   @ApiProperty({
-    description: 'Optional description of the workspace',
-    example: 'An updated description',
+    description: 'Optional description of the knowledge hub',
+    example: 'Updated description',
     required: false,
   })
   @IsString()

@@ -8,24 +8,24 @@ import {
   OneToMany,
   JoinColumn,
 } from 'typeorm';
-import { Workspace } from '../../workspaces/entities/workspace.entity';
+import { KnowledgeHub } from '../../knowledge-hubs/entities/knowledge-hub.entity';
 import { User } from '../../users/entities/user.entity';
 import { ChatMessage } from './chat-message.entity';
 
 @Entity()
-export class ChatConversation {
+export class ChatThread {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({ type: 'varchar', nullable: true })
   title: string | null;
 
-  @Column()
-  workspaceId: string;
+  @Column({ unique: true })
+  knowledgeHubId: string;
 
-  @ManyToOne(() => Workspace, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'workspaceId' })
-  workspace: Workspace;
+  @ManyToOne(() => KnowledgeHub, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'knowledgeHubId' })
+  knowledgeHub: KnowledgeHub;
 
   @Column()
   userId: string;
@@ -34,7 +34,7 @@ export class ChatConversation {
   @JoinColumn({ name: 'userId' })
   user: User;
 
-  @OneToMany(() => ChatMessage, (message) => message.conversation)
+  @OneToMany(() => ChatMessage, (message) => message.thread)
   messages: ChatMessage[];
 
   @CreateDateColumn()

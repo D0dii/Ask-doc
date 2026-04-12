@@ -7,7 +7,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { Workspace } from '../../workspaces/entities/workspace.entity';
+import { KnowledgeHub } from '../../knowledge-hubs/entities/knowledge-hub.entity';
 
 export enum FileStatus {
   PENDING = 'pending',
@@ -44,13 +44,13 @@ export class File {
   errorMessage: string;
 
   @Column()
-  workspaceId: string;
+  knowledgeHubId: string;
 
-  @ManyToOne(() => Workspace, (workspace) => workspace.files, {
+  @ManyToOne(() => KnowledgeHub, {
     onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'workspaceId' })
-  workspace: Workspace;
+  @JoinColumn({ name: 'knowledgeHubId', referencedColumnName: 'id' })
+  knowledgeHub: KnowledgeHub;
 
   @CreateDateColumn()
   createdAt: Date;

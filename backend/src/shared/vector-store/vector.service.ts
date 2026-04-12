@@ -22,7 +22,7 @@ export class VectorService {
 
   async ingestDocument(
     text: string,
-    workspaceId: string,
+    knowledgeHubId: string,
     fileId: string,
   ): Promise<number> {
     this.logger.log(`Starting ingestion for file: ${fileId}`);
@@ -58,7 +58,7 @@ export class VectorService {
       payload: {
         text: chunk,
         fileId,
-        workspaceId,
+        knowledgeHubId,
       },
     }));
 
@@ -71,12 +71,12 @@ export class VectorService {
   }
 
   async search(
-    workspaceId: string,
+    knowledgeHubId: string,
     query: string,
     limit?: number,
   ): Promise<VectorSearchResult[]> {
     const searchLimit = limit ?? RAG_CONFIG.DEFAULT_SEARCH_LIMIT;
-    this.logger.log(`Searching workspace ${workspaceId} for: ${query}`);
+    this.logger.log(`Searching knowledge hub ${knowledgeHubId} for: ${query}`);
 
     const queryEmbedding = await this.llmClient.embed({
       model: EMBEDDING_MODELS.OLLAMA.DEFAULT,
@@ -84,13 +84,13 @@ export class VectorService {
     });
 
     const results = await this.vectorStore.searchByVector({
-      workspaceId,
+      knowledgeHubId,
       vector: queryEmbedding,
       limit: searchLimit,
     });
 
     this.logger.log(
-      `Found ${results.length} relevant chunks for workspace ${workspaceId}`,
+      `Found ${results.length} relevant chunks for knowledge hub ${knowledgeHubId}`,
     );
 
     return results;
@@ -109,14 +109,16 @@ export class VectorService {
     }
   }
 
-  async deleteByWorkspaceId(workspaceId: string): Promise<void> {
+  async deleteByKnowledgeHubId(knowledgeHubId: string): Promise<void> {
     try {
-      await this.vectorStore.deleteByWorkspaceId(workspaceId);
-      this.logger.log(`Deleted all vectors for workspace: ${workspaceId}`);
+      await this.vectorStore.deleteByKnowledgeHubId(knowledgeHubId);
+      this.logger.log(
+        `Deleted all vectors for knowledge hub: ${knowledgeHubId}`,
+      );
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Unknown error';
       this.logger.error(
-        `Error deleting vectors for workspace ${workspaceId}: ${message}`,
+        `Error deleting vectors for knowledge hub ${knowledgeHubId}: ${message}`,
       );
       throw error;
     }

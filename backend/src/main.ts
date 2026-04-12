@@ -27,7 +27,7 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('AskDoc API')
     .setVersion('1.0')
-    .addCookieAuth('access_token')
+    .addCookieAuth('access_token', { type: 'apiKey', in: 'cookie' }, 'cookie')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

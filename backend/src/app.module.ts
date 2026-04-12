@@ -2,11 +2,13 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
-import { WorkspacesModule } from './workspaces/workspaces.module';
+import { KnowledgeHubsModule } from './knowledge-hubs/knowledge-hubs.module';
 import { ChatModule } from './chat/chat.module';
 import { DocumentsModule } from './documents/documents.module';
 import { IngestionModule } from './ingestion/ingestion.module';
 import { RetrievalModule } from './retrieval/retrieval.module';
+import { NotesModule } from './notes/notes.module';
+import { FlashcardsModule } from './flashcards/flashcards.module';
 
 @Module({
   imports: [
@@ -30,8 +32,10 @@ import { RetrievalModule } from './retrieval/retrieval.module';
     IngestionModule,
     RetrievalModule,
     AuthModule,
-    WorkspacesModule,
+    KnowledgeHubsModule,
     ChatModule,
+    NotesModule,
+    FlashcardsModule,
   ],
   controllers: [],
   providers: [],

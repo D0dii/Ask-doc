@@ -10,6 +10,7 @@ import {
   UseGuards,
   Req,
   NotFoundException,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
@@ -22,8 +23,8 @@ import {
   ApiParam,
 } from '@nestjs/swagger';
 import { JwtCookieGuard } from '../auth/guards/jwt-cookie.guard';
-import { WorkspaceAccessGuard } from '../workspaces/guards/workspace-access.guard';
-import type { WorkspaceRequest } from '../auth/types/auth.types';
+import { KnowledgeHubAccessGuard } from '../knowledge-hubs/guards/knowledge-hub-access.guard';
+import type { KnowledgeHubRequest } from '../auth/types/auth.types';
 import { FileResponseDto } from './dtos/file-response.dto';
 import { IngestResponseDto } from './dtos/ingest-response.dto';
 import { FileStatus } from './entities/file.entity';
@@ -33,21 +34,21 @@ const ALLOWED_MIME_TYPES = ['application/pdf'];
 
 @ApiTags('Documents')
 @ApiCookieAuth()
-@Controller('workspaces/:workspaceId/documents')
-@ApiParam({ name: 'workspaceId', description: 'Workspace ID', type: String })
-@UseGuards(JwtCookieGuard, WorkspaceAccessGuard)
+@Controller('knowledge-hubs/:hubId/documents')
+@ApiParam({ name: 'hubId', description: 'Knowledge Hub ID', type: String })
+@UseGuards(JwtCookieGuard, KnowledgeHubAccessGuard)
 export class DocumentsController {
   constructor(private readonly filesService: FilesService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Get all documents in a workspace' })
+  @ApiOperation({ summary: 'Get all documents in a knowledge hub' })
   @ApiResponse({
     status: 200,
     description: 'List of documents',
     type: [FileResponseDto],
   })
-  async getFiles(@Req() req: WorkspaceRequest): Promise<FileResponseDto[]> {
-    return this.filesService.getFilesByWorkspace(req.workspace.id);
+  async getFiles(@Req() req: KnowledgeHubRequest): Promise<FileResponseDto[]> {
+    return this.filesService.getFilesByKnowledgeHub(req.knowledgeHub.id);
   }
 
   @Get(':fileId')
@@ -59,10 +60,13 @@ export class DocumentsController {
     type: FileResponseDto,
   })
   async getFile(
-    @Req() req: WorkspaceRequest,
-    @Param('fileId') fileId: string,
+    @Req() req: KnowledgeHubRequest,
+    @Param('fileId', ParseUUIDPipe) fileId: string,
   ): Promise<FileResponseDto> {
-    const file = await this.filesService.getFileById(fileId, req.workspace.id);
+    const file = await this.filesService.getFileById(
+      fileId,
+      req.knowledgeHub.id,
+    );
     if (!file) {
       throw new NotFoundException('File not found');
     }
@@ -92,7 +96,7 @@ export class DocumentsController {
     type: IngestResponseDto,
   })
   async ingest(
-    @Req() req: WorkspaceRequest,
+    @Req() req: KnowledgeHubRequest,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<IngestResponseDto> {
     if (!file) {
@@ -107,7 +111,7 @@ export class DocumentsController {
 
     const savedFile = await this.filesService.createAndProcessFile(
       file,
-      req.workspace.id,
+      req.knowledgeHub.id,
     );
 
     return {
@@ -121,10 +125,10 @@ export class DocumentsController {
   @ApiOperation({ summary: 'Delete a document' })
   @ApiParam({ name: 'fileId', description: 'Document ID', type: String })
   async deleteFile(
-    @Req() req: WorkspaceRequest,
-    @Param('fileId') fileId: string,
+    @Req() req: KnowledgeHubRequest,
+    @Param('fileId', ParseUUIDPipe) fileId: string,
   ): Promise<{ message: string }> {
-    await this.filesService.deleteFile(fileId, req.workspace.id);
+    await this.filesService.deleteFile(fileId, req.knowledgeHub.id);
     return { message: 'File deleted successfully' };
   }
 }
