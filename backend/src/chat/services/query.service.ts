@@ -15,11 +15,11 @@ import {
   formatConversationHistory,
 } from '../constants/prompts.constants';
 import { ConversationsService } from './conversations.service';
-import { EvidencePipelineService } from '../../shared/evidence/evidence-pipeline.service';
+import { EvidencePipelineService } from '../../retrieval/evidence/evidence-pipeline.service';
 import {
   EvidencePolicyService,
   EvidencePolicyViolationError,
-} from '../../shared/evidence/evidence-policy.service';
+} from '../../retrieval/evidence/evidence-policy.service';
 
 export interface QueryResult {
   answer: string;

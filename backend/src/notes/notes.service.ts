@@ -6,8 +6,8 @@ import { LlmService } from '../shared/llm-client/llm.service';
 import {
   EvidencePolicyService,
   EvidencePolicyViolationError,
-} from '../shared/evidence/evidence-policy.service';
-import { EvidencePipelineService } from '../shared/evidence/evidence-pipeline.service';
+} from '../retrieval/evidence/evidence-policy.service';
+import { EvidencePipelineService } from '../retrieval/evidence/evidence-pipeline.service';
 import { LLM_MODELS } from '../shared/constants/ai-models.constants';
 import { GenerateNoteDto } from './dtos/generate-note.dto';
 

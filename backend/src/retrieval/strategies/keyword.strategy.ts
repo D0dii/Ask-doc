@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { File, FileStatus } from '../../documents/entities/file.entity';
 import type { RetrievalStrategy } from '../types/retrieval.types';
-import type { EvidenceChunk } from '../../shared/evidence/evidence.types';
+import type { EvidenceChunk } from '../evidence/evidence.types';
 
 @Injectable()
 export class KeywordStrategy implements RetrievalStrategy {

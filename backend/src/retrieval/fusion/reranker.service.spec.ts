@@ -1,5 +1,5 @@
 import { RerankerService } from './reranker.service';
-import type { EvidenceChunk } from '../../shared/evidence/evidence.types';
+import type { EvidenceChunk } from '../evidence/evidence.types';
 
 describe('RerankerService', () => {
   it('caps general knowledge chunks to 15 percent', () => {

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import type { EvidenceChunk } from './evidence.types';
+import type { EvidenceChunk } from '../evidence/evidence.types';
 
 @Injectable()
 export class WebSearchService {

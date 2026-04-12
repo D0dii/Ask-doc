@@ -9,8 +9,8 @@ import { LlmService } from '../shared/llm-client/llm.service';
 import {
   EvidencePolicyService,
   EvidencePolicyViolationError,
-} from '../shared/evidence/evidence-policy.service';
-import { EvidencePipelineService } from '../shared/evidence/evidence-pipeline.service';
+} from '../retrieval/evidence/evidence-policy.service';
+import { EvidencePipelineService } from '../retrieval/evidence/evidence-pipeline.service';
 import { LLM_MODELS } from '../shared/constants/ai-models.constants';
 import { GenerateFlashcardDto } from './dtos/generate-flashcard.dto';
 
@@ -180,7 +180,8 @@ export class FlashcardsService {
     firstPass: string,
   ): Promise<ParsedGeneralKnowledgeFlashcards> {
     try {
-      const parsedFirstPass = this.parseGeneralKnowledgeTaggedFlashcards(firstPass);
+      const parsedFirstPass =
+        this.parseGeneralKnowledgeTaggedFlashcards(firstPass);
       this.evidencePolicyService.enforceGeneralKnowledgeBudget({
         generatedText: JSON.stringify(parsedFirstPass.cards),
         generalKnowledgeText: parsedFirstPass.generalKnowledge,
@@ -205,7 +206,8 @@ export class FlashcardsService {
         this.evidencePolicyService.enforceGeneralKnowledgeBudget({
           generatedText: JSON.stringify(parsedSecondPass.cards),
           generalKnowledgeText: parsedSecondPass.generalKnowledge,
-          generalKnowledgeConfidence: parsedSecondPass.generalKnowledgeConfidence,
+          generalKnowledgeConfidence:
+            parsedSecondPass.generalKnowledgeConfidence,
         });
 
         return parsedSecondPass;
@@ -255,7 +257,9 @@ export class FlashcardsService {
     }
 
     if (!Array.isArray(parsedCards) || parsedCards.length === 0) {
-      throw new EvidencePolicyViolationError('Flashcards payload must be a non-empty array');
+      throw new EvidencePolicyViolationError(
+        'Flashcards payload must be a non-empty array',
+      );
     }
 
     const cards = parsedCards.map((card) => {
@@ -280,7 +284,9 @@ export class FlashcardsService {
       };
     });
 
-    const generalKnowledgeRaw = knowledgeLine.slice(knowledgePrefix.length).trim();
+    const generalKnowledgeRaw = knowledgeLine
+      .slice(knowledgePrefix.length)
+      .trim();
     const confidenceRaw = confidenceLine.slice(confidencePrefix.length).trim();
     const confidence = Number.parseFloat(confidenceRaw);
 

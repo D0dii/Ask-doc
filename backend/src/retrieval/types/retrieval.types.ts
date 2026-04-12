@@ -1,4 +1,4 @@
-import type { EvidenceChunk } from '../../shared/evidence/evidence.types';
+import type { EvidenceChunk } from '../evidence/evidence.types';
 
 export interface RetrievalStrategy {
   search(params: {

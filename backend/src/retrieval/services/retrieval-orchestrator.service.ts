@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import type { EvidenceChunk } from '../../shared/evidence/evidence.types';
+import type { EvidenceChunk } from '../evidence/evidence.types';
 import { SemanticStrategy } from '../strategies/semantic.strategy';
 import { KeywordStrategy } from '../strategies/keyword.strategy';
 import { WebStrategy } from '../strategies/web.strategy';

@@ -4,9 +4,9 @@ import {
   BuildEvidenceContextResult,
   EvidenceChunk,
 } from './evidence.types';
-import { RetrievalService } from '../../retrieval/services/retrieval.service';
-import { RetrievalOrchestratorService } from '../../retrieval/services/retrieval-orchestrator.service';
-import type { VectorSearchResult } from '../vector-store/vector-store.port';
+import { RetrievalService } from '../services/retrieval.service';
+import { RetrievalOrchestratorService } from '../services/retrieval-orchestrator.service';
+import type { VectorSearchResult } from '../../shared/vector-store/vector-store.port';
 
 @Injectable()
 export class EvidencePipelineService {

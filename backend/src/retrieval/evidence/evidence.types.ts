@@ -1,4 +1,4 @@
-import type { VectorSearchResult } from '../vector-store/vector-store.port';
+import type { VectorSearchResult } from '../../shared/vector-store/vector-store.port';
 
 export type EvidenceSourceType =
   | 'retrieved_doc'

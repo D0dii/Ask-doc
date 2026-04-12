@@ -1,4 +1,4 @@
-import { Module, forwardRef } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { File } from '../documents/entities/file.entity';
 import { RetrievalService } from './services/retrieval.service';
@@ -9,9 +9,12 @@ import { KeywordStrategy } from './strategies/keyword.strategy';
 import { WebStrategy } from './strategies/web.strategy';
 import { GeneralKnowledgeStrategy } from './strategies/general-knowledge.strategy';
 import { RerankerService } from './fusion/reranker.service';
+import { EvidencePipelineService } from './evidence/evidence-pipeline.service';
+import { EvidencePolicyService } from './evidence/evidence-policy.service';
+import { WebSearchService } from './web/web-search.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([File]), forwardRef(() => SharedModule)],
+  imports: [TypeOrmModule.forFeature([File]), SharedModule],
   providers: [
     RetrievalService,
     RetrievalOrchestratorService,
@@ -20,7 +23,16 @@ import { RerankerService } from './fusion/reranker.service';
     WebStrategy,
     GeneralKnowledgeStrategy,
     RerankerService,
+    EvidencePipelineService,
+    EvidencePolicyService,
+    WebSearchService,
   ],
-  exports: [RetrievalService, RetrievalOrchestratorService, TypeOrmModule],
+  exports: [
+    RetrievalService,
+    RetrievalOrchestratorService,
+    EvidencePipelineService,
+    EvidencePolicyService,
+    TypeOrmModule,
+  ],
 })
 export class RetrievalModule {}

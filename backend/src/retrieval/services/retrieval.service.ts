@@ -7,7 +7,7 @@ import type { VectorSearchResult } from '../../shared/vector-store/vector-store.
 import {
   EvidenceChunk,
   RetrievedEvidenceResult,
-} from '../../shared/evidence/evidence.types';
+} from '../evidence/evidence.types';
 
 @Injectable()
 export class RetrievalService {

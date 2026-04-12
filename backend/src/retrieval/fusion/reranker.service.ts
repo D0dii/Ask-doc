@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import type { EvidenceChunk } from '../../shared/evidence/evidence.types';
+import type { EvidenceChunk } from '../evidence/evidence.types';
 import type { StrategyResults } from '../types/retrieval.types';
 
 interface FuseInput extends StrategyResults {

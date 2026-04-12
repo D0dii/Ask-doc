@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { RetrievalService } from '../services/retrieval.service';
 import type { RetrievalStrategy } from '../types/retrieval.types';
-import type { EvidenceChunk } from '../../shared/evidence/evidence.types';
+import type { EvidenceChunk } from '../evidence/evidence.types';
 
 @Injectable()
 export class SemanticStrategy implements RetrievalStrategy {
