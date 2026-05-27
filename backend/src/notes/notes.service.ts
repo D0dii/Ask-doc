@@ -7,7 +7,7 @@ import {
   EvidencePolicyService,
   EvidencePolicyViolationError,
 } from '../retrieval/evidence/evidence-policy.service';
-import { EvidencePipelineService } from '../retrieval/evidence/evidence-pipeline.service';
+import { QueryOrchestratorService } from '../retrieval/services/query-orchestrator.service';
 import { LLM_MODELS } from '../shared/constants/ai-models.constants';
 import { GenerateNoteDto } from './dtos/generate-note.dto';
 
@@ -26,7 +26,7 @@ export class NotesService {
     @InjectRepository(Note)
     private readonly noteRepository: Repository<Note>,
     private readonly llmService: LlmService,
-    private readonly evidencePipelineService: EvidencePipelineService,
+    private readonly queryOrchestratorService: QueryOrchestratorService,
     private readonly evidencePolicyService: EvidencePolicyService,
   ) {}
 
@@ -89,7 +89,11 @@ export class NotesService {
     return this.noteRepository.save(note);
   }
 
-  async remove(id: string, knowledgeHubId: string, ownerId: string): Promise<boolean> {
+  async remove(
+    id: string,
+    knowledgeHubId: string,
+    ownerId: string,
+  ): Promise<boolean> {
     const note = await this.findOneById(id, knowledgeHubId, ownerId);
     if (!note) {
       return false;
@@ -106,14 +110,18 @@ export class NotesService {
   ): Promise<Note> {
     const input = this.resolveGenerationInput(dto);
 
-    const evidenceContext = await this.evidencePipelineService.buildContext({
+    const evidenceContext = await this.queryOrchestratorService.buildContext({
       knowledgeHubId,
       query: input,
       limit: undefined,
       includeWebSources: true,
     });
 
-    const prompt = this.buildGenerationPrompt(dto.mode, input, evidenceContext.context);
+    const prompt = this.buildGenerationPrompt(
+      dto.mode,
+      input,
+      evidenceContext.context,
+    );
 
     const firstPass = await this.llmService.generateText({
       model: LLM_MODELS.GROQ.DEFAULT,
@@ -192,12 +200,14 @@ export class NotesService {
           prompt: `${basePrompt}\n\nStrict rule: use only provided evidence context. If information is missing, say so.\nAt the end of your response, add one final line in this exact format:\nGENERAL_KNOWLEDGE: none\nAnd one more final line in this exact format:\nGENERAL_KNOWLEDGE_CONFIDENCE: 1.0`,
         });
 
-        const parsedSecondPass = this.parseGeneralKnowledgeTaggedNote(secondPass);
+        const parsedSecondPass =
+          this.parseGeneralKnowledgeTaggedNote(secondPass);
         this.enforceGroundingBudget(parsedSecondPass.content, evidenceContext);
         this.evidencePolicyService.enforceGeneralKnowledgeBudget({
           generatedText: parsedSecondPass.content,
           generalKnowledgeText: parsedSecondPass.generalKnowledge,
-          generalKnowledgeConfidence: parsedSecondPass.generalKnowledgeConfidence,
+          generalKnowledgeConfidence:
+            parsedSecondPass.generalKnowledgeConfidence,
         });
 
         return parsedSecondPass;
@@ -207,7 +217,9 @@ export class NotesService {
     }
   }
 
-  private parseGeneralKnowledgeTaggedNote(response: string): ParsedGeneralKnowledgeNote {
+  private parseGeneralKnowledgeTaggedNote(
+    response: string,
+  ): ParsedGeneralKnowledgeNote {
     const lines = response
       .split('\n')
       .map((line) => line.trimEnd())
@@ -236,7 +248,9 @@ export class NotesService {
       );
     }
 
-    const generalKnowledgeRaw = knowledgeLine.slice(knowledgePrefix.length).trim();
+    const generalKnowledgeRaw = knowledgeLine
+      .slice(knowledgePrefix.length)
+      .trim();
     const confidenceRaw = confidenceLine.slice(confidencePrefix.length).trim();
     const confidence = Number.parseFloat(confidenceRaw);
 
@@ -256,7 +270,10 @@ export class NotesService {
     };
   }
 
-  private defaultGeneratedTitle(mode: NoteGenerationMode, input: string): string {
+  private defaultGeneratedTitle(
+    mode: NoteGenerationMode,
+    input: string,
+  ): string {
     const modeLabel =
       mode === NoteGenerationMode.FROM_ANSWER
         ? 'From Answer'
@@ -265,7 +282,8 @@ export class NotesService {
           : 'From Topic Query';
 
     const cleanInput = input.trim().replace(/\s+/g, ' ');
-    const suffix = cleanInput.length > 80 ? `${cleanInput.slice(0, 77)}...` : cleanInput;
+    const suffix =
+      cleanInput.length > 80 ? `${cleanInput.slice(0, 77)}...` : cleanInput;
 
     return `${modeLabel}: ${suffix}`;
   }
@@ -289,7 +307,9 @@ export class NotesService {
     const evidenceTokens = this.extractTokens(evidenceContext);
 
     if (evidenceTokens.size === 0) {
-      throw new EvidencePolicyViolationError('Insufficient evidence for generation');
+      throw new EvidencePolicyViolationError(
+        'Insufficient evidence for generation',
+      );
     }
 
     const sentences = this.extractSentences(generatedContent);

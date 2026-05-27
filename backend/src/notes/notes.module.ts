@@ -6,6 +6,7 @@ import { NotesController } from './notes.controller';
 import { SharedModule } from '../shared/shared.module';
 import { AuthModule } from '../auth/auth.module';
 import { KnowledgeHubsModule } from '../knowledge-hubs/knowledge-hubs.module';
+import { RetrievalModule } from '../retrieval/retrieval.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { KnowledgeHubsModule } from '../knowledge-hubs/knowledge-hubs.module';
     SharedModule,
     KnowledgeHubsModule,
     AuthModule,
+    RetrievalModule,
   ],
   controllers: [NotesController],
   providers: [NotesService],

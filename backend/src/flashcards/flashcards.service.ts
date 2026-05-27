@@ -10,7 +10,7 @@ import {
   EvidencePolicyService,
   EvidencePolicyViolationError,
 } from '../retrieval/evidence/evidence-policy.service';
-import { EvidencePipelineService } from '../retrieval/evidence/evidence-pipeline.service';
+import { QueryOrchestratorService } from '../retrieval/services/query-orchestrator.service';
 import { LLM_MODELS } from '../shared/constants/ai-models.constants';
 import { GenerateFlashcardDto } from './dtos/generate-flashcard.dto';
 
@@ -26,7 +26,7 @@ export class FlashcardsService {
     @InjectRepository(Flashcard)
     private readonly flashcardRepository: Repository<Flashcard>,
     private readonly llmService: LlmService,
-    private readonly evidencePipelineService: EvidencePipelineService,
+    private readonly queryOrchestratorService: QueryOrchestratorService,
     private readonly evidencePolicyService: EvidencePolicyService,
   ) {}
 
@@ -111,7 +111,7 @@ export class FlashcardsService {
   ): Promise<Flashcard[]> {
     const input = this.resolveGenerationInput(dto);
 
-    const evidenceContext = await this.evidencePipelineService.buildContext({
+    const evidenceContext = await this.queryOrchestratorService.buildContext({
       knowledgeHubId,
       query: input,
       limit: undefined,

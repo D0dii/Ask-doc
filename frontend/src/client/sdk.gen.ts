@@ -2,7 +2,7 @@
 
 import { type Client, formDataBodySerializer, type Options as Options2, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { AuthControllerGoogleAuthData, AuthControllerLogoutData, AuthControllerLogoutResponses, AuthControllerMeData, AuthControllerMeErrors, AuthControllerMeResponses, AuthControllerRefreshData, AuthControllerRefreshErrors, AuthControllerRefreshResponses, ChatControllerClearConversationsData, ChatControllerClearConversationsErrors, ChatControllerClearConversationsResponses, ChatControllerCreateConversationData, ChatControllerCreateConversationErrors, ChatControllerCreateConversationResponses, ChatControllerDeleteConversationData, ChatControllerDeleteConversationErrors, ChatControllerDeleteConversationResponses, ChatControllerDeleteMessageData, ChatControllerDeleteMessageErrors, ChatControllerDeleteMessageResponses, ChatControllerGetConversationData, ChatControllerGetConversationErrors, ChatControllerGetConversationResponses, ChatControllerGetConversationsData, ChatControllerGetConversationsErrors, ChatControllerGetConversationsResponses, ChatControllerGetMessagesData, ChatControllerGetMessagesErrors, ChatControllerGetMessagesResponses, ChatControllerQueryData, ChatControllerQueryErrors, ChatControllerQueryResponses, ChatControllerUpdateConversationData, ChatControllerUpdateConversationErrors, ChatControllerUpdateConversationResponses, RagControllerDeleteFileData, RagControllerDeleteFileErrors, RagControllerDeleteFileResponses, RagControllerGetFileData, RagControllerGetFileErrors, RagControllerGetFileResponses, RagControllerGetFilesData, RagControllerGetFilesErrors, RagControllerGetFilesResponses, RagControllerIngestData, RagControllerIngestErrors, RagControllerIngestResponses, WorkspacesControllerCreateData, WorkspacesControllerCreateErrors, WorkspacesControllerCreateResponses, WorkspacesControllerFindAllData, WorkspacesControllerFindAllErrors, WorkspacesControllerFindAllResponses, WorkspacesControllerFindOneData, WorkspacesControllerFindOneErrors, WorkspacesControllerFindOneResponses, WorkspacesControllerRemoveData, WorkspacesControllerRemoveErrors, WorkspacesControllerRemoveResponses, WorkspacesControllerUpdateData, WorkspacesControllerUpdateErrors, WorkspacesControllerUpdateResponses } from './types.gen';
+import type { AuthControllerGoogleAuthData, AuthControllerLogoutData, AuthControllerLogoutResponses, AuthControllerMeData, AuthControllerMeErrors, AuthControllerMeResponses, AuthControllerRefreshData, AuthControllerRefreshErrors, AuthControllerRefreshResponses, ConversationsControllerDeleteMessageData, ConversationsControllerDeleteMessageErrors, ConversationsControllerDeleteMessageResponses, ConversationsControllerGetMessagesData, ConversationsControllerGetMessagesErrors, ConversationsControllerGetMessagesResponses, DocumentsControllerDeleteFileData, DocumentsControllerDeleteFileResponses, DocumentsControllerGetFileData, DocumentsControllerGetFileResponses, DocumentsControllerGetFilesData, DocumentsControllerGetFilesResponses, DocumentsControllerIngestData, DocumentsControllerIngestResponses, FlashcardsControllerCreateData, FlashcardsControllerCreateErrors, FlashcardsControllerCreateResponses, FlashcardsControllerFindAllData, FlashcardsControllerFindAllErrors, FlashcardsControllerFindAllResponses, FlashcardsControllerFindOneData, FlashcardsControllerFindOneErrors, FlashcardsControllerFindOneResponses, FlashcardsControllerGenerateData, FlashcardsControllerGenerateErrors, FlashcardsControllerGenerateResponses, FlashcardsControllerRemoveData, FlashcardsControllerRemoveErrors, FlashcardsControllerRemoveResponses, FlashcardsControllerUpdateData, FlashcardsControllerUpdateErrors, FlashcardsControllerUpdateResponses, KnowledgeHubsControllerCreateData, KnowledgeHubsControllerCreateErrors, KnowledgeHubsControllerCreateResponses, KnowledgeHubsControllerFindAllData, KnowledgeHubsControllerFindAllErrors, KnowledgeHubsControllerFindAllResponses, KnowledgeHubsControllerFindOneData, KnowledgeHubsControllerFindOneErrors, KnowledgeHubsControllerFindOneResponses, KnowledgeHubsControllerRemoveData, KnowledgeHubsControllerRemoveErrors, KnowledgeHubsControllerRemoveResponses, KnowledgeHubsControllerUpdateData, KnowledgeHubsControllerUpdateErrors, KnowledgeHubsControllerUpdateResponses, NotesControllerCreateData, NotesControllerCreateErrors, NotesControllerCreateResponses, NotesControllerFindAllData, NotesControllerFindAllErrors, NotesControllerFindAllResponses, NotesControllerFindOneData, NotesControllerFindOneErrors, NotesControllerFindOneResponses, NotesControllerGenerateData, NotesControllerGenerateErrors, NotesControllerGenerateResponses, NotesControllerRemoveData, NotesControllerRemoveErrors, NotesControllerRemoveResponses, NotesControllerUpdateData, NotesControllerUpdateErrors, NotesControllerUpdateResponses, QueryControllerQueryData, QueryControllerQueryErrors, QueryControllerQueryResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -19,29 +19,29 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 };
 
 /**
- * Get all files in a workspace
+ * Get all documents in a knowledge hub
  */
-export const ragControllerGetFiles = <ThrowOnError extends boolean = false>(options: Options<RagControllerGetFilesData, ThrowOnError>) => (options.client ?? client).get<RagControllerGetFilesResponses, RagControllerGetFilesErrors, ThrowOnError>({
+export const documentsControllerGetFiles = <ThrowOnError extends boolean = false>(options: Options<DocumentsControllerGetFilesData, ThrowOnError>) => (options.client ?? client).get<DocumentsControllerGetFilesResponses, unknown, ThrowOnError>({
     security: [{
             in: 'cookie',
             name: 'access_token',
             type: 'apiKey'
         }],
-    url: '/workspaces/{workspaceId}/files',
+    url: '/knowledge-hubs/{hubId}/documents',
     ...options
 });
 
 /**
- * Upload and ingest a PDF file
+ * Upload and ingest a PDF document
  */
-export const ragControllerIngest = <ThrowOnError extends boolean = false>(options: Options<RagControllerIngestData, ThrowOnError>) => (options.client ?? client).post<RagControllerIngestResponses, RagControllerIngestErrors, ThrowOnError>({
+export const documentsControllerIngest = <ThrowOnError extends boolean = false>(options: Options<DocumentsControllerIngestData, ThrowOnError>) => (options.client ?? client).post<DocumentsControllerIngestResponses, unknown, ThrowOnError>({
     ...formDataBodySerializer,
     security: [{
             in: 'cookie',
             name: 'access_token',
             type: 'apiKey'
         }],
-    url: '/workspaces/{workspaceId}/files',
+    url: '/knowledge-hubs/{hubId}/documents',
     ...options,
     headers: {
         'Content-Type': null,
@@ -50,54 +50,54 @@ export const ragControllerIngest = <ThrowOnError extends boolean = false>(option
 });
 
 /**
- * Delete a file
+ * Delete a document
  */
-export const ragControllerDeleteFile = <ThrowOnError extends boolean = false>(options: Options<RagControllerDeleteFileData, ThrowOnError>) => (options.client ?? client).delete<RagControllerDeleteFileResponses, RagControllerDeleteFileErrors, ThrowOnError>({
+export const documentsControllerDeleteFile = <ThrowOnError extends boolean = false>(options: Options<DocumentsControllerDeleteFileData, ThrowOnError>) => (options.client ?? client).delete<DocumentsControllerDeleteFileResponses, unknown, ThrowOnError>({
     security: [{
             in: 'cookie',
             name: 'access_token',
             type: 'apiKey'
         }],
-    url: '/workspaces/{workspaceId}/files/{fileId}',
+    url: '/knowledge-hubs/{hubId}/documents/{fileId}',
     ...options
 });
 
 /**
- * Get a specific file by ID
+ * Get a specific document by ID
  */
-export const ragControllerGetFile = <ThrowOnError extends boolean = false>(options: Options<RagControllerGetFileData, ThrowOnError>) => (options.client ?? client).get<RagControllerGetFileResponses, RagControllerGetFileErrors, ThrowOnError>({
+export const documentsControllerGetFile = <ThrowOnError extends boolean = false>(options: Options<DocumentsControllerGetFileData, ThrowOnError>) => (options.client ?? client).get<DocumentsControllerGetFileResponses, unknown, ThrowOnError>({
     security: [{
             in: 'cookie',
             name: 'access_token',
             type: 'apiKey'
         }],
-    url: '/workspaces/{workspaceId}/files/{fileId}',
+    url: '/knowledge-hubs/{hubId}/documents/{fileId}',
     ...options
 });
 
 /**
- * Get all workspaces for the current user
+ * Get all knowledge hubs for the current user
  */
-export const workspacesControllerFindAll = <ThrowOnError extends boolean = false>(options?: Options<WorkspacesControllerFindAllData, ThrowOnError>) => (options?.client ?? client).get<WorkspacesControllerFindAllResponses, WorkspacesControllerFindAllErrors, ThrowOnError>({
+export const knowledgeHubsControllerFindAll = <ThrowOnError extends boolean = false>(options?: Options<KnowledgeHubsControllerFindAllData, ThrowOnError>) => (options?.client ?? client).get<KnowledgeHubsControllerFindAllResponses, KnowledgeHubsControllerFindAllErrors, ThrowOnError>({
     security: [{
             in: 'cookie',
             name: 'access_token',
             type: 'apiKey'
         }],
-    url: '/workspaces',
+    url: '/knowledge-hubs',
     ...options
 });
 
 /**
- * Create a new workspace
+ * Create a new knowledge hub
  */
-export const workspacesControllerCreate = <ThrowOnError extends boolean = false>(options: Options<WorkspacesControllerCreateData, ThrowOnError>) => (options.client ?? client).post<WorkspacesControllerCreateResponses, WorkspacesControllerCreateErrors, ThrowOnError>({
+export const knowledgeHubsControllerCreate = <ThrowOnError extends boolean = false>(options: Options<KnowledgeHubsControllerCreateData, ThrowOnError>) => (options.client ?? client).post<KnowledgeHubsControllerCreateResponses, KnowledgeHubsControllerCreateErrors, ThrowOnError>({
     security: [{
             in: 'cookie',
             name: 'access_token',
             type: 'apiKey'
         }],
-    url: '/workspaces',
+    url: '/knowledge-hubs',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -106,41 +106,41 @@ export const workspacesControllerCreate = <ThrowOnError extends boolean = false>
 });
 
 /**
- * Delete a workspace
+ * Delete a knowledge hub
  */
-export const workspacesControllerRemove = <ThrowOnError extends boolean = false>(options: Options<WorkspacesControllerRemoveData, ThrowOnError>) => (options.client ?? client).delete<WorkspacesControllerRemoveResponses, WorkspacesControllerRemoveErrors, ThrowOnError>({
+export const knowledgeHubsControllerRemove = <ThrowOnError extends boolean = false>(options: Options<KnowledgeHubsControllerRemoveData, ThrowOnError>) => (options.client ?? client).delete<KnowledgeHubsControllerRemoveResponses, KnowledgeHubsControllerRemoveErrors, ThrowOnError>({
     security: [{
             in: 'cookie',
             name: 'access_token',
             type: 'apiKey'
         }],
-    url: '/workspaces/{id}',
+    url: '/knowledge-hubs/{id}',
     ...options
 });
 
 /**
- * Get a specific workspace by ID
+ * Get a specific knowledge hub by ID
  */
-export const workspacesControllerFindOne = <ThrowOnError extends boolean = false>(options: Options<WorkspacesControllerFindOneData, ThrowOnError>) => (options.client ?? client).get<WorkspacesControllerFindOneResponses, WorkspacesControllerFindOneErrors, ThrowOnError>({
+export const knowledgeHubsControllerFindOne = <ThrowOnError extends boolean = false>(options: Options<KnowledgeHubsControllerFindOneData, ThrowOnError>) => (options.client ?? client).get<KnowledgeHubsControllerFindOneResponses, KnowledgeHubsControllerFindOneErrors, ThrowOnError>({
     security: [{
             in: 'cookie',
             name: 'access_token',
             type: 'apiKey'
         }],
-    url: '/workspaces/{id}',
+    url: '/knowledge-hubs/{id}',
     ...options
 });
 
 /**
- * Update a workspace
+ * Update a knowledge hub
  */
-export const workspacesControllerUpdate = <ThrowOnError extends boolean = false>(options: Options<WorkspacesControllerUpdateData, ThrowOnError>) => (options.client ?? client).patch<WorkspacesControllerUpdateResponses, WorkspacesControllerUpdateErrors, ThrowOnError>({
+export const knowledgeHubsControllerUpdate = <ThrowOnError extends boolean = false>(options: Options<KnowledgeHubsControllerUpdateData, ThrowOnError>) => (options.client ?? client).patch<KnowledgeHubsControllerUpdateResponses, KnowledgeHubsControllerUpdateErrors, ThrowOnError>({
     security: [{
             in: 'cookie',
             name: 'access_token',
             type: 'apiKey'
         }],
-    url: '/workspaces/{id}',
+    url: '/knowledge-hubs/{id}',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -185,17 +185,17 @@ export const authControllerLogout = <ThrowOnError extends boolean = false>(optio
 });
 
 /**
- * Ask a question about the documents in a workspace
+ * Ask a question about the documents in a knowledge hub
  *
- * Asks a question and optionally continues an existing conversation. If conversationId is provided, the question will be added to that conversation with context awareness. If not, a new conversation will be created.
+ * Asks a question in the single chat thread for this knowledge hub and returns an answer with sources.
  */
-export const chatControllerQuery = <ThrowOnError extends boolean = false>(options: Options<ChatControllerQueryData, ThrowOnError>) => (options.client ?? client).post<ChatControllerQueryResponses, ChatControllerQueryErrors, ThrowOnError>({
+export const queryControllerQuery = <ThrowOnError extends boolean = false>(options: Options<QueryControllerQueryData, ThrowOnError>) => (options.client ?? client).post<QueryControllerQueryResponses, QueryControllerQueryErrors, ThrowOnError>({
     security: [{
             in: 'cookie',
             name: 'access_token',
             type: 'apiKey'
         }],
-    url: '/workspaces/{workspaceId}/chat/query',
+    url: '/knowledge-hubs/{hubId}/chat/query',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -204,41 +204,54 @@ export const chatControllerQuery = <ThrowOnError extends boolean = false>(option
 });
 
 /**
- * Clear all conversations for a workspace
+ * Get all messages in the knowledge hub chat thread
  */
-export const chatControllerClearConversations = <ThrowOnError extends boolean = false>(options: Options<ChatControllerClearConversationsData, ThrowOnError>) => (options.client ?? client).delete<ChatControllerClearConversationsResponses, ChatControllerClearConversationsErrors, ThrowOnError>({
+export const conversationsControllerGetMessages = <ThrowOnError extends boolean = false>(options: Options<ConversationsControllerGetMessagesData, ThrowOnError>) => (options.client ?? client).get<ConversationsControllerGetMessagesResponses, ConversationsControllerGetMessagesErrors, ThrowOnError>({
     security: [{
             in: 'cookie',
             name: 'access_token',
             type: 'apiKey'
         }],
-    url: '/workspaces/{workspaceId}/chat/conversations',
+    url: '/knowledge-hubs/{hubId}/chat/messages',
     ...options
 });
 
 /**
- * Get all conversations for a workspace
+ * Delete a specific message from knowledge hub thread
  */
-export const chatControllerGetConversations = <ThrowOnError extends boolean = false>(options: Options<ChatControllerGetConversationsData, ThrowOnError>) => (options.client ?? client).get<ChatControllerGetConversationsResponses, ChatControllerGetConversationsErrors, ThrowOnError>({
+export const conversationsControllerDeleteMessage = <ThrowOnError extends boolean = false>(options: Options<ConversationsControllerDeleteMessageData, ThrowOnError>) => (options.client ?? client).delete<ConversationsControllerDeleteMessageResponses, ConversationsControllerDeleteMessageErrors, ThrowOnError>({
     security: [{
             in: 'cookie',
             name: 'access_token',
             type: 'apiKey'
         }],
-    url: '/workspaces/{workspaceId}/chat/conversations',
+    url: '/knowledge-hubs/{hubId}/chat/messages/{messageId}',
     ...options
 });
 
 /**
- * Create a new conversation
+ * List notes in a knowledge hub
  */
-export const chatControllerCreateConversation = <ThrowOnError extends boolean = false>(options: Options<ChatControllerCreateConversationData, ThrowOnError>) => (options.client ?? client).post<ChatControllerCreateConversationResponses, ChatControllerCreateConversationErrors, ThrowOnError>({
+export const notesControllerFindAll = <ThrowOnError extends boolean = false>(options: Options<NotesControllerFindAllData, ThrowOnError>) => (options.client ?? client).get<NotesControllerFindAllResponses, NotesControllerFindAllErrors, ThrowOnError>({
     security: [{
             in: 'cookie',
             name: 'access_token',
             type: 'apiKey'
         }],
-    url: '/workspaces/{workspaceId}/chat/conversations',
+    url: '/knowledge-hubs/{hubId}/notes',
+    ...options
+});
+
+/**
+ * Create a manual note
+ */
+export const notesControllerCreate = <ThrowOnError extends boolean = false>(options: Options<NotesControllerCreateData, ThrowOnError>) => (options.client ?? client).post<NotesControllerCreateResponses, NotesControllerCreateErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'access_token',
+            type: 'apiKey'
+        }],
+    url: '/knowledge-hubs/{hubId}/notes',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -247,41 +260,41 @@ export const chatControllerCreateConversation = <ThrowOnError extends boolean = 
 });
 
 /**
- * Delete a conversation and all its messages
+ * Delete a note
  */
-export const chatControllerDeleteConversation = <ThrowOnError extends boolean = false>(options: Options<ChatControllerDeleteConversationData, ThrowOnError>) => (options.client ?? client).delete<ChatControllerDeleteConversationResponses, ChatControllerDeleteConversationErrors, ThrowOnError>({
+export const notesControllerRemove = <ThrowOnError extends boolean = false>(options: Options<NotesControllerRemoveData, ThrowOnError>) => (options.client ?? client).delete<NotesControllerRemoveResponses, NotesControllerRemoveErrors, ThrowOnError>({
     security: [{
             in: 'cookie',
             name: 'access_token',
             type: 'apiKey'
         }],
-    url: '/workspaces/{workspaceId}/chat/conversations/{conversationId}',
+    url: '/knowledge-hubs/{hubId}/notes/{noteId}',
     ...options
 });
 
 /**
- * Get a specific conversation with its messages
+ * Get a note by ID
  */
-export const chatControllerGetConversation = <ThrowOnError extends boolean = false>(options: Options<ChatControllerGetConversationData, ThrowOnError>) => (options.client ?? client).get<ChatControllerGetConversationResponses, ChatControllerGetConversationErrors, ThrowOnError>({
+export const notesControllerFindOne = <ThrowOnError extends boolean = false>(options: Options<NotesControllerFindOneData, ThrowOnError>) => (options.client ?? client).get<NotesControllerFindOneResponses, NotesControllerFindOneErrors, ThrowOnError>({
     security: [{
             in: 'cookie',
             name: 'access_token',
             type: 'apiKey'
         }],
-    url: '/workspaces/{workspaceId}/chat/conversations/{conversationId}',
+    url: '/knowledge-hubs/{hubId}/notes/{noteId}',
     ...options
 });
 
 /**
- * Update a conversation title
+ * Update a note
  */
-export const chatControllerUpdateConversation = <ThrowOnError extends boolean = false>(options: Options<ChatControllerUpdateConversationData, ThrowOnError>) => (options.client ?? client).patch<ChatControllerUpdateConversationResponses, ChatControllerUpdateConversationErrors, ThrowOnError>({
+export const notesControllerUpdate = <ThrowOnError extends boolean = false>(options: Options<NotesControllerUpdateData, ThrowOnError>) => (options.client ?? client).patch<NotesControllerUpdateResponses, NotesControllerUpdateErrors, ThrowOnError>({
     security: [{
             in: 'cookie',
             name: 'access_token',
             type: 'apiKey'
         }],
-    url: '/workspaces/{workspaceId}/chat/conversations/{conversationId}',
+    url: '/knowledge-hubs/{hubId}/notes/{noteId}',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -290,27 +303,108 @@ export const chatControllerUpdateConversation = <ThrowOnError extends boolean = 
 });
 
 /**
- * Get all messages in a conversation
+ * Generate a note from contextual input
  */
-export const chatControllerGetMessages = <ThrowOnError extends boolean = false>(options: Options<ChatControllerGetMessagesData, ThrowOnError>) => (options.client ?? client).get<ChatControllerGetMessagesResponses, ChatControllerGetMessagesErrors, ThrowOnError>({
+export const notesControllerGenerate = <ThrowOnError extends boolean = false>(options: Options<NotesControllerGenerateData, ThrowOnError>) => (options.client ?? client).post<NotesControllerGenerateResponses, NotesControllerGenerateErrors, ThrowOnError>({
     security: [{
             in: 'cookie',
             name: 'access_token',
             type: 'apiKey'
         }],
-    url: '/workspaces/{workspaceId}/chat/conversations/{conversationId}/messages',
+    url: '/knowledge-hubs/{hubId}/notes/generate',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * List flashcards in a knowledge hub
+ */
+export const flashcardsControllerFindAll = <ThrowOnError extends boolean = false>(options: Options<FlashcardsControllerFindAllData, ThrowOnError>) => (options.client ?? client).get<FlashcardsControllerFindAllResponses, FlashcardsControllerFindAllErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'access_token',
+            type: 'apiKey'
+        }],
+    url: '/knowledge-hubs/{hubId}/flashcards',
     ...options
 });
 
 /**
- * Delete a specific message from a conversation
+ * Create a manual flashcard
  */
-export const chatControllerDeleteMessage = <ThrowOnError extends boolean = false>(options: Options<ChatControllerDeleteMessageData, ThrowOnError>) => (options.client ?? client).delete<ChatControllerDeleteMessageResponses, ChatControllerDeleteMessageErrors, ThrowOnError>({
+export const flashcardsControllerCreate = <ThrowOnError extends boolean = false>(options: Options<FlashcardsControllerCreateData, ThrowOnError>) => (options.client ?? client).post<FlashcardsControllerCreateResponses, FlashcardsControllerCreateErrors, ThrowOnError>({
     security: [{
             in: 'cookie',
             name: 'access_token',
             type: 'apiKey'
         }],
-    url: '/workspaces/{workspaceId}/chat/conversations/{conversationId}/messages/{messageId}',
+    url: '/knowledge-hubs/{hubId}/flashcards',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Delete a flashcard
+ */
+export const flashcardsControllerRemove = <ThrowOnError extends boolean = false>(options: Options<FlashcardsControllerRemoveData, ThrowOnError>) => (options.client ?? client).delete<FlashcardsControllerRemoveResponses, FlashcardsControllerRemoveErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'access_token',
+            type: 'apiKey'
+        }],
+    url: '/knowledge-hubs/{hubId}/flashcards/{flashcardId}',
     ...options
+});
+
+/**
+ * Get a flashcard by ID
+ */
+export const flashcardsControllerFindOne = <ThrowOnError extends boolean = false>(options: Options<FlashcardsControllerFindOneData, ThrowOnError>) => (options.client ?? client).get<FlashcardsControllerFindOneResponses, FlashcardsControllerFindOneErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'access_token',
+            type: 'apiKey'
+        }],
+    url: '/knowledge-hubs/{hubId}/flashcards/{flashcardId}',
+    ...options
+});
+
+/**
+ * Update a flashcard
+ */
+export const flashcardsControllerUpdate = <ThrowOnError extends boolean = false>(options: Options<FlashcardsControllerUpdateData, ThrowOnError>) => (options.client ?? client).patch<FlashcardsControllerUpdateResponses, FlashcardsControllerUpdateErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'access_token',
+            type: 'apiKey'
+        }],
+    url: '/knowledge-hubs/{hubId}/flashcards/{flashcardId}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Generate flashcards from contextual input
+ */
+export const flashcardsControllerGenerate = <ThrowOnError extends boolean = false>(options: Options<FlashcardsControllerGenerateData, ThrowOnError>) => (options.client ?? client).post<FlashcardsControllerGenerateResponses, FlashcardsControllerGenerateErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'access_token',
+            type: 'apiKey'
+        }],
+    url: '/knowledge-hubs/{hubId}/flashcards/generate',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });

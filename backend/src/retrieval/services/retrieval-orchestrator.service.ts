@@ -4,7 +4,7 @@ import { SemanticStrategy } from '../strategies/semantic.strategy';
 import { KeywordStrategy } from '../strategies/keyword.strategy';
 import { WebStrategy } from '../strategies/web.strategy';
 import { GeneralKnowledgeStrategy } from '../strategies/general-knowledge.strategy';
-import { RerankerService } from '../fusion/reranker.service';
+import { RerankerService } from './reranker.service';
 import {
   GENERATION_POLICY,
   RAG_CONFIG,

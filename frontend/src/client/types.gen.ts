@@ -34,9 +34,9 @@ export type FileResponseDto = {
      */
     errorMessage?: string;
     /**
-     * Workspace ID this file belongs to
+     * Knowledge hub ID this file belongs to
      */
-    workspaceId: string;
+    knowledgeHubId: string;
     /**
      * Created timestamp
      */
@@ -62,34 +62,34 @@ export type IngestResponseDto = {
     status: 'pending' | 'processing' | 'completed' | 'failed';
 };
 
-export type CreateWorkspaceDto = {
+export type CreateKnowledgeHubDto = {
     /**
-     * Name of the workspace
+     * Name of the knowledge hub
      */
     name: string;
     /**
-     * Optional description of the workspace
+     * Optional description of the knowledge hub
      */
     description?: string;
 };
 
-export type WorkspaceResponseDto = {
+export type KnowledgeHubResponseDto = {
     /**
-     * Unique identifier of the workspace
+     * Unique identifier of the knowledge hub
      */
     id: string;
     /**
-     * Name of the workspace
+     * Name of the knowledge hub
      */
     name: string;
     /**
-     * Description of the workspace
+     * Description of the knowledge hub
      */
     description: {
         [key: string]: unknown;
     } | null;
     /**
-     * ID of the workspace owner
+     * ID of the knowledge hub owner
      */
     ownerId: string;
     /**
@@ -102,13 +102,13 @@ export type WorkspaceResponseDto = {
     updatedAt: string;
 };
 
-export type UpdateWorkspaceDto = {
+export type UpdateKnowledgeHubDto = {
     /**
-     * Name of the workspace
+     * Name of the knowledge hub
      */
     name?: string;
     /**
-     * Optional description of the workspace
+     * Optional description of the knowledge hub
      */
     description?: string;
 };
@@ -194,57 +194,6 @@ export type QueryInConversationResponseDto = {
     messageId: string;
 };
 
-export type CreateConversationDto = {
-    /**
-     * Optional title for the conversation
-     */
-    title?: string;
-};
-
-export type ConversationResponseDto = {
-    /**
-     * Unique identifier of the conversation
-     */
-    id: string;
-    /**
-     * Title of the conversation
-     */
-    title: {
-        [key: string]: unknown;
-    } | null;
-    /**
-     * ID of the workspace this conversation belongs to
-     */
-    workspaceId: string;
-    /**
-     * ID of the user who created the conversation
-     */
-    userId: string;
-    /**
-     * Number of messages in the conversation
-     */
-    messageCount: number;
-    /**
-     * When the conversation was created
-     */
-    createdAt: string;
-    /**
-     * When the conversation was last updated
-     */
-    updatedAt: string;
-};
-
-export type ConversationListResponseDto = {
-    /**
-     * List of conversations
-     */
-    conversations: Array<ConversationResponseDto>;
-    /**
-     * Total number of conversations
-     */
-    total: number;
-};
-
 export type ChatMessageSourceDto = {
     /**
      * The file ID this source belongs to
@@ -278,9 +227,9 @@ export type ChatMessageResponseDto = {
      */
     sources: Array<ChatMessageSourceDto> | null;
     /**
-     * ID of the conversation this message belongs to
+     * ID of the thread this message belongs to
      */
-    conversationId: string;
+    threadId: string;
     /**
      * ID of the user who asked the question
      */
@@ -291,323 +240,326 @@ export type ChatMessageResponseDto = {
     createdAt: string;
 };
 
-export type ConversationWithMessagesDto = {
+export type CreateNoteDto = {
     /**
-     * Unique identifier of the conversation
-     */
-    id: string;
-    /**
-     * Title of the conversation
-     */
-    title: {
-        [key: string]: unknown;
-    } | null;
-    /**
-     * ID of the workspace this conversation belongs to
-     */
-    workspaceId: string;
-    /**
-     * ID of the user who created the conversation
-     */
-    userId: string;
-    /**
-     * Number of messages in the conversation
-     */
-    messageCount: number;
-    /**
-     * When the conversation was created
-     */
-    createdAt: string;
-    /**
-     * When the conversation was last updated
-     */
-    updatedAt: string;
-    /**
-     * Messages in the conversation
-     */
-    messages: Array<ChatMessageResponseDto>;
-};
-
-export type UpdateConversationDto = {
-    /**
-     * New title for the conversation
+     * Note title
      */
     title: string;
+    /**
+     * Note content in plain text or markdown
+     */
+    content: string;
 };
 
-export type RagControllerGetFilesData = {
+export type UpdateNoteDto = {
+    /**
+     * Note title
+     */
+    title?: string;
+    /**
+     * Note content in plain text or markdown
+     */
+    content?: string;
+};
+
+export type GenerateNoteDto = {
+    /**
+     * How the note should be generated
+     */
+    mode: 'from_answer' | 'from_selection' | 'from_topic_query';
+    /**
+     * Topic query text used when mode is from_topic_query
+     */
+    query?: string;
+    /**
+     * Chat message ID used when mode is from_answer
+     */
+    messageId?: string;
+    /**
+     * Document ID used when mode is from_selection
+     */
+    documentId?: string;
+    /**
+     * Selected text from document used when mode is from_selection
+     */
+    selectionText?: string;
+    /**
+     * Optional note title override
+     */
+    title?: string;
+};
+
+export type CreateFlashcardDto = {
+    /**
+     * Flashcard front text (question/prompt)
+     */
+    front: string;
+    /**
+     * Flashcard back text (answer/explanation)
+     */
+    back: string;
+};
+
+export type UpdateFlashcardDto = {
+    /**
+     * Flashcard front text (question/prompt)
+     */
+    front?: string;
+    /**
+     * Flashcard back text (answer/explanation)
+     */
+    back?: string;
+};
+
+export type GenerateFlashcardDto = {
+    /**
+     * How the flashcards should be generated
+     */
+    mode: 'from_answer' | 'from_selection' | 'from_topic_query';
+    /**
+     * Topic query text used when mode is from_topic_query
+     */
+    query?: string;
+    /**
+     * Chat message ID used when mode is from_answer
+     */
+    messageId?: string;
+    /**
+     * Document ID used when mode is from_selection
+     */
+    documentId?: string;
+    /**
+     * Selected text from document used when mode is from_selection
+     */
+    selectionText?: string;
+    /**
+     * Number of flashcards to generate
+     */
+    count?: number;
+};
+
+export type DocumentsControllerGetFilesData = {
     body?: never;
     path: {
         /**
-         * Workspace ID
+         * Knowledge Hub ID
          */
-        workspaceId: string;
+        hubId: string;
     };
     query?: never;
-    url: '/workspaces/{workspaceId}/files';
+    url: '/knowledge-hubs/{hubId}/documents';
 };
 
-export type RagControllerGetFilesErrors = {
+export type DocumentsControllerGetFilesResponses = {
     /**
-     * Unauthorized
-     */
-    401: unknown;
-    /**
-     * Workspace not found
-     */
-    404: unknown;
-};
-
-export type RagControllerGetFilesResponses = {
-    /**
-     * List of files
+     * List of documents
      */
     200: Array<FileResponseDto>;
 };
 
-export type RagControllerGetFilesResponse = RagControllerGetFilesResponses[keyof RagControllerGetFilesResponses];
+export type DocumentsControllerGetFilesResponse = DocumentsControllerGetFilesResponses[keyof DocumentsControllerGetFilesResponses];
 
-export type RagControllerIngestData = {
+export type DocumentsControllerIngestData = {
     body: {
         /**
-         * PDF file to upload
+         * PDF document to upload
          */
         file: Blob | File;
     };
     path: {
         /**
-         * Workspace ID
+         * Knowledge Hub ID
          */
-        workspaceId: string;
+        hubId: string;
     };
     query?: never;
-    url: '/workspaces/{workspaceId}/files';
+    url: '/knowledge-hubs/{hubId}/documents';
 };
 
-export type RagControllerIngestErrors = {
+export type DocumentsControllerIngestResponses = {
     /**
-     * Bad request - file is required or invalid file type
-     */
-    400: unknown;
-    /**
-     * Unauthorized
-     */
-    401: unknown;
-    /**
-     * Workspace not found
-     */
-    404: unknown;
-};
-
-export type RagControllerIngestResponses = {
-    /**
-     * File upload started
+     * Document upload started
      */
     201: IngestResponseDto;
 };
 
-export type RagControllerIngestResponse = RagControllerIngestResponses[keyof RagControllerIngestResponses];
+export type DocumentsControllerIngestResponse = DocumentsControllerIngestResponses[keyof DocumentsControllerIngestResponses];
 
-export type RagControllerDeleteFileData = {
+export type DocumentsControllerDeleteFileData = {
     body?: never;
     path: {
         /**
-         * File ID
+         * Document ID
          */
         fileId: string;
         /**
-         * Workspace ID
+         * Knowledge Hub ID
          */
-        workspaceId: string;
+        hubId: string;
     };
     query?: never;
-    url: '/workspaces/{workspaceId}/files/{fileId}';
+    url: '/knowledge-hubs/{hubId}/documents/{fileId}';
 };
 
-export type RagControllerDeleteFileErrors = {
-    /**
-     * Unauthorized
-     */
-    401: unknown;
-    /**
-     * File not found
-     */
-    404: unknown;
-};
-
-export type RagControllerDeleteFileResponses = {
-    /**
-     * File deleted successfully
-     */
+export type DocumentsControllerDeleteFileResponses = {
     200: unknown;
 };
 
-export type RagControllerGetFileData = {
+export type DocumentsControllerGetFileData = {
     body?: never;
     path: {
         /**
-         * File ID
+         * Document ID
          */
         fileId: string;
         /**
-         * Workspace ID
+         * Knowledge Hub ID
          */
-        workspaceId: string;
+        hubId: string;
     };
     query?: never;
-    url: '/workspaces/{workspaceId}/files/{fileId}';
+    url: '/knowledge-hubs/{hubId}/documents/{fileId}';
 };
 
-export type RagControllerGetFileErrors = {
+export type DocumentsControllerGetFileResponses = {
     /**
-     * Unauthorized
-     */
-    401: unknown;
-    /**
-     * File not found
-     */
-    404: unknown;
-};
-
-export type RagControllerGetFileResponses = {
-    /**
-     * File details
+     * Document details
      */
     200: FileResponseDto;
 };
 
-export type RagControllerGetFileResponse = RagControllerGetFileResponses[keyof RagControllerGetFileResponses];
+export type DocumentsControllerGetFileResponse = DocumentsControllerGetFileResponses[keyof DocumentsControllerGetFileResponses];
 
-export type WorkspacesControllerFindAllData = {
+export type KnowledgeHubsControllerFindAllData = {
     body?: never;
     path?: never;
     query?: never;
-    url: '/workspaces';
+    url: '/knowledge-hubs';
 };
 
-export type WorkspacesControllerFindAllErrors = {
+export type KnowledgeHubsControllerFindAllErrors = {
     /**
      * Unauthorized
      */
     401: unknown;
 };
 
-export type WorkspacesControllerFindAllResponses = {
+export type KnowledgeHubsControllerFindAllResponses = {
     /**
-     * List of workspaces
+     * List of knowledge hubs
      */
-    200: Array<WorkspaceResponseDto>;
+    200: Array<KnowledgeHubResponseDto>;
 };
 
-export type WorkspacesControllerFindAllResponse = WorkspacesControllerFindAllResponses[keyof WorkspacesControllerFindAllResponses];
+export type KnowledgeHubsControllerFindAllResponse = KnowledgeHubsControllerFindAllResponses[keyof KnowledgeHubsControllerFindAllResponses];
 
-export type WorkspacesControllerCreateData = {
-    body: CreateWorkspaceDto;
+export type KnowledgeHubsControllerCreateData = {
+    body: CreateKnowledgeHubDto;
     path?: never;
     query?: never;
-    url: '/workspaces';
+    url: '/knowledge-hubs';
 };
 
-export type WorkspacesControllerCreateErrors = {
+export type KnowledgeHubsControllerCreateErrors = {
     /**
      * Unauthorized
      */
     401: unknown;
 };
 
-export type WorkspacesControllerCreateResponses = {
+export type KnowledgeHubsControllerCreateResponses = {
     /**
-     * Workspace created successfully
+     * Knowledge hub created successfully
      */
-    201: WorkspaceResponseDto;
+    201: KnowledgeHubResponseDto;
 };
 
-export type WorkspacesControllerCreateResponse = WorkspacesControllerCreateResponses[keyof WorkspacesControllerCreateResponses];
+export type KnowledgeHubsControllerCreateResponse = KnowledgeHubsControllerCreateResponses[keyof KnowledgeHubsControllerCreateResponses];
 
-export type WorkspacesControllerRemoveData = {
+export type KnowledgeHubsControllerRemoveData = {
     body?: never;
     path: {
         id: string;
     };
     query?: never;
-    url: '/workspaces/{id}';
+    url: '/knowledge-hubs/{id}';
 };
 
-export type WorkspacesControllerRemoveErrors = {
+export type KnowledgeHubsControllerRemoveErrors = {
     /**
      * Unauthorized
      */
     401: unknown;
     /**
-     * Workspace not found
+     * Knowledge hub not found
      */
     404: unknown;
 };
 
-export type WorkspacesControllerRemoveResponses = {
+export type KnowledgeHubsControllerRemoveResponses = {
     /**
-     * Workspace deleted successfully
+     * Knowledge hub deleted successfully
      */
     200: unknown;
 };
 
-export type WorkspacesControllerFindOneData = {
+export type KnowledgeHubsControllerFindOneData = {
     body?: never;
     path: {
         id: string;
     };
     query?: never;
-    url: '/workspaces/{id}';
+    url: '/knowledge-hubs/{id}';
 };
 
-export type WorkspacesControllerFindOneErrors = {
+export type KnowledgeHubsControllerFindOneErrors = {
     /**
      * Unauthorized
      */
     401: unknown;
     /**
-     * Workspace not found
+     * Knowledge hub not found
      */
     404: unknown;
 };
 
-export type WorkspacesControllerFindOneResponses = {
+export type KnowledgeHubsControllerFindOneResponses = {
     /**
-     * Workspace details
+     * Knowledge hub details
      */
-    200: WorkspaceResponseDto;
+    200: KnowledgeHubResponseDto;
 };
 
-export type WorkspacesControllerFindOneResponse = WorkspacesControllerFindOneResponses[keyof WorkspacesControllerFindOneResponses];
+export type KnowledgeHubsControllerFindOneResponse = KnowledgeHubsControllerFindOneResponses[keyof KnowledgeHubsControllerFindOneResponses];
 
-export type WorkspacesControllerUpdateData = {
-    body: UpdateWorkspaceDto;
+export type KnowledgeHubsControllerUpdateData = {
+    body: UpdateKnowledgeHubDto;
     path: {
         id: string;
     };
     query?: never;
-    url: '/workspaces/{id}';
+    url: '/knowledge-hubs/{id}';
 };
 
-export type WorkspacesControllerUpdateErrors = {
+export type KnowledgeHubsControllerUpdateErrors = {
     /**
      * Unauthorized
      */
     401: unknown;
     /**
-     * Workspace not found
+     * Knowledge hub not found
      */
     404: unknown;
 };
 
-export type WorkspacesControllerUpdateResponses = {
+export type KnowledgeHubsControllerUpdateResponses = {
     /**
-     * Workspace updated successfully
+     * Knowledge hub updated successfully
      */
-    200: WorkspaceResponseDto;
+    200: KnowledgeHubResponseDto;
 };
 
-export type WorkspacesControllerUpdateResponse = WorkspacesControllerUpdateResponses[keyof WorkspacesControllerUpdateResponses];
+export type KnowledgeHubsControllerUpdateResponse = KnowledgeHubsControllerUpdateResponses[keyof KnowledgeHubsControllerUpdateResponses];
 
 export type AuthControllerGoogleAuthData = {
     body?: never;
@@ -678,21 +630,21 @@ export type AuthControllerLogoutResponses = {
 
 export type AuthControllerLogoutResponse = AuthControllerLogoutResponses[keyof AuthControllerLogoutResponses];
 
-export type ChatControllerQueryData = {
+export type QueryControllerQueryData = {
     body: QueryInConversationDto;
     path: {
         /**
-         * Workspace ID
+         * Knowledge Hub ID
          */
-        workspaceId: string;
+        hubId: string;
     };
     query?: never;
-    url: '/workspaces/{workspaceId}/chat/query';
+    url: '/knowledge-hubs/{hubId}/chat/query';
 };
 
-export type ChatControllerQueryErrors = {
+export type QueryControllerQueryErrors = {
     /**
-     * Bad request - no processed documents in workspace
+     * Bad request - no processed documents in knowledge hub
      */
     400: unknown;
     /**
@@ -700,274 +652,65 @@ export type ChatControllerQueryErrors = {
      */
     401: unknown;
     /**
-     * Workspace or conversation not found
+     * Knowledge hub thread not found
      */
     404: unknown;
 };
 
-export type ChatControllerQueryResponses = {
+export type QueryControllerQueryResponses = {
     /**
      * AI-generated answer with sources
      */
     200: QueryInConversationResponseDto;
 };
 
-export type ChatControllerQueryResponse = ChatControllerQueryResponses[keyof ChatControllerQueryResponses];
+export type QueryControllerQueryResponse = QueryControllerQueryResponses[keyof QueryControllerQueryResponses];
 
-export type ChatControllerClearConversationsData = {
+export type ConversationsControllerGetMessagesData = {
     body?: never;
     path: {
         /**
-         * Workspace ID
+         * Knowledge Hub ID
          */
-        workspaceId: string;
+        hubId: string;
     };
     query?: never;
-    url: '/workspaces/{workspaceId}/chat/conversations';
+    url: '/knowledge-hubs/{hubId}/chat/messages';
 };
 
-export type ChatControllerClearConversationsErrors = {
+export type ConversationsControllerGetMessagesErrors = {
     /**
      * Unauthorized
      */
     401: unknown;
 };
 
-export type ChatControllerClearConversationsResponses = {
+export type ConversationsControllerGetMessagesResponses = {
     /**
-     * All conversations cleared successfully
-     */
-    200: unknown;
-};
-
-export type ChatControllerGetConversationsData = {
-    body?: never;
-    path: {
-        /**
-         * Workspace ID
-         */
-        workspaceId: string;
-    };
-    query?: {
-        /**
-         * Number of conversations to return (default: 50)
-         */
-        limit?: number;
-        /**
-         * Number of conversations to skip (default: 0)
-         */
-        offset?: number;
-    };
-    url: '/workspaces/{workspaceId}/chat/conversations';
-};
-
-export type ChatControllerGetConversationsErrors = {
-    /**
-     * Unauthorized
-     */
-    401: unknown;
-};
-
-export type ChatControllerGetConversationsResponses = {
-    /**
-     * List of conversations
-     */
-    200: ConversationListResponseDto;
-};
-
-export type ChatControllerGetConversationsResponse = ChatControllerGetConversationsResponses[keyof ChatControllerGetConversationsResponses];
-
-export type ChatControllerCreateConversationData = {
-    body: CreateConversationDto;
-    path: {
-        /**
-         * Workspace ID
-         */
-        workspaceId: string;
-    };
-    query?: never;
-    url: '/workspaces/{workspaceId}/chat/conversations';
-};
-
-export type ChatControllerCreateConversationErrors = {
-    /**
-     * Unauthorized
-     */
-    401: unknown;
-};
-
-export type ChatControllerCreateConversationResponses = {
-    /**
-     * Conversation created successfully
-     */
-    201: ConversationResponseDto;
-};
-
-export type ChatControllerCreateConversationResponse = ChatControllerCreateConversationResponses[keyof ChatControllerCreateConversationResponses];
-
-export type ChatControllerDeleteConversationData = {
-    body?: never;
-    path: {
-        /**
-         * Conversation ID
-         */
-        conversationId: string;
-        /**
-         * Workspace ID
-         */
-        workspaceId: string;
-    };
-    query?: never;
-    url: '/workspaces/{workspaceId}/chat/conversations/{conversationId}';
-};
-
-export type ChatControllerDeleteConversationErrors = {
-    /**
-     * Unauthorized
-     */
-    401: unknown;
-    /**
-     * Conversation not found
-     */
-    404: unknown;
-};
-
-export type ChatControllerDeleteConversationResponses = {
-    /**
-     * Conversation deleted successfully
-     */
-    200: unknown;
-};
-
-export type ChatControllerGetConversationData = {
-    body?: never;
-    path: {
-        /**
-         * Conversation ID
-         */
-        conversationId: string;
-        /**
-         * Workspace ID
-         */
-        workspaceId: string;
-    };
-    query?: never;
-    url: '/workspaces/{workspaceId}/chat/conversations/{conversationId}';
-};
-
-export type ChatControllerGetConversationErrors = {
-    /**
-     * Unauthorized
-     */
-    401: unknown;
-    /**
-     * Conversation not found
-     */
-    404: unknown;
-};
-
-export type ChatControllerGetConversationResponses = {
-    /**
-     * Conversation with messages
-     */
-    200: ConversationWithMessagesDto;
-};
-
-export type ChatControllerGetConversationResponse = ChatControllerGetConversationResponses[keyof ChatControllerGetConversationResponses];
-
-export type ChatControllerUpdateConversationData = {
-    body: UpdateConversationDto;
-    path: {
-        /**
-         * Conversation ID
-         */
-        conversationId: string;
-        /**
-         * Workspace ID
-         */
-        workspaceId: string;
-    };
-    query?: never;
-    url: '/workspaces/{workspaceId}/chat/conversations/{conversationId}';
-};
-
-export type ChatControllerUpdateConversationErrors = {
-    /**
-     * Unauthorized
-     */
-    401: unknown;
-    /**
-     * Conversation not found
-     */
-    404: unknown;
-};
-
-export type ChatControllerUpdateConversationResponses = {
-    /**
-     * Conversation updated successfully
-     */
-    200: ConversationResponseDto;
-};
-
-export type ChatControllerUpdateConversationResponse = ChatControllerUpdateConversationResponses[keyof ChatControllerUpdateConversationResponses];
-
-export type ChatControllerGetMessagesData = {
-    body?: never;
-    path: {
-        /**
-         * Conversation ID
-         */
-        conversationId: string;
-        /**
-         * Workspace ID
-         */
-        workspaceId: string;
-    };
-    query?: never;
-    url: '/workspaces/{workspaceId}/chat/conversations/{conversationId}/messages';
-};
-
-export type ChatControllerGetMessagesErrors = {
-    /**
-     * Unauthorized
-     */
-    401: unknown;
-    /**
-     * Conversation not found
-     */
-    404: unknown;
-};
-
-export type ChatControllerGetMessagesResponses = {
-    /**
-     * List of messages in the conversation
+     * List of messages in the knowledge hub chat thread
      */
     200: Array<ChatMessageResponseDto>;
 };
 
-export type ChatControllerGetMessagesResponse = ChatControllerGetMessagesResponses[keyof ChatControllerGetMessagesResponses];
+export type ConversationsControllerGetMessagesResponse = ConversationsControllerGetMessagesResponses[keyof ConversationsControllerGetMessagesResponses];
 
-export type ChatControllerDeleteMessageData = {
+export type ConversationsControllerDeleteMessageData = {
     body?: never;
     path: {
-        /**
-         * Conversation ID
-         */
-        conversationId: string;
         /**
          * Message ID
          */
         messageId: string;
         /**
-         * Workspace ID
+         * Knowledge Hub ID
          */
-        workspaceId: string;
+        hubId: string;
     };
     query?: never;
-    url: '/workspaces/{workspaceId}/chat/conversations/{conversationId}/messages/{messageId}';
+    url: '/knowledge-hubs/{hubId}/chat/messages/{messageId}';
 };
 
-export type ChatControllerDeleteMessageErrors = {
+export type ConversationsControllerDeleteMessageErrors = {
     /**
      * Unauthorized
      */
@@ -978,9 +721,351 @@ export type ChatControllerDeleteMessageErrors = {
     404: unknown;
 };
 
-export type ChatControllerDeleteMessageResponses = {
+export type ConversationsControllerDeleteMessageResponses = {
     /**
      * Message deleted successfully
      */
     200: unknown;
+};
+
+export type NotesControllerFindAllData = {
+    body?: never;
+    path: {
+        /**
+         * Knowledge Hub ID
+         */
+        hubId: string;
+    };
+    query?: never;
+    url: '/knowledge-hubs/{hubId}/notes';
+};
+
+export type NotesControllerFindAllErrors = {
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+};
+
+export type NotesControllerFindAllResponses = {
+    /**
+     * Notes list
+     */
+    200: unknown;
+};
+
+export type NotesControllerCreateData = {
+    body: CreateNoteDto;
+    path: {
+        /**
+         * Knowledge Hub ID
+         */
+        hubId: string;
+    };
+    query?: never;
+    url: '/knowledge-hubs/{hubId}/notes';
+};
+
+export type NotesControllerCreateErrors = {
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+};
+
+export type NotesControllerCreateResponses = {
+    /**
+     * Note created successfully
+     */
+    201: unknown;
+};
+
+export type NotesControllerRemoveData = {
+    body?: never;
+    path: {
+        noteId: string;
+        /**
+         * Knowledge Hub ID
+         */
+        hubId: string;
+    };
+    query?: never;
+    url: '/knowledge-hubs/{hubId}/notes/{noteId}';
+};
+
+export type NotesControllerRemoveErrors = {
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Note not found
+     */
+    404: unknown;
+};
+
+export type NotesControllerRemoveResponses = {
+    /**
+     * Note deleted successfully
+     */
+    200: unknown;
+};
+
+export type NotesControllerFindOneData = {
+    body?: never;
+    path: {
+        noteId: string;
+        /**
+         * Knowledge Hub ID
+         */
+        hubId: string;
+    };
+    query?: never;
+    url: '/knowledge-hubs/{hubId}/notes/{noteId}';
+};
+
+export type NotesControllerFindOneErrors = {
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Note not found
+     */
+    404: unknown;
+};
+
+export type NotesControllerFindOneResponses = {
+    /**
+     * Note details
+     */
+    200: unknown;
+};
+
+export type NotesControllerUpdateData = {
+    body: UpdateNoteDto;
+    path: {
+        noteId: string;
+        /**
+         * Knowledge Hub ID
+         */
+        hubId: string;
+    };
+    query?: never;
+    url: '/knowledge-hubs/{hubId}/notes/{noteId}';
+};
+
+export type NotesControllerUpdateErrors = {
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Note not found
+     */
+    404: unknown;
+};
+
+export type NotesControllerUpdateResponses = {
+    /**
+     * Note updated successfully
+     */
+    200: unknown;
+};
+
+export type NotesControllerGenerateData = {
+    body: GenerateNoteDto;
+    path: {
+        /**
+         * Knowledge Hub ID
+         */
+        hubId: string;
+    };
+    query?: never;
+    url: '/knowledge-hubs/{hubId}/notes/generate';
+};
+
+export type NotesControllerGenerateErrors = {
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+};
+
+export type NotesControllerGenerateResponses = {
+    /**
+     * Note generated successfully
+     */
+    201: unknown;
+};
+
+export type FlashcardsControllerFindAllData = {
+    body?: never;
+    path: {
+        /**
+         * Knowledge Hub ID
+         */
+        hubId: string;
+    };
+    query?: never;
+    url: '/knowledge-hubs/{hubId}/flashcards';
+};
+
+export type FlashcardsControllerFindAllErrors = {
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+};
+
+export type FlashcardsControllerFindAllResponses = {
+    /**
+     * Flashcards list
+     */
+    200: unknown;
+};
+
+export type FlashcardsControllerCreateData = {
+    body: CreateFlashcardDto;
+    path: {
+        /**
+         * Knowledge Hub ID
+         */
+        hubId: string;
+    };
+    query?: never;
+    url: '/knowledge-hubs/{hubId}/flashcards';
+};
+
+export type FlashcardsControllerCreateErrors = {
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+};
+
+export type FlashcardsControllerCreateResponses = {
+    /**
+     * Flashcard created successfully
+     */
+    201: unknown;
+};
+
+export type FlashcardsControllerRemoveData = {
+    body?: never;
+    path: {
+        flashcardId: string;
+        /**
+         * Knowledge Hub ID
+         */
+        hubId: string;
+    };
+    query?: never;
+    url: '/knowledge-hubs/{hubId}/flashcards/{flashcardId}';
+};
+
+export type FlashcardsControllerRemoveErrors = {
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Flashcard not found
+     */
+    404: unknown;
+};
+
+export type FlashcardsControllerRemoveResponses = {
+    /**
+     * Flashcard deleted successfully
+     */
+    200: unknown;
+};
+
+export type FlashcardsControllerFindOneData = {
+    body?: never;
+    path: {
+        flashcardId: string;
+        /**
+         * Knowledge Hub ID
+         */
+        hubId: string;
+    };
+    query?: never;
+    url: '/knowledge-hubs/{hubId}/flashcards/{flashcardId}';
+};
+
+export type FlashcardsControllerFindOneErrors = {
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Flashcard not found
+     */
+    404: unknown;
+};
+
+export type FlashcardsControllerFindOneResponses = {
+    /**
+     * Flashcard details
+     */
+    200: unknown;
+};
+
+export type FlashcardsControllerUpdateData = {
+    body: UpdateFlashcardDto;
+    path: {
+        flashcardId: string;
+        /**
+         * Knowledge Hub ID
+         */
+        hubId: string;
+    };
+    query?: never;
+    url: '/knowledge-hubs/{hubId}/flashcards/{flashcardId}';
+};
+
+export type FlashcardsControllerUpdateErrors = {
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Flashcard not found
+     */
+    404: unknown;
+};
+
+export type FlashcardsControllerUpdateResponses = {
+    /**
+     * Flashcard updated successfully
+     */
+    200: unknown;
+};
+
+export type FlashcardsControllerGenerateData = {
+    body: GenerateFlashcardDto;
+    path: {
+        /**
+         * Knowledge Hub ID
+         */
+        hubId: string;
+    };
+    query?: never;
+    url: '/knowledge-hubs/{hubId}/flashcards/generate';
+};
+
+export type FlashcardsControllerGenerateErrors = {
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+};
+
+export type FlashcardsControllerGenerateResponses = {
+    /**
+     * Flashcards generated successfully
+     */
+    201: unknown;
 };

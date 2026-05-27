@@ -10,7 +10,7 @@ import {
 } from '../evidence/evidence.types';
 
 @Injectable()
-export class RetrievalService {
+export class SemanticSearchService {
   constructor(
     @InjectRepository(File)
     private fileRepository: Repository<File>,

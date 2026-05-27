@@ -38,9 +38,9 @@ export const FileResponseDtoSchema = {
             type: 'string',
             description: 'Error message if processing failed'
         },
-        workspaceId: {
+        knowledgeHubId: {
             type: 'string',
-            description: 'Workspace ID this file belongs to'
+            description: 'Knowledge hub ID this file belongs to'
         },
         createdAt: {
             format: 'date-time',
@@ -60,7 +60,7 @@ export const FileResponseDtoSchema = {
         'mimeType',
         'size',
         'status',
-        'workspaceId',
+        'knowledgeHubId',
         'createdAt',
         'updatedAt'
     ]
@@ -96,19 +96,19 @@ export const IngestResponseDtoSchema = {
     ]
 } as const;
 
-export const CreateWorkspaceDtoSchema = {
+export const CreateKnowledgeHubDtoSchema = {
     type: 'object',
     properties: {
         name: {
             type: 'string',
-            description: 'Name of the workspace',
-            example: 'My Project',
+            description: 'Name of the knowledge hub',
+            example: 'Product Architecture',
             maxLength: 255
         },
         description: {
             type: 'string',
-            description: 'Optional description of the workspace',
-            example: 'A workspace for my project documents'
+            description: 'Optional description of the knowledge hub',
+            example: 'All docs, notes, chat, and cards for the product architecture'
         }
     },
     required: [
@@ -116,41 +116,37 @@ export const CreateWorkspaceDtoSchema = {
     ]
 } as const;
 
-export const WorkspaceResponseDtoSchema = {
+export const KnowledgeHubResponseDtoSchema = {
     type: 'object',
     properties: {
         id: {
             type: 'string',
-            description: 'Unique identifier of the workspace',
+            description: 'Unique identifier of the knowledge hub',
             example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890'
         },
         name: {
             type: 'string',
-            description: 'Name of the workspace',
-            example: 'My Project'
+            description: 'Name of the knowledge hub',
+            example: 'Product Architecture'
         },
         description: {
             type: 'object',
-            description: 'Description of the workspace',
-            example: 'A workspace for my project documents',
+            description: 'Description of the knowledge hub',
             nullable: true
         },
         ownerId: {
             type: 'string',
-            description: 'ID of the workspace owner',
-            example: 'b2c3d4e5-f6a7-8901-bcde-f23456789012'
+            description: 'ID of the knowledge hub owner'
         },
         createdAt: {
             format: 'date-time',
             type: 'string',
-            description: 'Creation timestamp',
-            example: '2025-12-29T10:00:00.000Z'
+            description: 'Creation timestamp'
         },
         updatedAt: {
             format: 'date-time',
             type: 'string',
-            description: 'Last update timestamp',
-            example: '2025-12-29T12:00:00.000Z'
+            description: 'Last update timestamp'
         }
     },
     required: [
@@ -163,19 +159,19 @@ export const WorkspaceResponseDtoSchema = {
     ]
 } as const;
 
-export const UpdateWorkspaceDtoSchema = {
+export const UpdateKnowledgeHubDtoSchema = {
     type: 'object',
     properties: {
         name: {
             type: 'string',
-            description: 'Name of the workspace',
-            example: 'My Updated Project',
+            description: 'Name of the knowledge hub',
+            example: 'Updated Product Architecture',
             maxLength: 255
         },
         description: {
             type: 'string',
-            description: 'Optional description of the workspace',
-            example: 'An updated description'
+            description: 'Optional description of the knowledge hub',
+            example: 'Updated description'
         }
     }
 } as const;
@@ -318,85 +314,6 @@ export const QueryInConversationResponseDtoSchema = {
     ]
 } as const;
 
-export const CreateConversationDtoSchema = {
-    type: 'object',
-    properties: {
-        title: {
-            type: 'string',
-            description: 'Optional title for the conversation',
-            example: 'Questions about REST API',
-            maxLength: 200
-        }
-    }
-} as const;
-
-export const ConversationResponseDtoSchema = {
-    type: 'object',
-    properties: {
-        id: {
-            type: 'string',
-            description: 'Unique identifier of the conversation'
-        },
-        title: {
-            type: 'object',
-            description: 'Title of the conversation',
-            nullable: true
-        },
-        workspaceId: {
-            type: 'string',
-            description: 'ID of the workspace this conversation belongs to'
-        },
-        userId: {
-            type: 'string',
-            description: 'ID of the user who created the conversation'
-        },
-        messageCount: {
-            type: 'number',
-            description: 'Number of messages in the conversation'
-        },
-        createdAt: {
-            format: 'date-time',
-            type: 'string',
-            description: 'When the conversation was created'
-        },
-        updatedAt: {
-            format: 'date-time',
-            type: 'string',
-            description: 'When the conversation was last updated'
-        }
-    },
-    required: [
-        'id',
-        'title',
-        'workspaceId',
-        'userId',
-        'messageCount',
-        'createdAt',
-        'updatedAt'
-    ]
-} as const;
-
-export const ConversationListResponseDtoSchema = {
-    type: 'object',
-    properties: {
-        conversations: {
-            description: 'List of conversations',
-            type: 'array',
-            items: {
-                $ref: '#/components/schemas/ConversationResponseDto'
-            }
-        },
-        total: {
-            type: 'number',
-            description: 'Total number of conversations'
-        }
-    },
-    required: [
-        'conversations',
-        'total'
-    ]
-} as const;
-
 export const ChatMessageSourceDtoSchema = {
     type: 'object',
     properties: {
@@ -443,9 +360,9 @@ export const ChatMessageResponseDtoSchema = {
                 $ref: '#/components/schemas/ChatMessageSourceDto'
             }
         },
-        conversationId: {
+        threadId: {
             type: 'string',
-            description: 'ID of the conversation this message belongs to'
+            description: 'ID of the thread this message belongs to'
         },
         userId: {
             type: 'string',
@@ -462,78 +379,180 @@ export const ChatMessageResponseDtoSchema = {
         'question',
         'answer',
         'sources',
-        'conversationId',
+        'threadId',
         'userId',
         'createdAt'
     ]
 } as const;
 
-export const ConversationWithMessagesDtoSchema = {
+export const CreateNoteDtoSchema = {
     type: 'object',
     properties: {
-        id: {
-            type: 'string',
-            description: 'Unique identifier of the conversation'
-        },
         title: {
-            type: 'object',
-            description: 'Title of the conversation',
-            nullable: true
-        },
-        workspaceId: {
             type: 'string',
-            description: 'ID of the workspace this conversation belongs to'
+            description: 'Note title',
+            example: 'Q3 rollout checklist',
+            maxLength: 255
         },
-        userId: {
+        content: {
             type: 'string',
-            description: 'ID of the user who created the conversation'
-        },
-        messageCount: {
-            type: 'number',
-            description: 'Number of messages in the conversation'
-        },
-        createdAt: {
-            format: 'date-time',
-            type: 'string',
-            description: 'When the conversation was created'
-        },
-        updatedAt: {
-            format: 'date-time',
-            type: 'string',
-            description: 'When the conversation was last updated'
-        },
-        messages: {
-            description: 'Messages in the conversation',
-            type: 'array',
-            items: {
-                $ref: '#/components/schemas/ChatMessageResponseDto'
-            }
+            description: 'Note content in plain text or markdown',
+            example: 'Key points from today\'s review...'
         }
     },
     required: [
-        'id',
         'title',
-        'workspaceId',
-        'userId',
-        'messageCount',
-        'createdAt',
-        'updatedAt',
-        'messages'
+        'content'
     ]
 } as const;
 
-export const UpdateConversationDtoSchema = {
+export const UpdateNoteDtoSchema = {
     type: 'object',
     properties: {
         title: {
             type: 'string',
-            description: 'New title for the conversation',
-            example: 'REST API Architecture Discussion',
-            minLength: 1,
-            maxLength: 200
+            description: 'Note title',
+            example: 'Q3 rollout checklist (updated)',
+            maxLength: 255
+        },
+        content: {
+            type: 'string',
+            description: 'Note content in plain text or markdown',
+            example: 'Updated notes after reviewing action items.'
+        }
+    }
+} as const;
+
+export const GenerateNoteDtoSchema = {
+    type: 'object',
+    properties: {
+        mode: {
+            type: 'string',
+            description: 'How the note should be generated',
+            enum: [
+                'from_answer',
+                'from_selection',
+                'from_topic_query'
+            ],
+            example: 'from_answer'
+        },
+        query: {
+            type: 'string',
+            description: 'Topic query text used when mode is from_topic_query',
+            example: 'Summarize OAuth2 authorization code flow from uploaded docs',
+            minLength: 3,
+            maxLength: 4000
+        },
+        messageId: {
+            type: 'string',
+            description: 'Chat message ID used when mode is from_answer',
+            example: '123e4567-e89b-12d3-a456-426614174000'
+        },
+        documentId: {
+            type: 'string',
+            description: 'Document ID used when mode is from_selection',
+            example: '123e4567-e89b-12d3-a456-426614174000'
+        },
+        selectionText: {
+            type: 'string',
+            description: 'Selected text from document used when mode is from_selection',
+            example: 'OAuth2 authorization code flow exchanges an auth code for access token.',
+            minLength: 3,
+            maxLength: 4000
+        },
+        title: {
+            type: 'string',
+            description: 'Optional note title override',
+            example: 'Study Notes: API Authentication',
+            maxLength: 255
         }
     },
     required: [
-        'title'
+        'mode'
+    ]
+} as const;
+
+export const CreateFlashcardDtoSchema = {
+    type: 'object',
+    properties: {
+        front: {
+            type: 'string',
+            description: 'Flashcard front text (question/prompt)',
+            example: 'What is retrieval augmented generation (RAG)?'
+        },
+        back: {
+            type: 'string',
+            description: 'Flashcard back text (answer/explanation)',
+            example: 'A pattern that augments LLM prompts with retrieved context.'
+        }
+    },
+    required: [
+        'front',
+        'back'
+    ]
+} as const;
+
+export const UpdateFlashcardDtoSchema = {
+    type: 'object',
+    properties: {
+        front: {
+            type: 'string',
+            description: 'Flashcard front text (question/prompt)',
+            example: 'What does RAG stand for?'
+        },
+        back: {
+            type: 'string',
+            description: 'Flashcard back text (answer/explanation)',
+            example: 'Retrieval Augmented Generation'
+        }
+    }
+} as const;
+
+export const GenerateFlashcardDtoSchema = {
+    type: 'object',
+    properties: {
+        mode: {
+            type: 'string',
+            description: 'How the flashcards should be generated',
+            enum: [
+                'from_answer',
+                'from_selection',
+                'from_topic_query'
+            ],
+            example: 'from_topic_query'
+        },
+        query: {
+            type: 'string',
+            description: 'Topic query text used when mode is from_topic_query',
+            example: 'Generate cards about OAuth2 authorization code flow.',
+            maxLength: 4000
+        },
+        messageId: {
+            type: 'string',
+            description: 'Chat message ID used when mode is from_answer',
+            example: '123e4567-e89b-12d3-a456-426614174000'
+        },
+        documentId: {
+            type: 'string',
+            description: 'Document ID used when mode is from_selection',
+            example: '123e4567-e89b-12d3-a456-426614174000'
+        },
+        selectionText: {
+            type: 'string',
+            description: 'Selected text from document used when mode is from_selection',
+            example: 'OAuth2 uses authorization code exchange for tokens.',
+            maxLength: 4000
+        },
+        count: {
+            type: 'number',
+            description: 'Number of flashcards to generate',
+            example: 5,
+            minimum: 1,
+            maximum: 20,
+            default: 5
+        }
+    },
+    required: [
+        'mode'
     ]
 } as const;

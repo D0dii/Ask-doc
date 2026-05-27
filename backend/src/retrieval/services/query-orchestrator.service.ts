@@ -1,18 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import {
+import type {
   BuildEvidenceContextInput,
   BuildEvidenceContextResult,
   EvidenceChunk,
-} from './evidence.types';
-import { RetrievalService } from '../services/retrieval.service';
-import { RetrievalOrchestratorService } from '../services/retrieval-orchestrator.service';
+} from '../evidence/evidence.types';
+import { RetrievalOrchestratorService } from './retrieval-orchestrator.service';
+import { SemanticSearchService } from './semantic-search.service';
 import type { VectorSearchResult } from '../../shared/vector-store/vector-store.port';
 
 @Injectable()
-export class EvidencePipelineService {
+export class QueryOrchestratorService {
   constructor(
-    private retrievalService: RetrievalService,
     private retrievalOrchestratorService: RetrievalOrchestratorService,
+    private semanticSearchService: SemanticSearchService,
   ) {}
 
   async buildContext({
@@ -21,7 +21,7 @@ export class EvidencePipelineService {
     limit,
     includeWebSources = false,
   }: BuildEvidenceContextInput): Promise<BuildEvidenceContextResult> {
-    const retrievedEvidence = await this.retrievalService.retrieveEvidence(
+    const semanticEvidence = await this.semanticSearchService.retrieveEvidence(
       knowledgeHubId,
       query,
       limit,
@@ -33,7 +33,7 @@ export class EvidencePipelineService {
           query,
           limit,
         })
-      : retrievedEvidence.evidenceChunks;
+      : semanticEvidence.evidenceChunks;
 
     const sources: VectorSearchResult[] = chunks
       .filter((chunk) => chunk.sourceType === 'retrieved_doc')

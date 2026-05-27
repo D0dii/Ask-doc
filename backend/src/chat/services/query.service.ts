@@ -15,7 +15,7 @@ import {
   formatConversationHistory,
 } from '../constants/prompts.constants';
 import { ConversationsService } from './conversations.service';
-import { EvidencePipelineService } from '../../retrieval/evidence/evidence-pipeline.service';
+import { QueryOrchestratorService } from '../../retrieval/services/query-orchestrator.service';
 import {
   EvidencePolicyService,
   EvidencePolicyViolationError,
@@ -46,7 +46,7 @@ export class QueryService {
   constructor(
     private conversationsService: ConversationsService,
     private llmService: LlmService,
-    private evidencePipelineService: EvidencePipelineService,
+    private queryOrchestratorService: QueryOrchestratorService,
     private evidencePolicyService: EvidencePolicyService,
   ) {}
 
@@ -81,7 +81,7 @@ export class QueryService {
     );
 
     // 4. Search for relevant document chunks using the standalone question
-    const evidenceContext = await this.evidencePipelineService.buildContext({
+    const evidenceContext = await this.queryOrchestratorService.buildContext({
       knowledgeHubId,
       query: standaloneQuestion,
       limit: undefined,
