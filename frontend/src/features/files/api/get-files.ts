@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { ragControllerGetFiles } from "@/client";
+import { documentsControllerGetFiles } from "@/client";
 import type { FileResponseDto } from "../types/file";
 
 const getFiles = async (workspaceId: string) => {
-  const { data } = await ragControllerGetFiles({ path: { workspaceId }, throwOnError: true });
+  const { data } = await documentsControllerGetFiles({ path: { hubId: workspaceId }, throwOnError: true });
   return data;
 };
 

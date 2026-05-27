@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { workspacesControllerFindAll } from "@/client";
+import { knowledgeHubsControllerFindAll } from "@/client";
 
 const getWorkspaces = async () => {
-  const { data } = await workspacesControllerFindAll({ throwOnError: true });
+  const { data } = await knowledgeHubsControllerFindAll({ throwOnError: true });
   return data;
 };
 

@@ -8,12 +8,8 @@ let refreshPromise: Promise<boolean> | null = null;
  * Returns true if refresh was successful, false otherwise.
  */
 async function refreshToken(): Promise<boolean> {
-  try {
-    const response = await authControllerRefresh();
-    return response.response.ok;
-  } catch {
-    return false;
-  }
+  const response = await authControllerRefresh({ throwOnError: false });
+  return response.response.ok;
 }
 
 /**
@@ -30,19 +26,17 @@ export function setupApiClient() {
     throwOnError: true,
   });
 
-  console.log("Setting up API client interceptors");
-
-  // Add response interceptor for handling 401 errors
   client.interceptors.response.use(async (response, request) => {
-    // If not a 401, return as-is
     if (response.status !== 401) {
       return response;
     }
-    console.log("Interceptor: Got 401, checking if should refresh...");
-    // Don't try to refresh for auth endpoints that would cause infinite loops
+
     const url = new URL(request.url);
-    if (url.pathname.includes("/auth/refresh") || url.pathname.includes("/auth/logout")) {
-      console.log("Interceptor: Skipping refresh for auth endpoint");
+    if (
+      url.pathname.includes("/auth/refresh") ||
+      url.pathname.includes("/auth/logout") ||
+      url.pathname.includes("/auth/me")
+    ) {
       return response;
     }
 

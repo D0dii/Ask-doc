@@ -1,16 +1,16 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ragControllerDeleteFile } from "@/client";
+import { documentsControllerDeleteFile } from "@/client";
 
-const deleteFile = (workspaceId: string, fileId: string) =>
-  ragControllerDeleteFile({ path: { workspaceId, fileId }, throwOnError: true });
+const deleteFile = (hubId: string, fileId: string) =>
+  documentsControllerDeleteFile({ path: { hubId, fileId }, throwOnError: true });
 
-export const useDeleteFile = (workspaceId: string) => {
+export const useDeleteFile = (hubId: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (fileId: string) => deleteFile(workspaceId, fileId),
+    mutationFn: (fileId: string) => deleteFile(hubId, fileId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["workspaces", workspaceId, "files"] });
+      queryClient.invalidateQueries({ queryKey: ["workspaces", hubId, "files"] });
     },
   });
 };

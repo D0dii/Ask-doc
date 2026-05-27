@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { workspacesControllerRemove } from "@/client";
+import { knowledgeHubsControllerRemove } from "@/client";
 
-const deleteWorkspace = (id: string) => workspacesControllerRemove({ path: { id }, throwOnError: true });
+const deleteWorkspace = (id: string) => knowledgeHubsControllerRemove({ path: { id }, throwOnError: true });
 
 export const useDeleteWorkspace = () => {
   const queryClient = useQueryClient();

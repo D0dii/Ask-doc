@@ -1,18 +1,18 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ragControllerIngest } from "@/client";
+import { documentsControllerIngest } from "@/client";
 
-const uploadFile = async (workspaceId: string, file: File) => {
-  const { data } = await ragControllerIngest({ path: { workspaceId }, body: { file }, throwOnError: true });
+const uploadFile = async (hubId: string, file: File) => {
+  const { data } = await documentsControllerIngest({ path: { hubId }, body: { file }, throwOnError: true });
   return data;
 };
 
-export const useUploadFile = (workspaceId: string) => {
+export const useUploadFile = (hubId: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (file: File) => uploadFile(workspaceId, file),
+    mutationFn: (file: File) => uploadFile(hubId, file),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["workspaces", workspaceId, "files"] });
+      queryClient.invalidateQueries({ queryKey: ["workspaces", hubId, "files"] });
     },
   });
 };

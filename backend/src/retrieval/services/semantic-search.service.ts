@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { File, FileStatus } from '../../documents/entities/file.entity';
@@ -27,9 +27,7 @@ export class SemanticSearchService {
     });
 
     if (completedFiles === 0) {
-      throw new BadRequestException(
-        'No processed documents in this knowledge hub. Please upload and wait for files to be processed.',
-      );
+      return [];
     }
 
     return this.vectorService.search(knowledgeHubId, question, limit);

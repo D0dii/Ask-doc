@@ -21,19 +21,19 @@ export class QueryOrchestratorService {
     limit,
     includeWebSources = false,
   }: BuildEvidenceContextInput): Promise<BuildEvidenceContextResult> {
-    const semanticEvidence = await this.semanticSearchService.retrieveEvidence(
-      knowledgeHubId,
-      query,
-      limit,
-    );
-
     const chunks = includeWebSources
       ? await this.retrievalOrchestratorService.retrieveEvidence({
           knowledgeHubId,
           query,
           limit,
         })
-      : semanticEvidence.evidenceChunks;
+      : (
+          await this.semanticSearchService.retrieveEvidence(
+            knowledgeHubId,
+            query,
+            limit,
+          )
+        ).evidenceChunks;
 
     const sources: VectorSearchResult[] = chunks
       .filter((chunk) => chunk.sourceType === 'retrieved_doc')
