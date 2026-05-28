@@ -1,5 +1,6 @@
 import { useAuth } from "@/features/auth/auth-provider";
 import { UserMenu } from "@/features/auth/components/user-menu";
+import { ThemeToggle } from "@/features/layout/theme-toggle";
 import { Link, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
@@ -24,7 +25,8 @@ export function RootLayout() {
             )}
           </nav>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
             <UserMenu />
           </div>
         </div>

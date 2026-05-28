@@ -8,6 +8,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { getContext } from "./lib/tanstack-query/get-context";
 import { setupApiClient } from "./lib/api-client";
 import { AuthProvider, type AuthContextType } from "@/features/auth/auth-provider";
+import { ThemeProvider } from "@/features/layout/theme-provider";
 
 const queryClientContext = getContext();
 
@@ -39,11 +40,13 @@ if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
     <StrictMode>
-      <AuthProvider>
-        <QueryClientProvider client={queryClientContext.queryClient}>
-          <RouterProvider router={router} />
-        </QueryClientProvider>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <QueryClientProvider client={queryClientContext.queryClient}>
+            <RouterProvider router={router} />
+          </QueryClientProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </StrictMode>,
   );
 }
