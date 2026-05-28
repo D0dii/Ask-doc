@@ -14,7 +14,7 @@ export class CreateKnowledgeHubDto {
 
   @ApiProperty({
     description: 'Optional description of the knowledge hub',
-    example: 'All docs, notes, chat, and cards for the product architecture',
+    example: 'All docs and chat for the product architecture',
     required: false,
   })
   @IsString()

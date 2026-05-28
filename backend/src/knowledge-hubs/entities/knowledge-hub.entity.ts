@@ -11,8 +11,6 @@ import {
 import { User } from '../../users/entities/user.entity';
 import { File } from '../../documents/entities/file.entity';
 import { ChatThread } from '../../chat/entities/chat-thread.entity';
-import { Note } from '../../notes/entities/note.entity';
-import { Flashcard } from '../../flashcards/entities/flashcard.entity';
 
 @Entity()
 export class KnowledgeHub {
@@ -37,12 +35,6 @@ export class KnowledgeHub {
 
   @OneToMany(() => ChatThread, (thread) => thread.knowledgeHub)
   chatThreads: ChatThread[];
-
-  @OneToMany(() => Note, (note) => note.knowledgeHub)
-  notes: Note[];
-
-  @OneToMany(() => Flashcard, (flashcard) => flashcard.knowledgeHub)
-  flashcards: Flashcard[];
 
   @CreateDateColumn()
   createdAt: Date;

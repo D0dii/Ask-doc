@@ -1,7 +1,6 @@
 import { FileUpload } from "@/features/files/components/file-upload";
 import { FileList } from "@/features/files/components/file-list";
 import { ChatPanel } from "@/features/chat/components/chat-panel";
-import { HubExtrasPanel } from "@/features/hub/hub-extras-panel";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useFiles } from "@/features/files/api/get-files";
 
@@ -23,15 +22,12 @@ export function WorkspacePage({ workspaceId }: WorkspacePageProps) {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="grid gap-6 lg:grid-cols-[350px_1fr]">
-        <div className="space-y-6">
-          <FileUpload workspaceId={workspaceId} />
-          <FileList workspaceId={workspaceId} />
-        </div>
-        <ChatPanel hubId={workspaceId} />
+    <div className="grid gap-6 lg:grid-cols-[350px_1fr]">
+      <div className="space-y-6">
+        <FileUpload workspaceId={workspaceId} />
+        <FileList workspaceId={workspaceId} />
       </div>
-      <HubExtrasPanel hubId={workspaceId} />
+      <ChatPanel hubId={workspaceId} />
     </div>
   );
 }

@@ -7,8 +7,6 @@ import { ChatModule } from './chat/chat.module';
 import { DocumentsModule } from './documents/documents.module';
 import { IngestionModule } from './ingestion/ingestion.module';
 import { RetrievalModule } from './retrieval/retrieval.module';
-import { NotesModule } from './notes/notes.module';
-import { FlashcardsModule } from './flashcards/flashcards.module';
 
 @Module({
   imports: [
@@ -34,8 +32,6 @@ import { FlashcardsModule } from './flashcards/flashcards.module';
     AuthModule,
     KnowledgeHubsModule,
     ChatModule,
-    NotesModule,
-    FlashcardsModule,
   ],
   controllers: [],
   providers: [],
