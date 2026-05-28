@@ -15,24 +15,27 @@ export class QueryDto {
   question: string;
 }
 
-export class SourceDto {
-  @ApiProperty({ description: 'The file ID this chunk belongs to' })
-  fileId: string;
-
-  @ApiProperty({ description: 'The text content of the chunk' })
-  text: string;
-
-  @ApiProperty({ description: 'Similarity score (0-1)' })
-  score: number;
-}
-
 export class QueryResponseDto {
   @ApiProperty({ description: 'The AI-generated answer' })
   answer: string;
 
   @ApiProperty({
     description: 'Source documents used to generate the answer',
-    type: [SourceDto],
+    type: 'array',
+    items: {
+      type: 'object',
+      properties: {
+        fileId: { type: 'string' },
+        text: { type: 'string' },
+        score: { type: 'number' },
+      },
+    },
   })
-  sources: SourceDto[];
+  sources: Array<{ fileId: string; text: string; score: number }>;
+
+  @ApiProperty({ description: 'The chat thread ID for this knowledge hub' })
+  threadId: string;
+
+  @ApiProperty({ description: 'The message ID of this Q&A' })
+  messageId: string;
 }

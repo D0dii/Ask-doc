@@ -56,12 +56,3 @@ export const CHAT_CONFIG = {
   /** Max title length for auto-generated conversation titles */
   MAX_TITLE_LENGTH: 50,
 } as const;
-
-// ==================== GENERATION POLICY ====================
-
-export const GENERATION_POLICY = {
-  GENERAL_KNOWLEDGE_BUDGET_PERCENT: 10,
-  GENERAL_KNOWLEDGE_EVIDENCE_RATIO_MAX: 0.15,
-  MAX_REGENERATE_ATTEMPTS: 2,
-  INCLUDE_WEB_BY_DEFAULT: true,
-} as const;

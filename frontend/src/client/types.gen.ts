@@ -160,18 +160,14 @@ export type LogoutResponseDto = {
     ok: boolean;
 };
 
-export type QueryInConversationDto = {
+export type QueryDto = {
     /**
      * The question to ask about the documents
      */
     question: string;
-    /**
-     * ID of an existing conversation to continue. If not provided, a new conversation will be created.
-     */
-    conversationId?: string;
 };
 
-export type QueryInConversationResponseDto = {
+export type QueryResponseDto = {
     /**
      * The AI-generated answer
      */
@@ -185,9 +181,9 @@ export type QueryInConversationResponseDto = {
         score?: number;
     }>;
     /**
-     * The conversation ID (new or existing)
+     * The chat thread ID for this knowledge hub
      */
-    conversationId: string;
+    threadId: string;
     /**
      * The message ID of this Q&A
      */
@@ -238,104 +234,6 @@ export type ChatMessageResponseDto = {
      * When the message was created
      */
     createdAt: string;
-};
-
-export type CreateNoteDto = {
-    /**
-     * Note title
-     */
-    title: string;
-    /**
-     * Note content in plain text or markdown
-     */
-    content: string;
-};
-
-export type UpdateNoteDto = {
-    /**
-     * Note title
-     */
-    title?: string;
-    /**
-     * Note content in plain text or markdown
-     */
-    content?: string;
-};
-
-export type GenerateNoteDto = {
-    /**
-     * How the note should be generated
-     */
-    mode: 'from_answer' | 'from_selection' | 'from_topic_query';
-    /**
-     * Topic query text used when mode is from_topic_query
-     */
-    query?: string;
-    /**
-     * Chat message ID used when mode is from_answer
-     */
-    messageId?: string;
-    /**
-     * Document ID used when mode is from_selection
-     */
-    documentId?: string;
-    /**
-     * Selected text from document used when mode is from_selection
-     */
-    selectionText?: string;
-    /**
-     * Optional note title override
-     */
-    title?: string;
-};
-
-export type CreateFlashcardDto = {
-    /**
-     * Flashcard front text (question/prompt)
-     */
-    front: string;
-    /**
-     * Flashcard back text (answer/explanation)
-     */
-    back: string;
-};
-
-export type UpdateFlashcardDto = {
-    /**
-     * Flashcard front text (question/prompt)
-     */
-    front?: string;
-    /**
-     * Flashcard back text (answer/explanation)
-     */
-    back?: string;
-};
-
-export type GenerateFlashcardDto = {
-    /**
-     * How the flashcards should be generated
-     */
-    mode: 'from_answer' | 'from_selection' | 'from_topic_query';
-    /**
-     * Topic query text used when mode is from_topic_query
-     */
-    query?: string;
-    /**
-     * Chat message ID used when mode is from_answer
-     */
-    messageId?: string;
-    /**
-     * Document ID used when mode is from_selection
-     */
-    documentId?: string;
-    /**
-     * Selected text from document used when mode is from_selection
-     */
-    selectionText?: string;
-    /**
-     * Number of flashcards to generate
-     */
-    count?: number;
 };
 
 export type DocumentsControllerGetFilesData = {
@@ -631,7 +529,7 @@ export type AuthControllerLogoutResponses = {
 export type AuthControllerLogoutResponse = AuthControllerLogoutResponses[keyof AuthControllerLogoutResponses];
 
 export type QueryControllerQueryData = {
-    body: QueryInConversationDto;
+    body: QueryDto;
     path: {
         /**
          * Knowledge Hub ID
@@ -644,29 +542,21 @@ export type QueryControllerQueryData = {
 
 export type QueryControllerQueryErrors = {
     /**
-     * Bad request - no processed documents in knowledge hub
-     */
-    400: unknown;
-    /**
      * Unauthorized
      */
     401: unknown;
-    /**
-     * Knowledge hub thread not found
-     */
-    404: unknown;
 };
 
 export type QueryControllerQueryResponses = {
     /**
      * AI-generated answer with sources
      */
-    200: QueryInConversationResponseDto;
+    200: QueryResponseDto;
 };
 
 export type QueryControllerQueryResponse = QueryControllerQueryResponses[keyof QueryControllerQueryResponses];
 
-export type ConversationsControllerGetMessagesData = {
+export type ChatMessagesControllerGetMessagesData = {
     body?: never;
     path: {
         /**
@@ -678,23 +568,23 @@ export type ConversationsControllerGetMessagesData = {
     url: '/knowledge-hubs/{hubId}/chat/messages';
 };
 
-export type ConversationsControllerGetMessagesErrors = {
+export type ChatMessagesControllerGetMessagesErrors = {
     /**
      * Unauthorized
      */
     401: unknown;
 };
 
-export type ConversationsControllerGetMessagesResponses = {
+export type ChatMessagesControllerGetMessagesResponses = {
     /**
      * List of messages in the knowledge hub chat thread
      */
     200: Array<ChatMessageResponseDto>;
 };
 
-export type ConversationsControllerGetMessagesResponse = ConversationsControllerGetMessagesResponses[keyof ConversationsControllerGetMessagesResponses];
+export type ChatMessagesControllerGetMessagesResponse = ChatMessagesControllerGetMessagesResponses[keyof ChatMessagesControllerGetMessagesResponses];
 
-export type ConversationsControllerDeleteMessageData = {
+export type ChatMessagesControllerDeleteMessageData = {
     body?: never;
     path: {
         /**
@@ -710,7 +600,7 @@ export type ConversationsControllerDeleteMessageData = {
     url: '/knowledge-hubs/{hubId}/chat/messages/{messageId}';
 };
 
-export type ConversationsControllerDeleteMessageErrors = {
+export type ChatMessagesControllerDeleteMessageErrors = {
     /**
      * Unauthorized
      */
@@ -721,351 +611,9 @@ export type ConversationsControllerDeleteMessageErrors = {
     404: unknown;
 };
 
-export type ConversationsControllerDeleteMessageResponses = {
+export type ChatMessagesControllerDeleteMessageResponses = {
     /**
      * Message deleted successfully
      */
     200: unknown;
-};
-
-export type NotesControllerFindAllData = {
-    body?: never;
-    path: {
-        /**
-         * Knowledge Hub ID
-         */
-        hubId: string;
-    };
-    query?: never;
-    url: '/knowledge-hubs/{hubId}/notes';
-};
-
-export type NotesControllerFindAllErrors = {
-    /**
-     * Unauthorized
-     */
-    401: unknown;
-};
-
-export type NotesControllerFindAllResponses = {
-    /**
-     * Notes list
-     */
-    200: unknown;
-};
-
-export type NotesControllerCreateData = {
-    body: CreateNoteDto;
-    path: {
-        /**
-         * Knowledge Hub ID
-         */
-        hubId: string;
-    };
-    query?: never;
-    url: '/knowledge-hubs/{hubId}/notes';
-};
-
-export type NotesControllerCreateErrors = {
-    /**
-     * Unauthorized
-     */
-    401: unknown;
-};
-
-export type NotesControllerCreateResponses = {
-    /**
-     * Note created successfully
-     */
-    201: unknown;
-};
-
-export type NotesControllerRemoveData = {
-    body?: never;
-    path: {
-        noteId: string;
-        /**
-         * Knowledge Hub ID
-         */
-        hubId: string;
-    };
-    query?: never;
-    url: '/knowledge-hubs/{hubId}/notes/{noteId}';
-};
-
-export type NotesControllerRemoveErrors = {
-    /**
-     * Unauthorized
-     */
-    401: unknown;
-    /**
-     * Note not found
-     */
-    404: unknown;
-};
-
-export type NotesControllerRemoveResponses = {
-    /**
-     * Note deleted successfully
-     */
-    200: unknown;
-};
-
-export type NotesControllerFindOneData = {
-    body?: never;
-    path: {
-        noteId: string;
-        /**
-         * Knowledge Hub ID
-         */
-        hubId: string;
-    };
-    query?: never;
-    url: '/knowledge-hubs/{hubId}/notes/{noteId}';
-};
-
-export type NotesControllerFindOneErrors = {
-    /**
-     * Unauthorized
-     */
-    401: unknown;
-    /**
-     * Note not found
-     */
-    404: unknown;
-};
-
-export type NotesControllerFindOneResponses = {
-    /**
-     * Note details
-     */
-    200: unknown;
-};
-
-export type NotesControllerUpdateData = {
-    body: UpdateNoteDto;
-    path: {
-        noteId: string;
-        /**
-         * Knowledge Hub ID
-         */
-        hubId: string;
-    };
-    query?: never;
-    url: '/knowledge-hubs/{hubId}/notes/{noteId}';
-};
-
-export type NotesControllerUpdateErrors = {
-    /**
-     * Unauthorized
-     */
-    401: unknown;
-    /**
-     * Note not found
-     */
-    404: unknown;
-};
-
-export type NotesControllerUpdateResponses = {
-    /**
-     * Note updated successfully
-     */
-    200: unknown;
-};
-
-export type NotesControllerGenerateData = {
-    body: GenerateNoteDto;
-    path: {
-        /**
-         * Knowledge Hub ID
-         */
-        hubId: string;
-    };
-    query?: never;
-    url: '/knowledge-hubs/{hubId}/notes/generate';
-};
-
-export type NotesControllerGenerateErrors = {
-    /**
-     * Unauthorized
-     */
-    401: unknown;
-};
-
-export type NotesControllerGenerateResponses = {
-    /**
-     * Note generated successfully
-     */
-    201: unknown;
-};
-
-export type FlashcardsControllerFindAllData = {
-    body?: never;
-    path: {
-        /**
-         * Knowledge Hub ID
-         */
-        hubId: string;
-    };
-    query?: never;
-    url: '/knowledge-hubs/{hubId}/flashcards';
-};
-
-export type FlashcardsControllerFindAllErrors = {
-    /**
-     * Unauthorized
-     */
-    401: unknown;
-};
-
-export type FlashcardsControllerFindAllResponses = {
-    /**
-     * Flashcards list
-     */
-    200: unknown;
-};
-
-export type FlashcardsControllerCreateData = {
-    body: CreateFlashcardDto;
-    path: {
-        /**
-         * Knowledge Hub ID
-         */
-        hubId: string;
-    };
-    query?: never;
-    url: '/knowledge-hubs/{hubId}/flashcards';
-};
-
-export type FlashcardsControllerCreateErrors = {
-    /**
-     * Unauthorized
-     */
-    401: unknown;
-};
-
-export type FlashcardsControllerCreateResponses = {
-    /**
-     * Flashcard created successfully
-     */
-    201: unknown;
-};
-
-export type FlashcardsControllerRemoveData = {
-    body?: never;
-    path: {
-        flashcardId: string;
-        /**
-         * Knowledge Hub ID
-         */
-        hubId: string;
-    };
-    query?: never;
-    url: '/knowledge-hubs/{hubId}/flashcards/{flashcardId}';
-};
-
-export type FlashcardsControllerRemoveErrors = {
-    /**
-     * Unauthorized
-     */
-    401: unknown;
-    /**
-     * Flashcard not found
-     */
-    404: unknown;
-};
-
-export type FlashcardsControllerRemoveResponses = {
-    /**
-     * Flashcard deleted successfully
-     */
-    200: unknown;
-};
-
-export type FlashcardsControllerFindOneData = {
-    body?: never;
-    path: {
-        flashcardId: string;
-        /**
-         * Knowledge Hub ID
-         */
-        hubId: string;
-    };
-    query?: never;
-    url: '/knowledge-hubs/{hubId}/flashcards/{flashcardId}';
-};
-
-export type FlashcardsControllerFindOneErrors = {
-    /**
-     * Unauthorized
-     */
-    401: unknown;
-    /**
-     * Flashcard not found
-     */
-    404: unknown;
-};
-
-export type FlashcardsControllerFindOneResponses = {
-    /**
-     * Flashcard details
-     */
-    200: unknown;
-};
-
-export type FlashcardsControllerUpdateData = {
-    body: UpdateFlashcardDto;
-    path: {
-        flashcardId: string;
-        /**
-         * Knowledge Hub ID
-         */
-        hubId: string;
-    };
-    query?: never;
-    url: '/knowledge-hubs/{hubId}/flashcards/{flashcardId}';
-};
-
-export type FlashcardsControllerUpdateErrors = {
-    /**
-     * Unauthorized
-     */
-    401: unknown;
-    /**
-     * Flashcard not found
-     */
-    404: unknown;
-};
-
-export type FlashcardsControllerUpdateResponses = {
-    /**
-     * Flashcard updated successfully
-     */
-    200: unknown;
-};
-
-export type FlashcardsControllerGenerateData = {
-    body: GenerateFlashcardDto;
-    path: {
-        /**
-         * Knowledge Hub ID
-         */
-        hubId: string;
-    };
-    query?: never;
-    url: '/knowledge-hubs/{hubId}/flashcards/generate';
-};
-
-export type FlashcardsControllerGenerateErrors = {
-    /**
-     * Unauthorized
-     */
-    401: unknown;
-};
-
-export type FlashcardsControllerGenerateResponses = {
-    /**
-     * Flashcards generated successfully
-     */
-    201: unknown;
 };

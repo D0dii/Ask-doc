@@ -39,14 +39,3 @@ export class ChatMessageResponseDto {
   @ApiProperty({ description: 'When the message was created' })
   createdAt: Date;
 }
-
-export class ChatHistoryResponseDto {
-  @ApiProperty({
-    description: 'List of chat messages',
-    type: [ChatMessageResponseDto],
-  })
-  messages: ChatMessageResponseDto[];
-
-  @ApiProperty({ description: 'Total number of messages' })
-  total: number;
-}

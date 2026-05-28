@@ -6,7 +6,6 @@ import { KnowledgeHubsModule } from './knowledge-hubs/knowledge-hubs.module';
 import { ChatModule } from './chat/chat.module';
 import { DocumentsModule } from './documents/documents.module';
 import { IngestionModule } from './ingestion/ingestion.module';
-import { RetrievalModule } from './retrieval/retrieval.module';
 
 @Module({
   imports: [
@@ -28,7 +27,6 @@ import { RetrievalModule } from './retrieval/retrieval.module';
     }),
     DocumentsModule,
     IngestionModule,
-    RetrievalModule,
     AuthModule,
     KnowledgeHubsModule,
     ChatModule,

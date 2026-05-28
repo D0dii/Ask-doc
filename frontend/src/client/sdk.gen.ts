@@ -2,7 +2,7 @@
 
 import { type Client, formDataBodySerializer, type Options as Options2, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { AuthControllerGoogleAuthData, AuthControllerLogoutData, AuthControllerLogoutResponses, AuthControllerMeData, AuthControllerMeErrors, AuthControllerMeResponses, AuthControllerRefreshData, AuthControllerRefreshErrors, AuthControllerRefreshResponses, ConversationsControllerDeleteMessageData, ConversationsControllerDeleteMessageErrors, ConversationsControllerDeleteMessageResponses, ConversationsControllerGetMessagesData, ConversationsControllerGetMessagesErrors, ConversationsControllerGetMessagesResponses, DocumentsControllerDeleteFileData, DocumentsControllerDeleteFileResponses, DocumentsControllerGetFileData, DocumentsControllerGetFileResponses, DocumentsControllerGetFilesData, DocumentsControllerGetFilesResponses, DocumentsControllerIngestData, DocumentsControllerIngestResponses, FlashcardsControllerCreateData, FlashcardsControllerCreateErrors, FlashcardsControllerCreateResponses, FlashcardsControllerFindAllData, FlashcardsControllerFindAllErrors, FlashcardsControllerFindAllResponses, FlashcardsControllerFindOneData, FlashcardsControllerFindOneErrors, FlashcardsControllerFindOneResponses, FlashcardsControllerGenerateData, FlashcardsControllerGenerateErrors, FlashcardsControllerGenerateResponses, FlashcardsControllerRemoveData, FlashcardsControllerRemoveErrors, FlashcardsControllerRemoveResponses, FlashcardsControllerUpdateData, FlashcardsControllerUpdateErrors, FlashcardsControllerUpdateResponses, KnowledgeHubsControllerCreateData, KnowledgeHubsControllerCreateErrors, KnowledgeHubsControllerCreateResponses, KnowledgeHubsControllerFindAllData, KnowledgeHubsControllerFindAllErrors, KnowledgeHubsControllerFindAllResponses, KnowledgeHubsControllerFindOneData, KnowledgeHubsControllerFindOneErrors, KnowledgeHubsControllerFindOneResponses, KnowledgeHubsControllerRemoveData, KnowledgeHubsControllerRemoveErrors, KnowledgeHubsControllerRemoveResponses, KnowledgeHubsControllerUpdateData, KnowledgeHubsControllerUpdateErrors, KnowledgeHubsControllerUpdateResponses, NotesControllerCreateData, NotesControllerCreateErrors, NotesControllerCreateResponses, NotesControllerFindAllData, NotesControllerFindAllErrors, NotesControllerFindAllResponses, NotesControllerFindOneData, NotesControllerFindOneErrors, NotesControllerFindOneResponses, NotesControllerGenerateData, NotesControllerGenerateErrors, NotesControllerGenerateResponses, NotesControllerRemoveData, NotesControllerRemoveErrors, NotesControllerRemoveResponses, NotesControllerUpdateData, NotesControllerUpdateErrors, NotesControllerUpdateResponses, QueryControllerQueryData, QueryControllerQueryErrors, QueryControllerQueryResponses } from './types.gen';
+import type { AuthControllerGoogleAuthData, AuthControllerLogoutData, AuthControllerLogoutResponses, AuthControllerMeData, AuthControllerMeErrors, AuthControllerMeResponses, AuthControllerRefreshData, AuthControllerRefreshErrors, AuthControllerRefreshResponses, ChatMessagesControllerDeleteMessageData, ChatMessagesControllerDeleteMessageErrors, ChatMessagesControllerDeleteMessageResponses, ChatMessagesControllerGetMessagesData, ChatMessagesControllerGetMessagesErrors, ChatMessagesControllerGetMessagesResponses, DocumentsControllerDeleteFileData, DocumentsControllerDeleteFileResponses, DocumentsControllerGetFileData, DocumentsControllerGetFileResponses, DocumentsControllerGetFilesData, DocumentsControllerGetFilesResponses, DocumentsControllerIngestData, DocumentsControllerIngestResponses, KnowledgeHubsControllerCreateData, KnowledgeHubsControllerCreateErrors, KnowledgeHubsControllerCreateResponses, KnowledgeHubsControllerFindAllData, KnowledgeHubsControllerFindAllErrors, KnowledgeHubsControllerFindAllResponses, KnowledgeHubsControllerFindOneData, KnowledgeHubsControllerFindOneErrors, KnowledgeHubsControllerFindOneResponses, KnowledgeHubsControllerRemoveData, KnowledgeHubsControllerRemoveErrors, KnowledgeHubsControllerRemoveResponses, KnowledgeHubsControllerUpdateData, KnowledgeHubsControllerUpdateErrors, KnowledgeHubsControllerUpdateResponses, QueryControllerQueryData, QueryControllerQueryErrors, QueryControllerQueryResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -206,7 +206,7 @@ export const queryControllerQuery = <ThrowOnError extends boolean = false>(optio
 /**
  * Get all messages in the knowledge hub chat thread
  */
-export const conversationsControllerGetMessages = <ThrowOnError extends boolean = false>(options: Options<ConversationsControllerGetMessagesData, ThrowOnError>) => (options.client ?? client).get<ConversationsControllerGetMessagesResponses, ConversationsControllerGetMessagesErrors, ThrowOnError>({
+export const chatMessagesControllerGetMessages = <ThrowOnError extends boolean = false>(options: Options<ChatMessagesControllerGetMessagesData, ThrowOnError>) => (options.client ?? client).get<ChatMessagesControllerGetMessagesResponses, ChatMessagesControllerGetMessagesErrors, ThrowOnError>({
     security: [{
             in: 'cookie',
             name: 'access_token',
@@ -219,7 +219,7 @@ export const conversationsControllerGetMessages = <ThrowOnError extends boolean 
 /**
  * Delete a specific message from knowledge hub thread
  */
-export const conversationsControllerDeleteMessage = <ThrowOnError extends boolean = false>(options: Options<ConversationsControllerDeleteMessageData, ThrowOnError>) => (options.client ?? client).delete<ConversationsControllerDeleteMessageResponses, ConversationsControllerDeleteMessageErrors, ThrowOnError>({
+export const chatMessagesControllerDeleteMessage = <ThrowOnError extends boolean = false>(options: Options<ChatMessagesControllerDeleteMessageData, ThrowOnError>) => (options.client ?? client).delete<ChatMessagesControllerDeleteMessageResponses, ChatMessagesControllerDeleteMessageErrors, ThrowOnError>({
     security: [{
             in: 'cookie',
             name: 'access_token',
@@ -227,184 +227,4 @@ export const conversationsControllerDeleteMessage = <ThrowOnError extends boolea
         }],
     url: '/knowledge-hubs/{hubId}/chat/messages/{messageId}',
     ...options
-});
-
-/**
- * List notes in a knowledge hub
- */
-export const notesControllerFindAll = <ThrowOnError extends boolean = false>(options: Options<NotesControllerFindAllData, ThrowOnError>) => (options.client ?? client).get<NotesControllerFindAllResponses, NotesControllerFindAllErrors, ThrowOnError>({
-    security: [{
-            in: 'cookie',
-            name: 'access_token',
-            type: 'apiKey'
-        }],
-    url: '/knowledge-hubs/{hubId}/notes',
-    ...options
-});
-
-/**
- * Create a manual note
- */
-export const notesControllerCreate = <ThrowOnError extends boolean = false>(options: Options<NotesControllerCreateData, ThrowOnError>) => (options.client ?? client).post<NotesControllerCreateResponses, NotesControllerCreateErrors, ThrowOnError>({
-    security: [{
-            in: 'cookie',
-            name: 'access_token',
-            type: 'apiKey'
-        }],
-    url: '/knowledge-hubs/{hubId}/notes',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * Delete a note
- */
-export const notesControllerRemove = <ThrowOnError extends boolean = false>(options: Options<NotesControllerRemoveData, ThrowOnError>) => (options.client ?? client).delete<NotesControllerRemoveResponses, NotesControllerRemoveErrors, ThrowOnError>({
-    security: [{
-            in: 'cookie',
-            name: 'access_token',
-            type: 'apiKey'
-        }],
-    url: '/knowledge-hubs/{hubId}/notes/{noteId}',
-    ...options
-});
-
-/**
- * Get a note by ID
- */
-export const notesControllerFindOne = <ThrowOnError extends boolean = false>(options: Options<NotesControllerFindOneData, ThrowOnError>) => (options.client ?? client).get<NotesControllerFindOneResponses, NotesControllerFindOneErrors, ThrowOnError>({
-    security: [{
-            in: 'cookie',
-            name: 'access_token',
-            type: 'apiKey'
-        }],
-    url: '/knowledge-hubs/{hubId}/notes/{noteId}',
-    ...options
-});
-
-/**
- * Update a note
- */
-export const notesControllerUpdate = <ThrowOnError extends boolean = false>(options: Options<NotesControllerUpdateData, ThrowOnError>) => (options.client ?? client).patch<NotesControllerUpdateResponses, NotesControllerUpdateErrors, ThrowOnError>({
-    security: [{
-            in: 'cookie',
-            name: 'access_token',
-            type: 'apiKey'
-        }],
-    url: '/knowledge-hubs/{hubId}/notes/{noteId}',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * Generate a note from contextual input
- */
-export const notesControllerGenerate = <ThrowOnError extends boolean = false>(options: Options<NotesControllerGenerateData, ThrowOnError>) => (options.client ?? client).post<NotesControllerGenerateResponses, NotesControllerGenerateErrors, ThrowOnError>({
-    security: [{
-            in: 'cookie',
-            name: 'access_token',
-            type: 'apiKey'
-        }],
-    url: '/knowledge-hubs/{hubId}/notes/generate',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * List flashcards in a knowledge hub
- */
-export const flashcardsControllerFindAll = <ThrowOnError extends boolean = false>(options: Options<FlashcardsControllerFindAllData, ThrowOnError>) => (options.client ?? client).get<FlashcardsControllerFindAllResponses, FlashcardsControllerFindAllErrors, ThrowOnError>({
-    security: [{
-            in: 'cookie',
-            name: 'access_token',
-            type: 'apiKey'
-        }],
-    url: '/knowledge-hubs/{hubId}/flashcards',
-    ...options
-});
-
-/**
- * Create a manual flashcard
- */
-export const flashcardsControllerCreate = <ThrowOnError extends boolean = false>(options: Options<FlashcardsControllerCreateData, ThrowOnError>) => (options.client ?? client).post<FlashcardsControllerCreateResponses, FlashcardsControllerCreateErrors, ThrowOnError>({
-    security: [{
-            in: 'cookie',
-            name: 'access_token',
-            type: 'apiKey'
-        }],
-    url: '/knowledge-hubs/{hubId}/flashcards',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * Delete a flashcard
- */
-export const flashcardsControllerRemove = <ThrowOnError extends boolean = false>(options: Options<FlashcardsControllerRemoveData, ThrowOnError>) => (options.client ?? client).delete<FlashcardsControllerRemoveResponses, FlashcardsControllerRemoveErrors, ThrowOnError>({
-    security: [{
-            in: 'cookie',
-            name: 'access_token',
-            type: 'apiKey'
-        }],
-    url: '/knowledge-hubs/{hubId}/flashcards/{flashcardId}',
-    ...options
-});
-
-/**
- * Get a flashcard by ID
- */
-export const flashcardsControllerFindOne = <ThrowOnError extends boolean = false>(options: Options<FlashcardsControllerFindOneData, ThrowOnError>) => (options.client ?? client).get<FlashcardsControllerFindOneResponses, FlashcardsControllerFindOneErrors, ThrowOnError>({
-    security: [{
-            in: 'cookie',
-            name: 'access_token',
-            type: 'apiKey'
-        }],
-    url: '/knowledge-hubs/{hubId}/flashcards/{flashcardId}',
-    ...options
-});
-
-/**
- * Update a flashcard
- */
-export const flashcardsControllerUpdate = <ThrowOnError extends boolean = false>(options: Options<FlashcardsControllerUpdateData, ThrowOnError>) => (options.client ?? client).patch<FlashcardsControllerUpdateResponses, FlashcardsControllerUpdateErrors, ThrowOnError>({
-    security: [{
-            in: 'cookie',
-            name: 'access_token',
-            type: 'apiKey'
-        }],
-    url: '/knowledge-hubs/{hubId}/flashcards/{flashcardId}',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * Generate flashcards from contextual input
- */
-export const flashcardsControllerGenerate = <ThrowOnError extends boolean = false>(options: Options<FlashcardsControllerGenerateData, ThrowOnError>) => (options.client ?? client).post<FlashcardsControllerGenerateResponses, FlashcardsControllerGenerateErrors, ThrowOnError>({
-    security: [{
-            in: 'cookie',
-            name: 'access_token',
-            type: 'apiKey'
-        }],
-    url: '/knowledge-hubs/{hubId}/flashcards/generate',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
 });

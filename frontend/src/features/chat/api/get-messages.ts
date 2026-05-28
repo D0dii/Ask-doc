@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import { conversationsControllerGetMessages } from "@/client";
+import { chatMessagesControllerGetMessages } from "@/client";
 
 export const useMessages = (hubId: string) => {
   return useQuery({
     queryKey: ["workspaces", hubId, "messages"],
     queryFn: async () => {
-      const { data } = await conversationsControllerGetMessages({ path: { hubId }, throwOnError: true });
+      const { data } = await chatMessagesControllerGetMessages({ path: { hubId }, throwOnError: true });
       return data ?? [];
     },
   });

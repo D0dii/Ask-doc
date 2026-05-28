@@ -5,7 +5,7 @@ import { ChatMessage } from '../entities/chat-message.entity';
 import { ChatThread } from '../entities/chat-thread.entity';
 
 @Injectable()
-export class ConversationsService {
+export class ChatThreadService {
   constructor(
     @InjectRepository(ChatMessage)
     private chatMessageRepository: Repository<ChatMessage>,
@@ -118,11 +118,5 @@ export class ConversationsService {
     });
 
     return (result.affected ?? 0) > 0;
-  }
-
-  async getMessageCountByThread(threadId: string): Promise<number> {
-    return this.chatMessageRepository.count({
-      where: { threadId },
-    });
   }
 }

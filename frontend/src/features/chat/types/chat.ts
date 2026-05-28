@@ -1,6 +1,6 @@
 export type {
   ChatMessageResponseDto,
   ChatMessageSourceDto,
-  QueryInConversationDto,
-  QueryInConversationResponseDto,
+  QueryDto,
+  QueryResponseDto,
 } from "@/client";

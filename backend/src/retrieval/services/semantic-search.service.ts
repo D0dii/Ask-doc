@@ -4,10 +4,6 @@ import { Repository } from 'typeorm';
 import { File, FileStatus } from '../../documents/entities/file.entity';
 import { VectorService } from '../../shared/vector-store/vector.service';
 import type { VectorSearchResult } from '../../shared/vector-store/vector-store.port';
-import {
-  EvidenceChunk,
-  RetrievedEvidenceResult,
-} from '../evidence/evidence.types';
 
 @Injectable()
 export class SemanticSearchService {
@@ -31,29 +27,5 @@ export class SemanticSearchService {
     }
 
     return this.vectorService.search(knowledgeHubId, question, limit);
-  }
-
-  async retrieveEvidence(
-    knowledgeHubId: string,
-    question: string,
-    limit?: number,
-  ): Promise<RetrievedEvidenceResult> {
-    const sources = await this.retrieve(knowledgeHubId, question, limit);
-
-    return {
-      sources,
-      evidenceChunks: sources.map((source) =>
-        this.toRetrievedEvidenceChunk(source),
-      ),
-    };
-  }
-
-  private toRetrievedEvidenceChunk(source: VectorSearchResult): EvidenceChunk {
-    return {
-      sourceType: 'retrieved_doc',
-      content: source.text,
-      sourceRef: source.fileId,
-      score: source.score,
-    };
   }
 }

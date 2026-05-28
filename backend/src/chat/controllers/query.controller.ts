@@ -10,10 +10,7 @@ import { QueryService } from '../services/query.service';
 import { JwtCookieGuard } from '../../auth/guards/jwt-cookie.guard';
 import { KnowledgeHubAccessGuard } from '../../knowledge-hubs/guards/knowledge-hub-access.guard';
 import type { KnowledgeHubRequest } from '../../auth/types/auth.types';
-import {
-  QueryInConversationDto,
-  QueryInConversationResponseDto,
-} from '../dtos/chat-conversation.dto';
+import { QueryDto, QueryResponseDto } from '../dtos/chat-query.dto';
 
 @ApiTags('Chat')
 @ApiCookieAuth()
@@ -32,21 +29,13 @@ export class QueryController {
   @ApiResponse({
     status: 200,
     description: 'AI-generated answer with sources',
-    type: QueryInConversationResponseDto,
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Bad request - no processed documents in knowledge hub',
+    type: QueryResponseDto,
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({
-    status: 404,
-    description: 'Knowledge hub thread not found',
-  })
   async query(
     @Req() req: KnowledgeHubRequest,
-    @Body() body: QueryInConversationDto,
-  ): Promise<QueryInConversationResponseDto> {
+    @Body() body: QueryDto,
+  ): Promise<QueryResponseDto> {
     return this.queryService.query(
       req.knowledgeHub.id,
       req.user.id,

@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { QueryController } from './controllers/query.controller';
-import { ConversationsController } from './controllers/conversations.controller';
-import { ConversationsService } from './services/conversations.service';
+import { ChatMessagesController } from './controllers/chat-messages.controller';
+import { ChatThreadService } from './services/chat-thread.service';
 import { QueryService } from './services/query.service';
 import { ChatMessage } from './entities/chat-message.entity';
 import { ChatThread } from './entities/chat-thread.entity';
@@ -19,8 +19,8 @@ import { KnowledgeHubsModule } from '../knowledge-hubs/knowledge-hubs.module';
     SharedModule,
     AuthModule,
   ],
-  controllers: [QueryController, ConversationsController],
-  providers: [ConversationsService, QueryService],
-  exports: [ConversationsService, QueryService],
+  controllers: [QueryController, ChatMessagesController],
+  providers: [ChatThreadService, QueryService],
+  exports: [ChatThreadService, QueryService],
 })
 export class ChatModule {}

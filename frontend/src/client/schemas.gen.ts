@@ -108,7 +108,7 @@ export const CreateKnowledgeHubDtoSchema = {
         description: {
             type: 'string',
             description: 'Optional description of the knowledge hub',
-            example: 'All docs, notes, chat, and cards for the product architecture'
+            example: 'All docs and chat for the product architecture'
         }
     },
     required: [
@@ -251,7 +251,7 @@ export const LogoutResponseDtoSchema = {
     ]
 } as const;
 
-export const QueryInConversationDtoSchema = {
+export const QueryDtoSchema = {
     type: 'object',
     properties: {
         question: {
@@ -260,11 +260,6 @@ export const QueryInConversationDtoSchema = {
             example: 'What is the main topic of the document?',
             minLength: 3,
             maxLength: 1000
-        },
-        conversationId: {
-            type: 'string',
-            description: 'ID of an existing conversation to continue. If not provided, a new conversation will be created.',
-            example: '123e4567-e89b-12d3-a456-426614174000'
         }
     },
     required: [
@@ -272,7 +267,7 @@ export const QueryInConversationDtoSchema = {
     ]
 } as const;
 
-export const QueryInConversationResponseDtoSchema = {
+export const QueryResponseDtoSchema = {
     type: 'object',
     properties: {
         answer: {
@@ -297,9 +292,9 @@ export const QueryInConversationResponseDtoSchema = {
                 }
             }
         },
-        conversationId: {
+        threadId: {
             type: 'string',
-            description: 'The conversation ID (new or existing)'
+            description: 'The chat thread ID for this knowledge hub'
         },
         messageId: {
             type: 'string',
@@ -309,7 +304,7 @@ export const QueryInConversationResponseDtoSchema = {
     required: [
         'answer',
         'sources',
-        'conversationId',
+        'threadId',
         'messageId'
     ]
 } as const;
@@ -382,177 +377,5 @@ export const ChatMessageResponseDtoSchema = {
         'threadId',
         'userId',
         'createdAt'
-    ]
-} as const;
-
-export const CreateNoteDtoSchema = {
-    type: 'object',
-    properties: {
-        title: {
-            type: 'string',
-            description: 'Note title',
-            example: 'Q3 rollout checklist',
-            maxLength: 255
-        },
-        content: {
-            type: 'string',
-            description: 'Note content in plain text or markdown',
-            example: 'Key points from today\'s review...'
-        }
-    },
-    required: [
-        'title',
-        'content'
-    ]
-} as const;
-
-export const UpdateNoteDtoSchema = {
-    type: 'object',
-    properties: {
-        title: {
-            type: 'string',
-            description: 'Note title',
-            example: 'Q3 rollout checklist (updated)',
-            maxLength: 255
-        },
-        content: {
-            type: 'string',
-            description: 'Note content in plain text or markdown',
-            example: 'Updated notes after reviewing action items.'
-        }
-    }
-} as const;
-
-export const GenerateNoteDtoSchema = {
-    type: 'object',
-    properties: {
-        mode: {
-            type: 'string',
-            description: 'How the note should be generated',
-            enum: [
-                'from_answer',
-                'from_selection',
-                'from_topic_query'
-            ],
-            example: 'from_answer'
-        },
-        query: {
-            type: 'string',
-            description: 'Topic query text used when mode is from_topic_query',
-            example: 'Summarize OAuth2 authorization code flow from uploaded docs',
-            minLength: 3,
-            maxLength: 4000
-        },
-        messageId: {
-            type: 'string',
-            description: 'Chat message ID used when mode is from_answer',
-            example: '123e4567-e89b-12d3-a456-426614174000'
-        },
-        documentId: {
-            type: 'string',
-            description: 'Document ID used when mode is from_selection',
-            example: '123e4567-e89b-12d3-a456-426614174000'
-        },
-        selectionText: {
-            type: 'string',
-            description: 'Selected text from document used when mode is from_selection',
-            example: 'OAuth2 authorization code flow exchanges an auth code for access token.',
-            minLength: 3,
-            maxLength: 4000
-        },
-        title: {
-            type: 'string',
-            description: 'Optional note title override',
-            example: 'Study Notes: API Authentication',
-            maxLength: 255
-        }
-    },
-    required: [
-        'mode'
-    ]
-} as const;
-
-export const CreateFlashcardDtoSchema = {
-    type: 'object',
-    properties: {
-        front: {
-            type: 'string',
-            description: 'Flashcard front text (question/prompt)',
-            example: 'What is retrieval augmented generation (RAG)?'
-        },
-        back: {
-            type: 'string',
-            description: 'Flashcard back text (answer/explanation)',
-            example: 'A pattern that augments LLM prompts with retrieved context.'
-        }
-    },
-    required: [
-        'front',
-        'back'
-    ]
-} as const;
-
-export const UpdateFlashcardDtoSchema = {
-    type: 'object',
-    properties: {
-        front: {
-            type: 'string',
-            description: 'Flashcard front text (question/prompt)',
-            example: 'What does RAG stand for?'
-        },
-        back: {
-            type: 'string',
-            description: 'Flashcard back text (answer/explanation)',
-            example: 'Retrieval Augmented Generation'
-        }
-    }
-} as const;
-
-export const GenerateFlashcardDtoSchema = {
-    type: 'object',
-    properties: {
-        mode: {
-            type: 'string',
-            description: 'How the flashcards should be generated',
-            enum: [
-                'from_answer',
-                'from_selection',
-                'from_topic_query'
-            ],
-            example: 'from_topic_query'
-        },
-        query: {
-            type: 'string',
-            description: 'Topic query text used when mode is from_topic_query',
-            example: 'Generate cards about OAuth2 authorization code flow.',
-            maxLength: 4000
-        },
-        messageId: {
-            type: 'string',
-            description: 'Chat message ID used when mode is from_answer',
-            example: '123e4567-e89b-12d3-a456-426614174000'
-        },
-        documentId: {
-            type: 'string',
-            description: 'Document ID used when mode is from_selection',
-            example: '123e4567-e89b-12d3-a456-426614174000'
-        },
-        selectionText: {
-            type: 'string',
-            description: 'Selected text from document used when mode is from_selection',
-            example: 'OAuth2 uses authorization code exchange for tokens.',
-            maxLength: 4000
-        },
-        count: {
-            type: 'number',
-            description: 'Number of flashcards to generate',
-            example: 5,
-            minimum: 1,
-            maximum: 20,
-            default: 5
-        }
-    },
-    required: [
-        'mode'
     ]
 } as const;

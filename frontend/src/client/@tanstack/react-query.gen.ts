@@ -3,8 +3,8 @@
 import { type DefaultError, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { authControllerGoogleAuth, authControllerLogout, authControllerMe, authControllerRefresh, conversationsControllerDeleteMessage, conversationsControllerGetMessages, documentsControllerDeleteFile, documentsControllerGetFile, documentsControllerGetFiles, documentsControllerIngest, flashcardsControllerCreate, flashcardsControllerFindAll, flashcardsControllerFindOne, flashcardsControllerGenerate, flashcardsControllerRemove, flashcardsControllerUpdate, knowledgeHubsControllerCreate, knowledgeHubsControllerFindAll, knowledgeHubsControllerFindOne, knowledgeHubsControllerRemove, knowledgeHubsControllerUpdate, notesControllerCreate, notesControllerFindAll, notesControllerFindOne, notesControllerGenerate, notesControllerRemove, notesControllerUpdate, type Options, queryControllerQuery } from '../sdk.gen';
-import type { AuthControllerGoogleAuthData, AuthControllerLogoutData, AuthControllerLogoutResponse, AuthControllerMeData, AuthControllerMeResponse, AuthControllerRefreshData, AuthControllerRefreshResponse, ConversationsControllerDeleteMessageData, ConversationsControllerGetMessagesData, ConversationsControllerGetMessagesResponse, DocumentsControllerDeleteFileData, DocumentsControllerGetFileData, DocumentsControllerGetFileResponse, DocumentsControllerGetFilesData, DocumentsControllerGetFilesResponse, DocumentsControllerIngestData, DocumentsControllerIngestResponse, FlashcardsControllerCreateData, FlashcardsControllerFindAllData, FlashcardsControllerFindOneData, FlashcardsControllerGenerateData, FlashcardsControllerRemoveData, FlashcardsControllerUpdateData, KnowledgeHubsControllerCreateData, KnowledgeHubsControllerCreateResponse, KnowledgeHubsControllerFindAllData, KnowledgeHubsControllerFindAllResponse, KnowledgeHubsControllerFindOneData, KnowledgeHubsControllerFindOneResponse, KnowledgeHubsControllerRemoveData, KnowledgeHubsControllerUpdateData, KnowledgeHubsControllerUpdateResponse, NotesControllerCreateData, NotesControllerFindAllData, NotesControllerFindOneData, NotesControllerGenerateData, NotesControllerRemoveData, NotesControllerUpdateData, QueryControllerQueryData, QueryControllerQueryResponse } from '../types.gen';
+import { authControllerGoogleAuth, authControllerLogout, authControllerMe, authControllerRefresh, chatMessagesControllerDeleteMessage, chatMessagesControllerGetMessages, documentsControllerDeleteFile, documentsControllerGetFile, documentsControllerGetFiles, documentsControllerIngest, knowledgeHubsControllerCreate, knowledgeHubsControllerFindAll, knowledgeHubsControllerFindOne, knowledgeHubsControllerRemove, knowledgeHubsControllerUpdate, type Options, queryControllerQuery } from '../sdk.gen';
+import type { AuthControllerGoogleAuthData, AuthControllerLogoutData, AuthControllerLogoutResponse, AuthControllerMeData, AuthControllerMeResponse, AuthControllerRefreshData, AuthControllerRefreshResponse, ChatMessagesControllerDeleteMessageData, ChatMessagesControllerGetMessagesData, ChatMessagesControllerGetMessagesResponse, DocumentsControllerDeleteFileData, DocumentsControllerGetFileData, DocumentsControllerGetFileResponse, DocumentsControllerGetFilesData, DocumentsControllerGetFilesResponse, DocumentsControllerIngestData, DocumentsControllerIngestResponse, KnowledgeHubsControllerCreateData, KnowledgeHubsControllerCreateResponse, KnowledgeHubsControllerFindAllData, KnowledgeHubsControllerFindAllResponse, KnowledgeHubsControllerFindOneData, KnowledgeHubsControllerFindOneResponse, KnowledgeHubsControllerRemoveData, KnowledgeHubsControllerUpdateData, KnowledgeHubsControllerUpdateResponse, QueryControllerQueryData, QueryControllerQueryResponse } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
     Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
@@ -285,14 +285,14 @@ export const queryControllerQueryMutation = (options?: Partial<Options<QueryCont
     return mutationOptions;
 };
 
-export const conversationsControllerGetMessagesQueryKey = (options: Options<ConversationsControllerGetMessagesData>) => createQueryKey('conversationsControllerGetMessages', options);
+export const chatMessagesControllerGetMessagesQueryKey = (options: Options<ChatMessagesControllerGetMessagesData>) => createQueryKey('chatMessagesControllerGetMessages', options);
 
 /**
  * Get all messages in the knowledge hub chat thread
  */
-export const conversationsControllerGetMessagesOptions = (options: Options<ConversationsControllerGetMessagesData>) => queryOptions<ConversationsControllerGetMessagesResponse, DefaultError, ConversationsControllerGetMessagesResponse, ReturnType<typeof conversationsControllerGetMessagesQueryKey>>({
+export const chatMessagesControllerGetMessagesOptions = (options: Options<ChatMessagesControllerGetMessagesData>) => queryOptions<ChatMessagesControllerGetMessagesResponse, DefaultError, ChatMessagesControllerGetMessagesResponse, ReturnType<typeof chatMessagesControllerGetMessagesQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await conversationsControllerGetMessages({
+        const { data } = await chatMessagesControllerGetMessages({
             ...options,
             ...queryKey[0],
             signal,
@@ -300,224 +300,16 @@ export const conversationsControllerGetMessagesOptions = (options: Options<Conve
         });
         return data;
     },
-    queryKey: conversationsControllerGetMessagesQueryKey(options)
+    queryKey: chatMessagesControllerGetMessagesQueryKey(options)
 });
 
 /**
  * Delete a specific message from knowledge hub thread
  */
-export const conversationsControllerDeleteMessageMutation = (options?: Partial<Options<ConversationsControllerDeleteMessageData>>): UseMutationOptions<unknown, DefaultError, Options<ConversationsControllerDeleteMessageData>> => {
-    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<ConversationsControllerDeleteMessageData>> = {
+export const chatMessagesControllerDeleteMessageMutation = (options?: Partial<Options<ChatMessagesControllerDeleteMessageData>>): UseMutationOptions<unknown, DefaultError, Options<ChatMessagesControllerDeleteMessageData>> => {
+    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<ChatMessagesControllerDeleteMessageData>> = {
         mutationFn: async (fnOptions) => {
-            const { data } = await conversationsControllerDeleteMessage({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-export const notesControllerFindAllQueryKey = (options: Options<NotesControllerFindAllData>) => createQueryKey('notesControllerFindAll', options);
-
-/**
- * List notes in a knowledge hub
- */
-export const notesControllerFindAllOptions = (options: Options<NotesControllerFindAllData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof notesControllerFindAllQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await notesControllerFindAll({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: notesControllerFindAllQueryKey(options)
-});
-
-/**
- * Create a manual note
- */
-export const notesControllerCreateMutation = (options?: Partial<Options<NotesControllerCreateData>>): UseMutationOptions<unknown, DefaultError, Options<NotesControllerCreateData>> => {
-    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<NotesControllerCreateData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await notesControllerCreate({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-/**
- * Delete a note
- */
-export const notesControllerRemoveMutation = (options?: Partial<Options<NotesControllerRemoveData>>): UseMutationOptions<unknown, DefaultError, Options<NotesControllerRemoveData>> => {
-    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<NotesControllerRemoveData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await notesControllerRemove({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-export const notesControllerFindOneQueryKey = (options: Options<NotesControllerFindOneData>) => createQueryKey('notesControllerFindOne', options);
-
-/**
- * Get a note by ID
- */
-export const notesControllerFindOneOptions = (options: Options<NotesControllerFindOneData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof notesControllerFindOneQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await notesControllerFindOne({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: notesControllerFindOneQueryKey(options)
-});
-
-/**
- * Update a note
- */
-export const notesControllerUpdateMutation = (options?: Partial<Options<NotesControllerUpdateData>>): UseMutationOptions<unknown, DefaultError, Options<NotesControllerUpdateData>> => {
-    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<NotesControllerUpdateData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await notesControllerUpdate({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-/**
- * Generate a note from contextual input
- */
-export const notesControllerGenerateMutation = (options?: Partial<Options<NotesControllerGenerateData>>): UseMutationOptions<unknown, DefaultError, Options<NotesControllerGenerateData>> => {
-    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<NotesControllerGenerateData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await notesControllerGenerate({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-export const flashcardsControllerFindAllQueryKey = (options: Options<FlashcardsControllerFindAllData>) => createQueryKey('flashcardsControllerFindAll', options);
-
-/**
- * List flashcards in a knowledge hub
- */
-export const flashcardsControllerFindAllOptions = (options: Options<FlashcardsControllerFindAllData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof flashcardsControllerFindAllQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await flashcardsControllerFindAll({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: flashcardsControllerFindAllQueryKey(options)
-});
-
-/**
- * Create a manual flashcard
- */
-export const flashcardsControllerCreateMutation = (options?: Partial<Options<FlashcardsControllerCreateData>>): UseMutationOptions<unknown, DefaultError, Options<FlashcardsControllerCreateData>> => {
-    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<FlashcardsControllerCreateData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await flashcardsControllerCreate({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-/**
- * Delete a flashcard
- */
-export const flashcardsControllerRemoveMutation = (options?: Partial<Options<FlashcardsControllerRemoveData>>): UseMutationOptions<unknown, DefaultError, Options<FlashcardsControllerRemoveData>> => {
-    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<FlashcardsControllerRemoveData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await flashcardsControllerRemove({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-export const flashcardsControllerFindOneQueryKey = (options: Options<FlashcardsControllerFindOneData>) => createQueryKey('flashcardsControllerFindOne', options);
-
-/**
- * Get a flashcard by ID
- */
-export const flashcardsControllerFindOneOptions = (options: Options<FlashcardsControllerFindOneData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof flashcardsControllerFindOneQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await flashcardsControllerFindOne({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: flashcardsControllerFindOneQueryKey(options)
-});
-
-/**
- * Update a flashcard
- */
-export const flashcardsControllerUpdateMutation = (options?: Partial<Options<FlashcardsControllerUpdateData>>): UseMutationOptions<unknown, DefaultError, Options<FlashcardsControllerUpdateData>> => {
-    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<FlashcardsControllerUpdateData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await flashcardsControllerUpdate({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-/**
- * Generate flashcards from contextual input
- */
-export const flashcardsControllerGenerateMutation = (options?: Partial<Options<FlashcardsControllerGenerateData>>): UseMutationOptions<unknown, DefaultError, Options<FlashcardsControllerGenerateData>> => {
-    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<FlashcardsControllerGenerateData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await flashcardsControllerGenerate({
+            const { data } = await chatMessagesControllerDeleteMessage({
                 ...options,
                 ...fnOptions,
                 throwOnError: true

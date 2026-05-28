@@ -15,7 +15,7 @@ import {
   ApiCookieAuth,
   ApiParam,
 } from '@nestjs/swagger';
-import { ConversationsService } from '../services/conversations.service';
+import { ChatThreadService } from '../services/chat-thread.service';
 import { JwtCookieGuard } from '../../auth/guards/jwt-cookie.guard';
 import { KnowledgeHubAccessGuard } from '../../knowledge-hubs/guards/knowledge-hub-access.guard';
 import type { KnowledgeHubRequest } from '../../auth/types/auth.types';
@@ -26,8 +26,8 @@ import { ChatMessageResponseDto } from '../dtos/chat-message.dto';
 @Controller('knowledge-hubs/:hubId/chat')
 @ApiParam({ name: 'hubId', description: 'Knowledge Hub ID', type: String })
 @UseGuards(JwtCookieGuard, KnowledgeHubAccessGuard)
-export class ConversationsController {
-  constructor(private readonly conversationsService: ConversationsService) {}
+export class ChatMessagesController {
+  constructor(private readonly chatThreadService: ChatThreadService) {}
 
   @Get('messages')
   @ApiOperation({
@@ -42,7 +42,7 @@ export class ConversationsController {
   async getMessages(
     @Req() req: KnowledgeHubRequest,
   ): Promise<ChatMessageResponseDto[]> {
-    const thread = await this.conversationsService.getThreadByKnowledgeHubId(
+    const thread = await this.chatThreadService.getThreadByKnowledgeHubId(
       req.knowledgeHub.id,
     );
 
@@ -50,7 +50,7 @@ export class ConversationsController {
       return [];
     }
 
-    return this.conversationsService.getMessagesByThread(thread.id);
+    return this.chatThreadService.getMessagesByThread(thread.id);
   }
 
   @Delete('messages/:messageId')
@@ -65,7 +65,7 @@ export class ConversationsController {
     @Req() req: KnowledgeHubRequest,
     @Param('messageId', ParseUUIDPipe) messageId: string,
   ): Promise<{ success: boolean }> {
-    const thread = await this.conversationsService.getThreadByKnowledgeHubId(
+    const thread = await this.chatThreadService.getThreadByKnowledgeHubId(
       req.knowledgeHub.id,
     );
 
@@ -73,7 +73,7 @@ export class ConversationsController {
       throw new NotFoundException('Message not found');
     }
 
-    const deleted = await this.conversationsService.deleteMessageByThread(
+    const deleted = await this.chatThreadService.deleteMessageByThread(
       messageId,
       thread.id,
     );
