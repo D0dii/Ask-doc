@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { useAuth } from "@/features/auth/auth-provider";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,7 +24,7 @@ const FEATURES = [
 ] as const;
 
 export function HomePage() {
-  const { isLoading, isAuthenticated, login } = useAuth();
+  const { user, isLoading, isAuthenticated, login } = useAuth();
 
   if (isLoading) {
     return (
@@ -36,47 +37,54 @@ export function HomePage() {
     );
   }
 
-  if (!isAuthenticated) {
+  if (isAuthenticated) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-57px)] px-4">
-        <div className="max-w-3xl mx-auto text-center space-y-8">
-          <div className="space-y-4">
-            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-              Ask questions about your documents
+        <div className="max-w-lg mx-auto text-center space-y-6">
+          <div className="space-y-2">
+            <h1 className="text-3xl font-semibold tracking-tight">
+              Welcome back{user?.firstName ? `, ${user.firstName}` : ""}!
             </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Upload your PDF documents and use AI to extract insights, answer questions, and find information
-              instantly.
-            </p>
+            <p className="text-muted-foreground">Open a workspace to upload documents and chat.</p>
           </div>
-
-          <Button onClick={login} size="lg" className="text-base">
-            Get Started with Google
+          <Button asChild size="lg">
+            <Link to="/workspaces">Go to Workspaces</Link>
           </Button>
-
-          <div className="grid gap-6 sm:grid-cols-3 pt-8">
-            {FEATURES.map((feature) => (
-              <Card key={feature.title} className="text-left">
-                <CardHeader className="pb-3">
-                  <feature.icon className="h-8 w-8 text-primary mb-2" />
-                  <CardTitle className="text-base">{feature.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription>{feature.description}</CardDescription>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Welcome back!</h1>
-        <p className="text-muted-foreground">Select a workspace from the sidebar to get started.</p>
+    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-57px)] px-4">
+      <div className="max-w-3xl mx-auto text-center space-y-8">
+        <div className="space-y-4">
+          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
+            Ask questions about your documents
+          </h1>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Upload your PDF documents and use AI to extract insights, answer questions, and find information
+            instantly.
+          </p>
+        </div>
+
+        <Button onClick={login} size="lg" className="text-base">
+          Get Started with Google
+        </Button>
+
+        <div className="grid gap-6 sm:grid-cols-3 pt-8">
+          {FEATURES.map((feature) => (
+            <Card key={feature.title} className="text-left">
+              <CardHeader className="pb-3">
+                <feature.icon className="h-8 w-8 text-primary mb-2" />
+                <CardTitle className="text-base">{feature.title}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription>{feature.description}</CardDescription>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
     </div>
   );
