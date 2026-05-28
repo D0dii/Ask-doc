@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useMessages } from "../api/get-messages";
 import { useAskQuestion } from "../api/ask-question";
 import { ChatMessageItem } from "./chat-message-item";
@@ -24,14 +24,14 @@ export function ChatPanel({ hubId }: { hubId: string }) {
     }
   }, [messages.length, queryMutation.isPending]);
 
-  const handleAsk = useCallback(() => {
+  const handleAsk = () => {
     const trimmed = question.trim();
     if (!trimmed) return;
 
     queryMutation.mutate(trimmed, {
       onSuccess: () => setQuestion(""),
     });
-  }, [question, queryMutation]);
+  };
 
   return (
     <Card className="flex flex-col min-h-150">

@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { useCreateWorkspace } from "../api/create-workspace";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,11 +8,11 @@ export function CreateWorkspaceForm() {
   const [newWorkspaceName, setNewWorkspaceName] = useState("");
   const createMutation = useCreateWorkspace();
 
-  const handleCreate = useCallback(() => {
+  const handleCreate = () => {
     if (newWorkspaceName.trim()) {
       createMutation.mutate({ name: newWorkspaceName.trim() }, { onSuccess: () => setNewWorkspaceName("") });
     }
-  }, [newWorkspaceName, createMutation]);
+  };
 
   return (
     <div className="flex gap-2">

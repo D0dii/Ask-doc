@@ -1,4 +1,3 @@
-import { useCallback } from "react";
 import { useWorkspaces } from "../api/get-workspaces";
 import { useDeleteWorkspace } from "../api/delete-workspace";
 import { WorkspaceCard } from "./workspace-card";
@@ -10,12 +9,9 @@ export function WorkspaceList() {
   const { workspaces, isLoading } = useWorkspaces();
   const deleteMutation = useDeleteWorkspace();
 
-  const handleDelete = useCallback(
-    (workspaceId: string) => {
-      deleteMutation.mutate(workspaceId);
-    },
-    [deleteMutation],
-  );
+  const handleDelete = (workspaceId: string) => {
+    deleteMutation.mutate(workspaceId);
+  };
 
   if (isLoading) {
     return (

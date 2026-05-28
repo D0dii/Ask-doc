@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState } from "react";
 import { useUploadFile } from "../api/upload-file";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,11 +10,11 @@ export function FileUpload({ workspaceId }: { workspaceId: string }) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const uploadMutation = useUploadFile(workspaceId);
 
-  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedFile(e.target.files?.[0] || null);
-  }, []);
+  };
 
-  const handleUpload = useCallback(() => {
+  const handleUpload = () => {
     if (selectedFile) {
       uploadMutation.mutate(selectedFile, {
         onSuccess: () => {
@@ -23,7 +23,7 @@ export function FileUpload({ workspaceId }: { workspaceId: string }) {
         },
       });
     }
-  }, [selectedFile, uploadMutation]);
+  };
 
   return (
     <Card>
